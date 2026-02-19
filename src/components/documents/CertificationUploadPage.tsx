@@ -182,7 +182,7 @@ export default function CertificationUploadPage({
                   Remove
                 </Button>
                 <label className="cursor-pointer">
-                  <Button variant="ghost" size="sm" as="span">
+                  <Button variant="ghost" size="sm">
                     Replace
                   </Button>
                   <input
@@ -209,7 +209,7 @@ export default function CertificationUploadPage({
             
             <div className="flex items-center justify-center gap-3">
               <label className="cursor-pointer">
-                <Button variant="primary" leftIcon={<Upload className="w-4 h-4" />} as="span">
+                <Button variant="primary" leftIcon={<Upload className="w-4 h-4" />}>
                   Upload File
                 </Button>
                 <input
@@ -221,7 +221,7 @@ export default function CertificationUploadPage({
               </label>
               
               <label className="cursor-pointer">
-                <Button variant="outline" leftIcon={<Camera className="w-4 h-4" />} as="span">
+                <Button variant="outline" leftIcon={<Camera className="w-4 h-4" />}>
                   Take Photo
                 </Button>
                 <input
