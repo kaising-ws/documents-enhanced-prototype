@@ -15,10 +15,13 @@
  */
 export type TrackingMode = 'progress' | 'compliance' | 'issuance'
 
+export type TemplateCategory = 'signing' | 'write-up' | 'certification' | 'custom-form'
+
 export interface DocumentTemplate {
   id: string
   name: string
-  type: 'Payroll' | 'Onboarding' | 'Certifications' | 'Write-ups'
+  category: TemplateCategory
+  type: string            // user-defined type e.g. "Onboarding", "Payroll", "Operations"
   trackingMode: TrackingMode
 
   /** Universal assignment statistics — interpretation depends on trackingMode */
@@ -38,7 +41,7 @@ export interface DocumentRecipient {
   name: string
   role: string
   location: string
-  status: 'completed' | 'pending' | 'collecting' | 'expiring' | 'expired' | 'assigned' | 'pending_verification'
+  status: 'completed' | 'pending' | 'collecting' | 'expiring' | 'expired' | 'assigned' | 'pending_verification' | 'refused'
   statusText: string
   completedDate?: string
   lastAssignedDate: string
@@ -173,20 +176,21 @@ export interface WriteUp {
 }
 
 export const documentTemplates: DocumentTemplate[] = [
-  // ─── Payroll ───
+  // ─── Signing ───
   {
     id: '1',
     name: 'PIPL_consent_form.pdf',
+    category: 'signing',
     type: 'Payroll',
     trackingMode: 'progress',
     stats: { total: 27, completed: 19, attention: 8 },
     createdAt: '2024-01-15',
     createdAtFormatted: 'Jan 15, 2024',
   },
-  // ─── Onboarding ───
   {
     id: '2',
     name: 'Contract.pdf',
+    category: 'signing',
     type: 'Onboarding',
     trackingMode: 'progress',
     stats: { total: 24, completed: 24, attention: 0 },
@@ -196,6 +200,7 @@ export const documentTemplates: DocumentTemplate[] = [
   {
     id: '3',
     name: 'VFS_consent_form.pdf',
+    category: 'signing',
     type: 'Onboarding',
     trackingMode: 'progress',
     stats: { total: 22, completed: 9, attention: 13 },
@@ -205,17 +210,19 @@ export const documentTemplates: DocumentTemplate[] = [
   {
     id: '5',
     name: 'Employee_Handbook_2024.pdf',
+    category: 'signing',
     type: 'Onboarding',
     trackingMode: 'progress',
     stats: { total: 30, completed: 27, attention: 3 },
     createdAt: '2024-01-01',
     createdAtFormatted: 'Jan 1, 2024',
   },
-  // ─── Certifications ───
+  // ─── Certification ───
   {
     id: 'cert-1',
     name: 'Food Handler Certificate',
-    type: 'Certifications',
+    category: 'certification',
+    type: 'Compliance',
     trackingMode: 'compliance',
     stats: { total: 26, completed: 15, attention: 11, expired: 3 },
     createdAt: '2024-01-01',
@@ -224,7 +231,8 @@ export const documentTemplates: DocumentTemplate[] = [
   {
     id: 'cert-2',
     name: 'TIPS Alcohol Certification',
-    type: 'Certifications',
+    category: 'certification',
+    type: 'Compliance',
     trackingMode: 'compliance',
     stats: { total: 21, completed: 5, attention: 16, expired: 4 },
     createdAt: '2024-03-12',
@@ -233,7 +241,8 @@ export const documentTemplates: DocumentTemplate[] = [
   {
     id: 'cert-3',
     name: "Driver's License",
-    type: 'Certifications',
+    category: 'certification',
+    type: 'Operations',
     trackingMode: 'compliance',
     stats: { total: 23, completed: 17, attention: 6, expired: 1 },
     createdAt: '2024-02-20',
@@ -242,7 +251,8 @@ export const documentTemplates: DocumentTemplate[] = [
   {
     id: 'cert-4',
     name: 'Work Authorization',
-    type: 'Certifications',
+    category: 'certification',
+    type: 'Compliance',
     trackingMode: 'compliance',
     stats: { total: 25, completed: 9, attention: 16, expired: 4 },
     createdAt: '2024-01-01',
@@ -251,17 +261,19 @@ export const documentTemplates: DocumentTemplate[] = [
   {
     id: 'cert-5',
     name: 'Manager Food Safety Certification',
-    type: 'Certifications',
+    category: 'certification',
+    type: 'Safety',
     trackingMode: 'compliance',
     stats: { total: 20, completed: 18, attention: 2, expired: 0 },
     createdAt: '2024-06-01',
     createdAtFormatted: 'Jun 1, 2024',
   },
-  // ─── Write-ups ───
+  // ─── Write-up ───
   {
     id: 'wu-1',
     name: 'Standard Verbal Warning',
-    type: 'Write-ups',
+    category: 'write-up',
+    type: 'Performance',
     trackingMode: 'issuance',
     stats: { total: 28, completed: 22, attention: 6 },
     createdAt: '2024-01-01',
@@ -270,7 +282,8 @@ export const documentTemplates: DocumentTemplate[] = [
   {
     id: 'wu-2',
     name: 'Written Warning',
-    type: 'Write-ups',
+    category: 'write-up',
+    type: 'Performance',
     trackingMode: 'issuance',
     stats: { total: 20, completed: 5, attention: 15 },
     createdAt: '2024-01-20',
@@ -279,7 +292,8 @@ export const documentTemplates: DocumentTemplate[] = [
   {
     id: 'wu-3',
     name: 'Final Warning',
-    type: 'Write-ups',
+    category: 'write-up',
+    type: 'Performance',
     trackingMode: 'issuance',
     stats: { total: 23, completed: 16, attention: 7 },
     createdAt: '2024-01-28',
@@ -288,7 +302,8 @@ export const documentTemplates: DocumentTemplate[] = [
   {
     id: 'wu-4',
     name: 'Performance Improvement Plan',
-    type: 'Write-ups',
+    category: 'write-up',
+    type: 'Performance',
     trackingMode: 'issuance',
     stats: { total: 25, completed: 10, attention: 15 },
     createdAt: '2024-02-01',
@@ -297,11 +312,33 @@ export const documentTemplates: DocumentTemplate[] = [
   {
     id: 'wu-5',
     name: 'Employee Recognition',
-    type: 'Write-ups',
+    category: 'write-up',
+    type: 'Minor',
     trackingMode: 'issuance',
     stats: { total: 30, completed: 28, attention: 2 },
     createdAt: '2024-01-22',
     createdAtFormatted: 'Jan 22, 2024',
+  },
+  // ─── Custom Form ───
+  {
+    id: 'cf-1',
+    name: 'New Hire Checklist',
+    category: 'custom-form',
+    type: 'Onboarding',
+    trackingMode: 'progress',
+    stats: { total: 22, completed: 18, attention: 4 },
+    createdAt: '2024-04-10',
+    createdAtFormatted: 'Apr 10, 2024',
+  },
+  {
+    id: 'cf-2',
+    name: 'Safety Incident Report',
+    category: 'custom-form',
+    type: 'Safety',
+    trackingMode: 'issuance',
+    stats: { total: 12, completed: 10, attention: 2 },
+    createdAt: '2024-05-05',
+    createdAtFormatted: 'May 5, 2024',
   },
 ]
 
@@ -394,6 +431,7 @@ function makeRecipients(
   return EMPLOYEES.slice(0, count).map((emp, i) => {
     const status = statuses[i % statuses.length]
     const isCompleted = status === 'completed'
+    const isRefused = status === 'refused'
     const isExpired = status === 'expired'
     const isExpiring = status === 'expiring'
 
@@ -419,13 +457,14 @@ function makeRecipients(
       status,
       statusText:
         isCompleted ? 'Completed' :
+        isRefused ? 'Refused to sign' :
         isExpired ? 'Expired' :
         isExpiring ? 'Expiring soon' :
         isPendingVerification ? 'Pending verification' :
         status === 'collecting' ? 'Collecting signatures' :
         status === 'assigned' ? 'Assigned' :
         'Pending',
-      completedDate: isCompleted ? COMPLETED_DATES[i % COMPLETED_DATES.length] : undefined,
+      completedDate: (isCompleted || isRefused) ? COMPLETED_DATES[i % COMPLETED_DATES.length] : undefined,
       lastAssignedDate: COMPLETED_DATES[Math.max(0, (i % COMPLETED_DATES.length) - 2)],
       dueDate: !isCompleted && !isPendingVerification ? 'Mar 15, 2026' : undefined,
       expiryDate: (isExpired || isExpiring) ? EXPIRY_DATES[i % EXPIRY_DATES.length] : undefined,
@@ -468,9 +507,10 @@ function complianceStatuses(completed: number, attention: number, expired: numbe
 }
 
 // ── Issuance-mode status distributions ──
-function issuanceStatuses(completed: number, attention: number): RecipientStatusType[] {
+function issuanceStatuses(completed: number, attention: number, refused: number = 0): RecipientStatusType[] {
   const arr: RecipientStatusType[] = []
   for (let i = 0; i < completed; i++) arr.push('completed')
+  for (let i = 0; i < refused; i++) arr.push('refused')
   for (let i = 0; i < attention; i++) arr.push('pending')
   return arr
 }
@@ -511,7 +551,7 @@ export const documentDetails: Record<string, DocumentDetail> = {
   'cert-1': {
     id: 'cert-1',
     name: 'Food Handler Certificate',
-    type: 'Certifications',
+    type: 'Compliance',
     createdAt: 'Jan 1, 2024',
     recipients: makeRecipients('cert1', 26, complianceStatuses(15, 4, 3, 4)),
     assignmentHistory: makeHistory('cert1', 26, 15),
@@ -519,7 +559,7 @@ export const documentDetails: Record<string, DocumentDetail> = {
   'cert-2': {
     id: 'cert-2',
     name: 'TIPS Alcohol Certification',
-    type: 'Certifications',
+    type: 'Compliance',
     createdAt: 'Mar 12, 2024',
     recipients: makeRecipients('cert2', 21, complianceStatuses(5, 6, 4, 6)),
     assignmentHistory: makeHistory('cert2', 21, 5),
@@ -527,7 +567,7 @@ export const documentDetails: Record<string, DocumentDetail> = {
   'cert-3': {
     id: 'cert-3',
     name: "Driver's License",
-    type: 'Certifications',
+    type: 'Operations',
     createdAt: 'Feb 20, 2024',
     recipients: makeRecipients('cert3', 23, complianceStatuses(17, 2, 1, 3)),
     assignmentHistory: makeHistory('cert3', 23, 17),
@@ -535,7 +575,7 @@ export const documentDetails: Record<string, DocumentDetail> = {
   'cert-4': {
     id: 'cert-4',
     name: 'Work Authorization',
-    type: 'Certifications',
+    type: 'Compliance',
     createdAt: 'Jan 1, 2024',
     recipients: makeRecipients('cert4', 25, complianceStatuses(9, 7, 4, 5)),
     assignmentHistory: makeHistory('cert4', 25, 9),
@@ -543,7 +583,7 @@ export const documentDetails: Record<string, DocumentDetail> = {
   'cert-5': {
     id: 'cert-5',
     name: 'Manager Food Safety Certification',
-    type: 'Certifications',
+    type: 'Safety',
     createdAt: 'Jun 1, 2024',
     recipients: makeRecipients('cert5', 20, complianceStatuses(18, 0, 0, 2)),
     assignmentHistory: makeHistory('cert5', 20, 18),
@@ -551,42 +591,58 @@ export const documentDetails: Record<string, DocumentDetail> = {
   'wu-1': {
     id: 'wu-1',
     name: 'Standard Verbal Warning',
-    type: 'Write-ups',
+    type: 'Performance',
     createdAt: 'Jan 1, 2024',
-    recipients: makeRecipients('wu1', 28, issuanceStatuses(22, 6)),
+    recipients: makeRecipients('wu1', 28, issuanceStatuses(19, 6, 3)),
     assignmentHistory: makeHistory('wu1', 28, 22),
   },
   'wu-2': {
     id: 'wu-2',
     name: 'Written Warning',
-    type: 'Write-ups',
+    type: 'Performance',
     createdAt: 'Jan 20, 2024',
-    recipients: makeRecipients('wu2', 20, issuanceStatuses(5, 15)),
+    recipients: makeRecipients('wu2', 20, issuanceStatuses(3, 15, 2)),
     assignmentHistory: makeHistory('wu2', 20, 5),
   },
   'wu-3': {
     id: 'wu-3',
     name: 'Final Warning',
-    type: 'Write-ups',
+    type: 'Performance',
     createdAt: 'Jan 28, 2024',
-    recipients: makeRecipients('wu3', 23, issuanceStatuses(16, 7)),
+    recipients: makeRecipients('wu3', 23, issuanceStatuses(14, 7, 2)),
     assignmentHistory: makeHistory('wu3', 23, 16),
   },
   'wu-4': {
     id: 'wu-4',
     name: 'Performance Improvement Plan',
-    type: 'Write-ups',
+    type: 'Performance',
     createdAt: 'Feb 1, 2024',
-    recipients: makeRecipients('wu4', 25, issuanceStatuses(10, 15)),
+    recipients: makeRecipients('wu4', 25, issuanceStatuses(8, 15, 2)),
     assignmentHistory: makeHistory('wu4', 25, 10),
   },
   'wu-5': {
     id: 'wu-5',
     name: 'Employee Recognition',
-    type: 'Write-ups',
+    type: 'Minor',
     createdAt: 'Jan 22, 2024',
-    recipients: makeRecipients('wu5', 30, issuanceStatuses(28, 2)),
+    recipients: makeRecipients('wu5', 30, issuanceStatuses(27, 2, 1)),
     assignmentHistory: makeHistory('wu5', 30, 28),
+  },
+  'cf-1': {
+    id: 'cf-1',
+    name: 'New Hire Checklist',
+    type: 'Onboarding',
+    createdAt: 'Apr 10, 2024',
+    recipients: makeRecipients('cf1', 22, progressStatuses(18, 4)),
+    assignmentHistory: makeHistory('cf1', 22, 18),
+  },
+  'cf-2': {
+    id: 'cf-2',
+    name: 'Safety Incident Report',
+    type: 'Safety',
+    createdAt: 'May 5, 2024',
+    recipients: makeRecipients('cf2', 12, issuanceStatuses(10, 2)),
+    assignmentHistory: makeHistory('cf2', 12, 10),
   },
 }
 
@@ -740,9 +796,11 @@ export const teamMembers: TeamMember[] = [
 export const documentTypes = [
   'Payroll',
   'Onboarding',
-  'Certifications',
-  'Write-ups',
+  'Operations',
+  'Compliance',
   'Performance',
+  'Safety',
+  'Minor',
   'Company Policy',
 ]
 
@@ -773,73 +831,31 @@ export const roles = [
   { id: 'admin', name: 'Admin' },
 ]
 
-// Write-up Templates
+// Write-up Templates — two templates
 export const writeUpTemplates: WriteUpTemplate[] = [
   {
-    id: 'wt1',
-    title: 'Standard Verbal Warning',
-    type: 'verbal-warning',
-    description: 'First-level warning for minor infractions',
-    managerSigns: true,
-    workerSigns: true,
-    allowDecline: true,
-    escalationDays: 7,
-    permissions: { locations: [], roles: [] },
-    status: 'active',
-    createdAt: '2024-01-01',
-    createdBy: 'Admin',
-  },
-  {
-    id: 'wt2',
-    title: 'Written Warning',
+    id: 'wt-mgmt',
+    title: 'Management Write-up',
     type: 'written-warning',
-    description: 'Second-level warning for repeated or moderate infractions',
+    description: 'Write-up template used by management for performance and conduct issues',
     managerSigns: true,
     workerSigns: true,
-    allowDecline: true,
+    allowDecline: false,
     escalationDays: 7,
-    permissions: { locations: [], roles: [] },
-    status: 'active',
-    createdAt: '2024-01-01',
-    createdBy: 'Admin',
-  },
-  {
-    id: 'wt3',
-    title: 'Final Warning',
-    type: 'final-warning',
-    description: 'Last warning before termination consideration',
-    managerSigns: true,
-    workerSigns: true,
-    allowDecline: true,
-    escalationDays: 5,
     permissions: { locations: [], roles: ['manager', 'hr'] },
     status: 'active',
     createdAt: '2024-01-01',
     createdBy: 'Admin',
   },
   {
-    id: 'wt4',
-    title: 'Performance Improvement Plan',
-    type: 'performance-improvement',
-    description: 'Structured improvement plan with goals and timeline',
+    id: 'wt-worker',
+    title: 'Worker Write-up',
+    type: 'verbal-warning',
+    description: 'Standard write-up for frontline team member incidents',
     managerSigns: true,
     workerSigns: true,
     allowDecline: false,
-    escalationDays: 14,
-    permissions: { locations: [], roles: ['manager', 'hr'] },
-    status: 'active',
-    createdAt: '2024-01-01',
-    createdBy: 'Admin',
-  },
-  {
-    id: 'wt5',
-    title: 'Employee Recognition',
-    type: 'recognition',
-    description: 'Document outstanding performance or achievement',
-    managerSigns: true,
-    workerSigns: false,
-    allowDecline: false,
-    escalationDays: 30,
+    escalationDays: 7,
     permissions: { locations: [], roles: [] },
     status: 'active',
     createdAt: '2024-01-01',
@@ -847,11 +863,11 @@ export const writeUpTemplates: WriteUpTemplate[] = [
   },
 ]
 
-// Sample Write-ups (instances)
+// Sample Write-ups (instances) — referencing the two templates
 export const writeUps: WriteUp[] = [
   {
     id: 'wu1',
-    templateId: 'wt1',
+    templateId: 'wt-worker',
     employeeId: '3',
     employeeName: 'Mike Williams',
     employeeRole: 'Cook',
@@ -865,15 +881,8 @@ export const writeUps: WriteUp[] = [
     status: 'acknowledged',
     sentDate: '2024-01-15',
     acknowledgedDate: '2024-01-16',
-    managerSignature: {
-      signedBy: 'Sarah Johnson',
-      signedAt: '2024-01-15T10:30:00',
-    },
-    employeeSignature: {
-      signedBy: 'Mike Williams',
-      signedAt: '2024-01-16T09:15:00',
-      declined: false,
-    },
+    managerSignature: { signedBy: 'Sarah Johnson', signedAt: '2024-01-15T10:30:00' },
+    employeeSignature: { signedBy: 'Mike Williams', signedAt: '2024-01-16T09:15:00', declined: false },
     escalationDays: 7,
     remindersSent: 0,
     createdBy: 'Sarah Johnson',
@@ -882,7 +891,7 @@ export const writeUps: WriteUp[] = [
   },
   {
     id: 'wu2',
-    templateId: 'wt2',
+    templateId: 'wt-mgmt',
     employeeId: '1',
     employeeName: 'John Smith',
     employeeRole: 'Server',
@@ -895,10 +904,7 @@ export const writeUps: WriteUp[] = [
     points: 2,
     status: 'sent',
     sentDate: '2024-01-20',
-    managerSignature: {
-      signedBy: 'Sarah Johnson',
-      signedAt: '2024-01-20T18:00:00',
-    },
+    managerSignature: { signedBy: 'Sarah Johnson', signedAt: '2024-01-20T18:00:00' },
     escalationDays: 7,
     remindersSent: 1,
     lastReminderDate: '2024-01-25',
@@ -908,7 +914,7 @@ export const writeUps: WriteUp[] = [
   },
   {
     id: 'wu3',
-    templateId: 'wt1',
+    templateId: 'wt-worker',
     employeeId: '4',
     employeeName: 'Emily Davis',
     employeeRole: 'Bartender',
@@ -921,16 +927,8 @@ export const writeUps: WriteUp[] = [
     points: 1,
     status: 'refused',
     sentDate: '2024-01-18',
-    managerSignature: {
-      signedBy: 'Manager Alex',
-      signedAt: '2024-01-18T11:00:00',
-    },
-    employeeSignature: {
-      signedBy: 'Emily Davis',
-      signedAt: '2024-01-25T14:30:00',
-      declined: true,
-      declineReason: 'I was not informed about the shoe policy change.',
-    },
+    managerSignature: { signedBy: 'Manager Alex', signedAt: '2024-01-18T11:00:00' },
+    employeeSignature: { signedBy: 'Emily Davis', signedAt: '2024-01-25T14:30:00', declined: true, declineReason: 'I was not informed about the shoe policy change.' },
     escalationDays: 7,
     remindersSent: 2,
     lastReminderDate: '2024-01-24',
@@ -940,7 +938,7 @@ export const writeUps: WriteUp[] = [
   },
   {
     id: 'wu4',
-    templateId: 'wt5',
+    templateId: 'wt-mgmt',
     employeeId: '2',
     employeeName: 'Sarah Johnson',
     employeeRole: 'Manager',
@@ -953,10 +951,7 @@ export const writeUps: WriteUp[] = [
     status: 'acknowledged',
     sentDate: '2024-01-22',
     acknowledgedDate: '2024-01-22',
-    managerSignature: {
-      signedBy: 'Regional Manager',
-      signedAt: '2024-01-22T16:00:00',
-    },
+    managerSignature: { signedBy: 'Regional Manager', signedAt: '2024-01-22T16:00:00' },
     escalationDays: 30,
     remindersSent: 0,
     createdBy: 'Regional Manager',
@@ -965,7 +960,7 @@ export const writeUps: WriteUp[] = [
   },
   {
     id: 'wu5',
-    templateId: 'wt3',
+    templateId: 'wt-mgmt',
     employeeId: '5',
     employeeName: 'Chris Brown',
     employeeRole: 'Host',
@@ -977,10 +972,7 @@ export const writeUps: WriteUp[] = [
     managerNotes: 'Employee has been informed this is their final warning. Any further attendance issues will result in termination.',
     points: 3,
     status: 'draft',
-    managerSignature: {
-      signedBy: 'Sarah Johnson',
-      signedAt: '2024-01-28T09:00:00',
-    },
+    managerSignature: { signedBy: 'Sarah Johnson', signedAt: '2024-01-28T09:00:00' },
     escalationDays: 5,
     remindersSent: 0,
     createdBy: 'Sarah Johnson',
@@ -989,7 +981,7 @@ export const writeUps: WriteUp[] = [
   },
   {
     id: 'wu6',
-    templateId: 'wt4',
+    templateId: 'wt-mgmt',
     employeeId: '3',
     employeeName: 'Mike Williams',
     employeeRole: 'Cook',
@@ -1001,14 +993,151 @@ export const writeUps: WriteUp[] = [
     managerNotes: '30-day improvement plan. Weekly check-ins scheduled. Training refresher on plating standards.',
     status: 'scheduled',
     scheduledDate: '2024-02-05T09:00:00',
-    managerSignature: {
-      signedBy: 'Sarah Johnson',
-      signedAt: '2024-02-01T14:00:00',
-    },
+    managerSignature: { signedBy: 'Sarah Johnson', signedAt: '2024-02-01T14:00:00' },
     escalationDays: 14,
     remindersSent: 0,
     createdBy: 'Sarah Johnson',
     createdAt: '2024-02-01',
+    location: 'Downtown',
+  },
+  {
+    id: 'wu7',
+    templateId: 'wt-worker',
+    employeeId: '6',
+    employeeName: 'Maria Santos',
+    employeeRole: 'Server',
+    employeeLocation: 'Downtown',
+    type: 'verbal-warning',
+    title: 'Verbal Warning - Cell Phone Usage',
+    incidentDate: '2024-02-05',
+    description: 'Employee was observed using personal cell phone during service hours multiple times despite previous verbal reminders.',
+    managerNotes: 'Reiterated cell phone policy. Employee agreed to keep phone in locker during shifts.',
+    points: 1,
+    status: 'acknowledged',
+    sentDate: '2024-02-05',
+    acknowledgedDate: '2024-02-06',
+    managerSignature: { signedBy: 'Sarah Johnson', signedAt: '2024-02-05T15:00:00' },
+    employeeSignature: { signedBy: 'Maria Santos', signedAt: '2024-02-06T10:00:00', declined: false },
+    escalationDays: 7,
+    remindersSent: 0,
+    createdBy: 'Sarah Johnson',
+    createdAt: '2024-02-05',
+    location: 'Downtown',
+  },
+  {
+    id: 'wu8',
+    templateId: 'wt-worker',
+    employeeId: '7',
+    employeeName: 'James Wilson',
+    employeeRole: 'Line Cook',
+    employeeLocation: 'Midtown',
+    type: 'written-warning',
+    title: 'Written Warning - Food Safety Violation',
+    incidentDate: '2024-02-10',
+    description: 'Employee failed to properly label and date prep items, violating food safety protocols. Found unlabeled items during health inspection prep.',
+    managerNotes: 'Mandatory food safety refresher course assigned. Follow-up inspection in 2 weeks.',
+    points: 2,
+    status: 'sent',
+    sentDate: '2024-02-10',
+    managerSignature: { signedBy: 'Manager Alex', signedAt: '2024-02-10T16:00:00' },
+    escalationDays: 7,
+    remindersSent: 0,
+    createdBy: 'Manager Alex',
+    createdAt: '2024-02-10',
+    location: 'Midtown',
+  },
+  {
+    id: 'wu9',
+    templateId: 'wt-mgmt',
+    employeeId: '8',
+    employeeName: 'Priya Patel',
+    employeeRole: 'Bartender',
+    employeeLocation: 'Downtown',
+    type: 'verbal-warning',
+    title: 'Verbal Warning - Over-pouring',
+    incidentDate: '2024-02-12',
+    description: 'Inventory audit revealed consistent over-pouring on spirits. Cost variance of 8% above acceptable threshold.',
+    managerNotes: 'Re-trained on pour counts and jigger usage. Will monitor pour costs for next 30 days.',
+    points: 1,
+    status: 'acknowledged',
+    sentDate: '2024-02-12',
+    acknowledgedDate: '2024-02-13',
+    managerSignature: { signedBy: 'Sarah Johnson', signedAt: '2024-02-12T11:00:00' },
+    employeeSignature: { signedBy: 'Priya Patel', signedAt: '2024-02-13T09:30:00', declined: false },
+    escalationDays: 7,
+    remindersSent: 0,
+    createdBy: 'Sarah Johnson',
+    createdAt: '2024-02-12',
+    location: 'Downtown',
+  },
+  {
+    id: 'wu10',
+    templateId: 'wt-worker',
+    employeeId: '9',
+    employeeName: 'David Kim',
+    employeeRole: 'Server',
+    employeeLocation: 'Uptown',
+    type: 'verbal-warning',
+    title: 'Verbal Warning - Guest Complaint',
+    incidentDate: '2024-02-14',
+    description: 'Received formal guest complaint about rude interaction. Guest reported dismissive attitude when asking about allergen information.',
+    managerNotes: 'Discussed service standards and allergen awareness. Scheduled refresher training.',
+    points: 1,
+    status: 'sent',
+    sentDate: '2024-02-14',
+    managerSignature: { signedBy: 'Manager Taylor', signedAt: '2024-02-14T17:00:00' },
+    escalationDays: 7,
+    remindersSent: 1,
+    lastReminderDate: '2024-02-20',
+    createdBy: 'Manager Taylor',
+    createdAt: '2024-02-14',
+    location: 'Uptown',
+  },
+  {
+    id: 'wu11',
+    templateId: 'wt-mgmt',
+    employeeId: '10',
+    employeeName: 'Lisa Chen',
+    employeeRole: 'Shift Lead',
+    employeeLocation: 'Midtown',
+    type: 'written-warning',
+    title: 'Written Warning - Failure to Complete Closing Duties',
+    incidentDate: '2024-02-18',
+    description: 'As shift lead, failed to ensure closing checklist was completed. Health-critical items (temperature logs, sanitizer levels) were not verified.',
+    managerNotes: 'As a shift lead, accountability for closing duties is paramount. Second occurrence will result in demotion consideration.',
+    points: 2,
+    status: 'refused',
+    sentDate: '2024-02-18',
+    managerSignature: { signedBy: 'Regional Manager', signedAt: '2024-02-18T10:00:00' },
+    employeeSignature: { signedBy: 'Lisa Chen', signedAt: '2024-02-25T11:00:00', declined: true, declineReason: 'I completed the checklist but the system did not save it.' },
+    escalationDays: 7,
+    remindersSent: 2,
+    lastReminderDate: '2024-02-24',
+    createdBy: 'Regional Manager',
+    createdAt: '2024-02-18',
+    location: 'Midtown',
+  },
+  {
+    id: 'wu12',
+    templateId: 'wt-worker',
+    employeeId: '11',
+    employeeName: 'Tom Rivera',
+    employeeRole: 'Dishwasher',
+    employeeLocation: 'Downtown',
+    type: 'coaching',
+    title: 'Coaching - Workplace Communication',
+    incidentDate: '2024-02-20',
+    description: 'Observed conflict with coworker regarding task delegation. Both parties raised voices on the floor during service.',
+    managerNotes: 'Mediated conversation between both parties. Reviewed communication expectations. No further action at this time.',
+    status: 'acknowledged',
+    sentDate: '2024-02-20',
+    acknowledgedDate: '2024-02-21',
+    managerSignature: { signedBy: 'Sarah Johnson', signedAt: '2024-02-20T14:00:00' },
+    employeeSignature: { signedBy: 'Tom Rivera', signedAt: '2024-02-21T09:00:00', declined: false },
+    escalationDays: 7,
+    remindersSent: 0,
+    createdBy: 'Sarah Johnson',
+    createdAt: '2024-02-20',
     location: 'Downtown',
   },
 ]
@@ -1016,6 +1145,11 @@ export const writeUps: WriteUp[] = [
 // Helper function to get employee's write-up history
 export const getEmployeeWriteUps = (employeeId: string): WriteUp[] => {
   return writeUps.filter(wu => wu.employeeId === employeeId)
+}
+
+/** Look up write-up template title by id */
+export const getWriteUpTemplateName = (templateId: string): string => {
+  return writeUpTemplates.find(t => t.id === templateId)?.title ?? 'Unknown Template'
 }
 
 // Helper function to get employee's point balance

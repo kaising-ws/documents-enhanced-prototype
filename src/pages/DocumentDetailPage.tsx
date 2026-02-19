@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import {
   ArrowLeft,
   FileText,
@@ -17,6 +17,12 @@ import {
   RotateCcw,
   ImageIcon,
   Calendar,
+  ClipboardList,
+  Ban,
+  Filter,
+  MapPin,
+  Briefcase,
+  CircleDot,
 } from 'lucide-react'
 import SegmentedControl from '../components/ui/SegmentedControl'
 import SearchBox from '../components/ui/SearchBox'
@@ -24,11 +30,13 @@ import Button from '../components/ui/Button'
 import Checkbox from '../components/ui/Checkbox'
 import ContextMenu, { ContextMenuItem } from '../components/ui/ContextMenu'
 import { useToast } from '../components/ui/Toast'
-import { DocumentDetail, AssignmentInstance, DocumentRecipient } from '../data/mockData'
+import { DocumentDetail, AssignmentInstance, DocumentRecipient, TemplateCategory } from '../data/mockData'
 
 interface DocumentDetailPageProps {
   document: DocumentDetail
+  documentCategory?: TemplateCategory
   onBack: () => void
+  onViewAssigneeTask?: (recipient: DocumentRecipient) => void
 }
 
 const tabs = [
@@ -36,13 +44,55 @@ const tabs = [
   { id: 'history', label: 'History' },
 ]
 
-export default function DocumentDetailPage({ document, onBack }: DocumentDetailPageProps) {
+export default function DocumentDetailPage({ document, documentCategory, onBack, onViewAssigneeTask }: DocumentDetailPageProps) {
   const [activeTab, setActiveTab] = useState('status')
   const [searchQuery, setSearchQuery] = useState('')
+  const [filterLocation, setFilterLocation] = useState<string>('all')
+  const [filterRole, setFilterRole] = useState<string>('all')
+  const [filterStatus, setFilterStatus] = useState<string>('all')
   const [expandedGroups, setExpandedGroups] = useState<string[]>(
     document.assignmentHistory?.map((a) => a.id) || []
   )
   const { addToast } = useToast()
+
+  // Derive unique filter options from all recipients
+  const uniqueLocations = useMemo(
+    () => [...new Set(document.recipients.map((r) => r.location))].sort(),
+    [document.recipients]
+  )
+  const uniqueRoles = useMemo(
+    () => [...new Set(document.recipients.map((r) => r.role))].sort(),
+    [document.recipients]
+  )
+  const uniqueStatuses = useMemo(
+    () => [...new Set(document.recipients.map((r) => r.status))].sort(),
+    [document.recipients]
+  )
+
+  const statusLabel = (s: string) => {
+    const map: Record<string, string> = {
+      completed: 'Completed',
+      refused: 'Refused',
+      pending: 'Pending',
+      collecting: 'Collecting',
+      expiring: 'Expiring',
+      expired: 'Expired',
+      assigned: 'Assigned',
+      pending_verification: 'Pending verification',
+    }
+    return map[s] || s
+  }
+
+  const activeFilterCount =
+    (filterLocation !== 'all' ? 1 : 0) +
+    (filterRole !== 'all' ? 1 : 0) +
+    (filterStatus !== 'all' ? 1 : 0)
+
+  const clearAllFilters = () => {
+    setFilterLocation('all')
+    setFilterRole('all')
+    setFilterStatus('all')
+  }
 
   const toggleGroup = (groupId: string) => {
     setExpandedGroups((prev) =>
@@ -54,30 +104,31 @@ export default function DocumentDetailPage({ document, onBack }: DocumentDetailP
 
   // Filter and split recipients
   const filterRecipients = (recipients: DocumentRecipient[]) => {
-    return recipients.filter(
-      (r) =>
+    return recipients.filter((r) => {
+      const matchesSearch =
+        searchQuery === '' ||
         r.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         r.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
         r.role.toLowerCase().includes(searchQuery.toLowerCase())
-    )
+      const matchesLocation = filterLocation === 'all' || r.location === filterLocation
+      const matchesRole = filterRole === 'all' || r.role === filterRole
+      const matchesStatus = filterStatus === 'all' || r.status === filterStatus
+      return matchesSearch && matchesLocation && matchesRole && matchesStatus
+    })
   }
 
   const filteredRecipients = filterRecipients(document.recipients)
 
   // Summary stats
   const totalAssigned = document.recipients.length
-  const totalCompleted = document.recipients.filter((r) => r.status === 'completed' && !r.expiryDate).length
-  const totalNeedsAttention = document.recipients.filter(
-    (r) => r.status !== 'completed' || r.expiryDate
-  ).length
+  const isTerminal = (r: DocumentRecipient) =>
+    (r.status === 'completed' || r.status === 'refused') && !r.expiryDate
+  const totalCompleted = document.recipients.filter(isTerminal).length
+  const totalNeedsAttention = document.recipients.filter((r) => !isTerminal(r)).length
 
   // Split for status tab
-  const trueCompleted = filteredRecipients.filter(
-    (r) => r.status === 'completed' && !r.expiryDate
-  )
-  const attention = filteredRecipients.filter(
-    (r) => r.status !== 'completed' || r.expiryDate
-  )
+  const trueCompleted = filteredRecipients.filter(isTerminal)
+  const attention = filteredRecipients.filter((r) => !isTerminal(r))
 
   return (
     <div className="p-10 max-w-[1200px] mx-auto">
@@ -160,7 +211,7 @@ export default function DocumentDetailPage({ document, onBack }: DocumentDetailP
       </div>
 
       {/* Tabs and Search */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-4">
         <SegmentedControl
           segments={tabs}
           activeSegment={activeTab}
@@ -173,6 +224,87 @@ export default function DocumentDetailPage({ document, onBack }: DocumentDetailP
           className="w-60"
         />
       </div>
+
+      {/* Filters */}
+      {activeTab === 'status' && (
+        <div className="flex items-center gap-2 mb-6 flex-wrap">
+          <div className="flex items-center gap-1.5 text-text-secondary mr-1">
+            <Filter className="w-3.5 h-3.5" />
+            <span className="text-xs font-medium">Filters</span>
+          </div>
+
+          {/* Location filter */}
+          <div className="relative">
+            <select
+              value={filterLocation}
+              onChange={(e) => setFilterLocation(e.target.value)}
+              className={`appearance-none h-8 pl-7 pr-7 rounded-full border text-xs font-medium cursor-pointer transition-colors ${
+                filterLocation !== 'all'
+                  ? 'bg-primary-50 border-primary-300 text-primary-700'
+                  : 'bg-white border-border text-text-secondary hover:border-gray-400'
+              }`}
+            >
+              <option value="all">All locations</option>
+              {uniqueLocations.map((loc) => (
+                <option key={loc} value={loc}>{loc}</option>
+              ))}
+            </select>
+            <MapPin className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 pointer-events-none text-text-secondary" />
+            <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 pointer-events-none text-text-secondary" />
+          </div>
+
+          {/* Role filter */}
+          <div className="relative">
+            <select
+              value={filterRole}
+              onChange={(e) => setFilterRole(e.target.value)}
+              className={`appearance-none h-8 pl-7 pr-7 rounded-full border text-xs font-medium cursor-pointer transition-colors ${
+                filterRole !== 'all'
+                  ? 'bg-primary-50 border-primary-300 text-primary-700'
+                  : 'bg-white border-border text-text-secondary hover:border-gray-400'
+              }`}
+            >
+              <option value="all">All roles</option>
+              {uniqueRoles.map((role) => (
+                <option key={role} value={role}>{role}</option>
+              ))}
+            </select>
+            <Briefcase className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 pointer-events-none text-text-secondary" />
+            <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 pointer-events-none text-text-secondary" />
+          </div>
+
+          {/* Status filter */}
+          <div className="relative">
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className={`appearance-none h-8 pl-7 pr-7 rounded-full border text-xs font-medium cursor-pointer transition-colors ${
+                filterStatus !== 'all'
+                  ? 'bg-primary-50 border-primary-300 text-primary-700'
+                  : 'bg-white border-border text-text-secondary hover:border-gray-400'
+              }`}
+            >
+              <option value="all">All statuses</option>
+              {uniqueStatuses.map((s) => (
+                <option key={s} value={s}>{statusLabel(s)}</option>
+              ))}
+            </select>
+            <CircleDot className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 pointer-events-none text-text-secondary" />
+            <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 pointer-events-none text-text-secondary" />
+          </div>
+
+          {/* Clear all */}
+          {activeFilterCount > 0 && (
+            <button
+              onClick={clearAllFilters}
+              className="flex items-center gap-1 h-8 px-3 rounded-full text-xs font-medium text-red-600 hover:bg-red-50 transition-colors"
+            >
+              <X className="w-3 h-3" />
+              Clear {activeFilterCount > 1 ? `all (${activeFilterCount})` : ''}
+            </button>
+          )}
+        </div>
+      )}
 
       {/* Status Tab */}
       {activeTab === 'status' && (
@@ -193,7 +325,7 @@ export default function DocumentDetailPage({ document, onBack }: DocumentDetailP
                   </p>
                 </div>
               </div>
-              <NeedsAttentionTable recipients={attention} />
+              <NeedsAttentionTable recipients={attention} documentCategory={documentCategory} onViewAssigneeTask={onViewAssigneeTask} />
             </div>
           )}
 
@@ -213,7 +345,7 @@ export default function DocumentDetailPage({ document, onBack }: DocumentDetailP
                   </p>
                 </div>
               </div>
-              <CompletedTable recipients={trueCompleted} />
+              <CompletedTable recipients={trueCompleted} documentCategory={documentCategory} onViewAssigneeTask={onViewAssigneeTask} />
             </div>
           )}
 
@@ -255,9 +387,10 @@ export default function DocumentDetailPage({ document, onBack }: DocumentDetailP
 }
 
 // Completed Table Component
-function CompletedTable({ recipients }: { recipients: DocumentRecipient[] }) {
+function CompletedTable({ recipients, documentCategory, onViewAssigneeTask }: { recipients: DocumentRecipient[]; documentCategory?: TemplateCategory; onViewAssigneeTask?: (recipient: DocumentRecipient) => void }) {
   const [selected, setSelected] = useState<string[]>([])
   const { addToast } = useToast()
+  const hasRefused = recipients.some((r) => r.status === 'refused')
 
   const toggleRow = (id: string) =>
     setSelected((prev) => (prev.includes(id) ? prev.filter((r) => r !== id) : [...prev, id]))
@@ -265,6 +398,12 @@ function CompletedTable({ recipients }: { recipients: DocumentRecipient[] }) {
     setSelected((prev) => (prev.length === recipients.length ? [] : recipients.map((r) => r.id)))
 
   const getMenuItems = (recipient: DocumentRecipient): ContextMenuItem[] => [
+    {
+      id: 'view-assignee-task',
+      label: 'View assignee task',
+      icon: <ClipboardList className="w-4 h-4" />,
+      onClick: () => onViewAssigneeTask?.(recipient),
+    },
     {
       id: 'view',
       label: 'View Document',
@@ -318,43 +457,62 @@ function CompletedTable({ recipients }: { recipients: DocumentRecipient[] }) {
                 <th className="h-11 px-5 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider">
                   Name
                 </th>
-                <th className="h-11 px-5 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider w-[25%]">
+                <th className="h-11 px-5 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider w-[20%]">
                   Location
                 </th>
-                <th className="h-11 px-5 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider w-[25%]">
-                  Completed
+                {hasRefused && (
+                  <th className="h-11 px-5 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider w-[15%]">
+                    Status
+                  </th>
+                )}
+                <th className="h-11 px-5 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider w-[20%]">
+                  Date
                 </th>
                 <th className="h-11 px-3 w-12"></th>
               </tr>
             </thead>
             <tbody>
-              {recipients.map((recipient) => (
-                <tr
-                  key={recipient.id}
-                  className={`border-b border-border-light last:border-b-0 ${
-                    selected.includes(recipient.id) ? 'bg-primary-50' : 'hover:bg-gray-50'
-                  }`}
-                >
-                  <td className="h-12 px-4">
-                    <Checkbox checked={selected.includes(recipient.id)} onChange={() => toggleRow(recipient.id)} />
-                  </td>
-                  <td className="h-12 px-5">
-                    <div>
-                      <p className="text-sm text-text-primary">{recipient.name}</p>
-                      <p className="text-xs text-text-secondary">{recipient.role}</p>
-                    </div>
-                  </td>
-                  <td className="h-12 px-5">
-                    <span className="text-sm text-text-secondary">{recipient.location}</span>
-                  </td>
-                  <td className="h-12 px-5">
-                    <span className="text-sm text-text-secondary">{recipient.completedDate}</span>
-                  </td>
-                  <td className="h-12 px-3">
-                    <ContextMenu items={getMenuItems(recipient)} />
-                  </td>
-                </tr>
-              ))}
+              {recipients.map((recipient) => {
+                const isRefused = recipient.status === 'refused'
+                return (
+                  <tr
+                    key={recipient.id}
+                    className={`border-b border-border-light last:border-b-0 ${
+                      selected.includes(recipient.id) ? 'bg-primary-50' : 'hover:bg-gray-50'
+                    }`}
+                  >
+                    <td className="h-12 px-4">
+                      <Checkbox checked={selected.includes(recipient.id)} onChange={() => toggleRow(recipient.id)} />
+                    </td>
+                    <td className="h-12 px-5">
+                      <div>
+                        <p className="text-sm text-text-primary">{recipient.name}</p>
+                        <p className="text-xs text-text-secondary">{recipient.role}</p>
+                      </div>
+                    </td>
+                    <td className="h-12 px-5">
+                      <span className="text-sm text-text-secondary">{recipient.location}</span>
+                    </td>
+                    {hasRefused && (
+                      <td className="h-12 px-5">
+                        {isRefused ? (
+                          <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium text-red-700 bg-red-50">
+                            Refused
+                          </span>
+                        ) : (
+                          <span className="text-xs text-text-secondary">Completed</span>
+                        )}
+                      </td>
+                    )}
+                    <td className="h-12 px-5">
+                      <span className="text-sm text-text-secondary">{recipient.completedDate}</span>
+                    </td>
+                    <td className="h-12 px-3">
+                      <ContextMenu items={getMenuItems(recipient)} />
+                    </td>
+                  </tr>
+                )
+              })}
             </tbody>
           </table>
         </div>
@@ -364,7 +522,7 @@ function CompletedTable({ recipients }: { recipients: DocumentRecipient[] }) {
 }
 
 // Needs Attention Table Component
-function NeedsAttentionTable({ recipients }: { recipients: DocumentRecipient[] }) {
+function NeedsAttentionTable({ recipients, documentCategory, onViewAssigneeTask }: { recipients: DocumentRecipient[]; documentCategory?: TemplateCategory; onViewAssigneeTask?: (recipient: DocumentRecipient) => void }) {
   const [selected, setSelected] = useState<string[]>([])
   const [reviewingRecipient, setReviewingRecipient] = useState<DocumentRecipient | null>(null)
   const { addToast } = useToast()
@@ -416,7 +574,23 @@ function NeedsAttentionTable({ recipients }: { recipients: DocumentRecipient[] }
         onClick: () => setReviewingRecipient(recipient),
       })
     }
+    // "Mark as refused to sign" for write-ups with pending statuses
+    if (documentCategory === 'write-up' && (recipient.status === 'pending' || recipient.status === 'assigned')) {
+      items.push({
+        id: 'mark-refused',
+        label: 'Mark as refused to sign',
+        icon: <Ban className="w-4 h-4" />,
+        variant: 'danger',
+        onClick: () => addToast(`${recipient.name} marked as "Refused to sign"`, 'warning'),
+      })
+    }
     items.push(
+      {
+        id: 'view-assignee-task',
+        label: 'View assignee task',
+        icon: <ClipboardList className="w-4 h-4" />,
+        onClick: () => onViewAssigneeTask?.(recipient),
+      },
       {
         id: 'resend',
         label: 'Resend',
@@ -865,6 +1039,8 @@ function AssignmentCard({
                         className={`text-sm ${
                           recipient.status === 'completed'
                             ? 'text-green-600'
+                            : recipient.status === 'refused'
+                            ? 'text-red-600'
                             : recipient.status === 'pending_verification'
                             ? 'text-purple-600'
                             : recipient.status === 'collecting'

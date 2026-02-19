@@ -1,12 +1,14 @@
-import { FileSignature, PenLine, Upload, Copy } from 'lucide-react'
+import { FileSignature, PenLine, Upload, Copy, ClipboardList } from 'lucide-react'
 import Modal from '../ui/Modal'
 
-export type DocumentCreationType = 'pdf-signing' | 'write-up' | 'collect-uploads' | 'duplicate'
+export type DocumentCreationType = 'pdf-signing' | 'write-up' | 'collect-uploads' | 'custom-form' | 'duplicate'
 
 interface DocumentTypeSelectorProps {
   isOpen: boolean
   onClose: () => void
   onSelect: (type: DocumentCreationType) => void
+  /** Hide certain creation types from the selector */
+  excludeTypes?: DocumentCreationType[]
 }
 
 interface DocumentTypeOption {
@@ -40,6 +42,13 @@ const options: DocumentTypeOption[] = [
     iconBgColor: 'bg-emerald-50 text-emerald-600',
   },
   {
+    id: 'custom-form',
+    icon: <ClipboardList className="w-8 h-8" />,
+    title: 'Create a custom form',
+    description: 'Build a digital form with custom questions, or upload a PDF for signing.',
+    iconBgColor: 'bg-indigo-50 text-indigo-600',
+  },
+  {
     id: 'duplicate',
     icon: <Copy className="w-8 h-8" />,
     title: 'Duplicate from existing document',
@@ -52,7 +61,12 @@ export default function DocumentTypeSelector({
   isOpen,
   onClose,
   onSelect,
+  excludeTypes = [],
 }: DocumentTypeSelectorProps) {
+  const visibleOptions = excludeTypes.length > 0
+    ? options.filter((o) => !excludeTypes.includes(o.id))
+    : options
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="" size="xl">
       <div className="pb-2">
@@ -61,7 +75,7 @@ export default function DocumentTypeSelector({
         </h2>
 
         <div className="grid grid-cols-2 gap-4">
-          {options.map((option) => (
+          {visibleOptions.map((option) => (
             <button
               key={option.id}
               onClick={() => onSelect(option.id)}

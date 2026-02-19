@@ -1,35 +1,34 @@
 import { useMemo, useState } from 'react'
-import { Plus, Filter, LayoutGrid, Users, AlertTriangle, Eye, FileCheck } from 'lucide-react'
+import { Plus, AlertTriangle, Eye, FileCheck } from 'lucide-react'
 import SearchBox from '../components/ui/SearchBox'
 import Button from '../components/ui/Button'
-import Dropdown from '../components/ui/Dropdown'
 import DocumentsTable from '../components/documents/DocumentsTable'
-import MembersTable from '../components/documents/MembersTable'
 import DocumentTypeSelector, { DocumentCreationType } from '../components/documents/DocumentTypeSelector'
 import AddDocumentModal from '../components/documents/AddDocumentModal'
 import AssignDocumentModal from '../components/documents/AssignDocumentModal'
 import { useToast } from '../components/ui/Toast'
-import { documentTemplates, documentDetails, teamMembers, DocumentTemplate } from '../data/mockData'
+import { documentTemplates, documentDetails, DocumentTemplate, TemplateCategory } from '../data/mockData'
 
 interface DocumentsPageProps {
   onOpenDocument: (documentId: string) => void
+  /** When set, lock the page to a single category (hides category tabs). */
+  lockedCategory?: TemplateCategory
 }
 
-const filterOptions = [
-  { id: 'all', label: 'All Types' },
-  { id: 'payroll', label: 'Payroll' },
-  { id: 'onboarding', label: 'Onboarding' },
-  { id: 'certifications', label: 'Certifications' },
-  { id: 'write-ups', label: 'Write-ups' },
+/** Category tabs — "All" plus one per category (excluding write-ups, which have their own page) */
+const CATEGORY_TABS: { id: TemplateCategory | 'all'; label: string }[] = [
+  { id: 'all', label: 'All' },
+  { id: 'signing', label: 'Signing' },
+  { id: 'certification', label: 'Certifications' },
+  { id: 'custom-form', label: 'Custom Forms' },
 ]
 
-export default function DocumentsPage({ onOpenDocument }: DocumentsPageProps) {
+export default function DocumentsPage({ onOpenDocument, lockedCategory }: DocumentsPageProps) {
   const [searchQuery, setSearchQuery] = useState('')
-  const [filter, setFilter] = useState('all')
+  const [activeCategory, setActiveCategory] = useState<TemplateCategory | 'all'>('all')
   const [isTypeSelectorOpen, setIsTypeSelectorOpen] = useState(false)
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [selectedDocType, setSelectedDocType] = useState<DocumentCreationType | null>(null)
-  const [subView, setSubView] = useState<'templates' | 'members'>('templates')
   const [isAssignDocModalOpen, setIsAssignDocModalOpen] = useState(false)
   const [assignDocumentTemplate, setAssignDocumentTemplate] = useState<DocumentTemplate | null>(null)
 
@@ -55,173 +54,172 @@ export default function DocumentsPage({ onOpenDocument }: DocumentsPageProps) {
     setSelectedDocType(null)
   }
 
-  // Filter documents
-  const filteredDocuments = documentTemplates.filter((doc) => {
-    const matchesSearch = doc.name.toLowerCase().includes(searchQuery.toLowerCase())
-    const matchesFilter = filter === 'all' || doc.type.toLowerCase() === filter
-    return matchesSearch && matchesFilter
-  })
+  // The effective category: either locked from props, or user-selected from tabs
+  const effectiveCategory = lockedCategory ?? activeCategory
 
-  // Filter members
-  const filteredMembers = teamMembers.filter((member) =>
-    member.name.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+  // Base templates (when locked to a category, only show that category's templates)
+  const baseTemplates = lockedCategory
+    ? documentTemplates.filter((t) => t.category === lockedCategory)
+    : documentTemplates
+
+  // Count templates per category (for tab badges) — exclude write-ups since they have their own page
+  const categoryCounts = useMemo(() => {
+    const nonWriteUp = documentTemplates.filter((t) => t.category !== 'write-up')
+    const counts: Record<string, number> = { all: nonWriteUp.length }
+    for (const cat of ['signing', 'certification', 'custom-form'] as TemplateCategory[]) {
+      counts[cat] = nonWriteUp.filter((t) => t.category === cat).length
+    }
+    return counts
+  }, [])
+
+  // Filter documents — search matches name AND type
+  const filteredDocuments = baseTemplates.filter((doc) => {
+    const q = searchQuery.toLowerCase()
+    const matchesSearch = !q || doc.name.toLowerCase().includes(q) || doc.type.toLowerCase().includes(q)
+    const matchesCategory = lockedCategory || effectiveCategory === 'all' || doc.category === effectiveCategory
+    // When not locked, exclude write-ups from the Documents page (they have their own page)
+    const notWriteUp = lockedCategory ? true : doc.category !== 'write-up'
+    return matchesSearch && matchesCategory && notWriteUp
+  })
 
   // ── Analytics ──
   const analytics = useMemo(() => {
-    const totalAttention = documentTemplates.reduce((sum, t) => sum + t.stats.attention, 0)
-    const totalAssigned = documentTemplates.reduce((sum, t) => sum + t.stats.total, 0)
+    const scopedTemplates = lockedCategory
+      ? documentTemplates.filter((t) => t.category === lockedCategory)
+      : documentTemplates.filter((t) => t.category !== 'write-up')
+    const totalAttention = scopedTemplates.reduce((sum, t) => sum + t.stats.attention, 0)
+    const totalAssigned = scopedTemplates.reduce((sum, t) => sum + t.stats.total, 0)
 
     let pendingYourReview = 0
-    Object.values(documentDetails).forEach((detail) => {
-      detail.recipients.forEach((r) => {
-        if (r.status === 'pending_verification') pendingYourReview++
-      })
+    const scopedIds = new Set(scopedTemplates.map((t) => t.id))
+    Object.entries(documentDetails).forEach(([id, detail]) => {
+      if (scopedIds.has(id)) {
+        detail.recipients.forEach((r) => {
+          if (r.status === 'pending_verification') pendingYourReview++
+        })
+      }
     })
 
-    const templatesWithIssues = documentTemplates.filter((t) => t.stats.attention > 0).length
+    const templatesWithIssues = scopedTemplates.filter((t) => t.stats.attention > 0).length
 
-    return { totalAttention, totalAssigned, pendingYourReview, templatesWithIssues }
-  }, [])
+    return { totalAttention, totalAssigned, pendingYourReview, templatesWithIssues, templateCount: scopedTemplates.length }
+  }, [lockedCategory])
 
   return (
     <div className="p-6 max-w-[1400px] mx-auto">
       {/* ─── Analytics Banner ─── */}
-      {subView === 'templates' && (
-        <div className="grid grid-cols-3 gap-4 mb-5">
-          <div className="bg-white rounded-container border border-border-light p-4 flex items-center gap-4">
-            <div className="w-10 h-10 rounded-lg bg-amber-50 flex items-center justify-center flex-shrink-0">
-              <AlertTriangle className="w-5 h-5 text-amber-500" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-text-primary">{analytics.totalAttention}</p>
-              <p className="text-xs text-text-secondary">
-                assignees need attention across {analytics.templatesWithIssues} template{analytics.templatesWithIssues !== 1 ? 's' : ''}
-              </p>
-            </div>
+      <div className="grid grid-cols-3 gap-4 mb-6">
+        <div className="bg-white rounded-container border border-border-light p-4 flex items-center gap-4">
+          <div className="w-10 h-10 rounded-lg bg-amber-50 flex items-center justify-center flex-shrink-0">
+            <AlertTriangle className="w-5 h-5 text-amber-500" />
           </div>
-          <div className="bg-white rounded-container border border-border-light p-4 flex items-center gap-4">
-            <div className="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center flex-shrink-0">
-              <Eye className="w-5 h-5 text-purple-500" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-text-primary">{analytics.pendingYourReview}</p>
-              <p className="text-xs text-text-secondary">
-                submissions pending your review
-              </p>
-            </div>
-          </div>
-          <div className="bg-white rounded-container border border-border-light p-4 flex items-center gap-4">
-            <div className="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center flex-shrink-0">
-              <FileCheck className="w-5 h-5 text-green-500" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-text-primary">{analytics.totalAssigned}</p>
-              <p className="text-xs text-text-secondary">
-                total assigned across {documentTemplates.length} templates
-              </p>
-            </div>
+          <div>
+            <p className="text-2xl font-bold text-text-primary">{analytics.totalAttention}</p>
+            <p className="text-xs text-text-secondary">
+              assignees need attention across {analytics.templatesWithIssues} template{analytics.templatesWithIssues !== 1 ? 's' : ''}
+            </p>
           </div>
         </div>
-      )}
-
-      {/* ─── Toolbar ─── */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-3">
-          {/* Sub-view toggle */}
-          <div className="inline-flex rounded-element border border-border-light overflow-hidden mr-3">
-            <button
-              onClick={() => setSubView('templates')}
-              className={`h-9 px-3 text-sm font-medium transition-all flex items-center gap-1.5 ${
-                subView === 'templates'
-                  ? 'bg-nav text-white'
-                  : 'bg-white text-text-primary hover:bg-gray-50'
-              }`}
-            >
-              <LayoutGrid className="w-3.5 h-3.5" />
-              Templates
-            </button>
-            <button
-              onClick={() => setSubView('members')}
-              className={`h-9 px-3 text-sm font-medium transition-all flex items-center gap-1.5 border-l border-border-light ${
-                subView === 'members'
-                  ? 'bg-nav text-white'
-                  : 'bg-white text-text-primary hover:bg-gray-50'
-              }`}
-            >
-              <Users className="w-3.5 h-3.5" />
-              Members
-            </button>
+        <div className="bg-white rounded-container border border-border-light p-4 flex items-center gap-4">
+          <div className="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center flex-shrink-0">
+            <Eye className="w-5 h-5 text-purple-500" />
           </div>
-
-          {subView === 'templates' && (
-            <Dropdown
-              options={filterOptions}
-              value={filter}
-              onChange={setFilter}
-              className="w-48"
-            />
-          )}
-          <SearchBox
-            value={searchQuery}
-            onChange={setSearchQuery}
-            placeholder={subView === 'templates' ? 'Search templates...' : 'Search members...'}
-            className="w-72"
-          />
+          <div>
+            <p className="text-2xl font-bold text-text-primary">{analytics.pendingYourReview}</p>
+            <p className="text-xs text-text-secondary">
+              submissions pending your review
+            </p>
+          </div>
         </div>
-
-        <div className="flex items-center gap-2">
-          {subView === 'templates' && (
-            <>
-              <Button variant="ghost" leftIcon={<Filter className="w-4 h-4" />}>
-                More filters
-              </Button>
-              <Button
-                variant="primary"
-                leftIcon={<Plus className="w-4 h-4" />}
-                onClick={handleAddClick}
-              >
-                Add Template
-              </Button>
-            </>
-          )}
+        <div className="bg-white rounded-container border border-border-light p-4 flex items-center gap-4">
+          <div className="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center flex-shrink-0">
+            <FileCheck className="w-5 h-5 text-green-500" />
+          </div>
+          <div>
+            <p className="text-2xl font-bold text-text-primary">{analytics.totalAssigned}</p>
+            <p className="text-xs text-text-secondary">
+              total assigned across {analytics.templateCount} template{analytics.templateCount !== 1 ? 's' : ''}
+            </p>
+          </div>
         </div>
       </div>
 
-      {/* ─── Content ─── */}
-      {subView === 'templates' && (
-        <DocumentsTable
-          documents={filteredDocuments}
-          onAssign={handleAssign}
-          onOpenDocument={onOpenDocument}
+      {/* ─── Toolbar ─── */}
+      <div className="flex items-center justify-between mb-1">
+        <SearchBox
+          value={searchQuery}
+          onChange={setSearchQuery}
+          placeholder="Search by name or type..."
+          className="w-72"
         />
-      )}
-      {subView === 'members' && (
-        <MembersTable members={filteredMembers} />
-      )}
 
-      {/* Pagination */}
-      {subView === 'templates' && (
-        <div className="flex items-center justify-between mt-4 px-4">
-          <span className="text-sm text-text-secondary">
-            Showing {filteredDocuments.length} of {documentTemplates.length} templates
-          </span>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" disabled>
-              Previous
-            </Button>
-            <Button variant="outline" size="sm">
-              Next
-            </Button>
-          </div>
+        <Button
+          variant="primary"
+          leftIcon={<Plus className="w-4 h-4" />}
+          onClick={handleAddClick}
+        >
+          Add Template
+        </Button>
+      </div>
+
+      {/* ─── Category Tabs (hidden when page is locked to a category) ─── */}
+      {!lockedCategory && (
+        <div className="flex items-center gap-1 border-b border-border-light mb-4">
+          {CATEGORY_TABS.map((tab) => {
+            const isActive = activeCategory === tab.id
+            const count = categoryCounts[tab.id] ?? 0
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveCategory(tab.id)}
+                className={`relative px-4 py-2.5 text-sm font-medium transition-colors whitespace-nowrap ${
+                  isActive
+                    ? 'text-text-primary'
+                    : 'text-text-secondary hover:text-text-primary'
+                }`}
+              >
+                {tab.label}
+                <span className={`ml-1.5 text-xs tabular-nums ${isActive ? 'text-text-secondary' : 'text-text-secondary/60'}`}>
+                  {count}
+                </span>
+                {/* Active indicator bar */}
+                {isActive && (
+                  <span className="absolute bottom-0 left-2 right-2 h-[2px] bg-primary-500 rounded-full" />
+                )}
+              </button>
+            )
+          })}
         </div>
       )}
+
+      {/* ─── Content ─── */}
+      <DocumentsTable
+        documents={filteredDocuments}
+        onAssign={handleAssign}
+        onOpenDocument={onOpenDocument}
+      />
+
+      {/* Pagination */}
+      <div className="flex items-center justify-between mt-4 px-4">
+        <span className="text-sm text-text-secondary">
+          Showing {filteredDocuments.length} of {baseTemplates.length} template{baseTemplates.length !== 1 ? 's' : ''}
+        </span>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" disabled>
+            Previous
+          </Button>
+          <Button variant="outline" size="sm">
+            Next
+          </Button>
+        </div>
+      </div>
 
       {/* Document Type Selector Modal */}
       <DocumentTypeSelector
         isOpen={isTypeSelectorOpen}
         onClose={() => setIsTypeSelectorOpen(false)}
         onSelect={handleTypeSelect}
+        excludeTypes={['write-up']}
       />
 
       {/* Add Document Modal */}

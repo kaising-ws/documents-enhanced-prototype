@@ -3,6 +3,7 @@ import {
   FileSignature,
   Shield,
   PenLine,
+  ClipboardList,
   Edit,
   Copy,
   Trash2,
@@ -12,7 +13,7 @@ import {
   ArrowUp,
   ArrowDown,
 } from 'lucide-react'
-import { DocumentTemplate } from '../../data/mockData'
+import { DocumentTemplate, TemplateCategory } from '../../data/mockData'
 import Button from '../ui/Button'
 import Checkbox from '../ui/Checkbox'
 import ContextMenu, { ContextMenuItem } from '../ui/ContextMenu'
@@ -27,16 +28,25 @@ interface DocumentsTableProps {
 type SortField = 'name' | 'type' | 'status' | 'createdAt'
 type SortDirection = 'asc' | 'desc'
 
-/** Get the right icon per document type */
-function getDocTypeIcon(type: DocumentTemplate['type']) {
-  switch (type) {
-    case 'Certifications':
-      return <Shield className="w-4 h-4 text-gray-400" />
-    case 'Write-ups':
-      return <PenLine className="w-4 h-4 text-gray-400" />
-    default:
+/** Get the icon per document category */
+function getCategoryIcon(category: TemplateCategory) {
+  switch (category) {
+    case 'signing':
       return <FileSignature className="w-4 h-4 text-gray-400" />
+    case 'certification':
+      return <Shield className="w-4 h-4 text-gray-400" />
+    case 'write-up':
+      return <PenLine className="w-4 h-4 text-gray-400" />
+    case 'custom-form':
+      return <ClipboardList className="w-4 h-4 text-gray-400" />
   }
+}
+
+const categoryLabel: Record<TemplateCategory, string> = {
+  signing: 'Signing',
+  certification: 'Certification',
+  'write-up': 'Write-up',
+  'custom-form': 'Custom Form',
 }
 
 /** Health dot color: green = nothing needs attention, amber = some need attention, red = expired items */
@@ -192,14 +202,14 @@ export default function DocumentsTable({ documents, onAssign, onOpenDocument }: 
       <div className="bg-white rounded-container border border-border-light overflow-hidden">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-border-light bg-gray-50">
-              <th className="h-11 px-4 w-12">
+            <tr className="border-b border-border-light bg-gray-50/80">
+              <th className="h-10 px-4 w-11">
                 <Checkbox
                   checked={selectedRows.length === documents.length && documents.length > 0}
                   onChange={handleSelectAll}
                 />
               </th>
-              <th className="h-11 px-4 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider">
+              <th className="h-10 px-4 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider">
                 <button
                   onClick={() => handleSort('name')}
                   className="flex items-center gap-1 hover:text-text-primary transition-colors"
@@ -207,7 +217,7 @@ export default function DocumentsTable({ documents, onAssign, onOpenDocument }: 
                   Template {getSortIcon('name')}
                 </button>
               </th>
-              <th className="h-11 px-4 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider w-[120px]">
+              <th className="h-10 px-4 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider w-[140px]">
                 <button
                   onClick={() => handleSort('type')}
                   className="flex items-center gap-1 hover:text-text-primary transition-colors"
@@ -215,7 +225,7 @@ export default function DocumentsTable({ documents, onAssign, onOpenDocument }: 
                   Type {getSortIcon('type')}
                 </button>
               </th>
-              <th className="h-11 px-4 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider w-[120px]">
+              <th className="h-10 px-4 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider w-[110px]">
                 <button
                   onClick={() => handleSort('status')}
                   className="flex items-center gap-1 hover:text-text-primary transition-colors"
@@ -223,7 +233,7 @@ export default function DocumentsTable({ documents, onAssign, onOpenDocument }: 
                   Status {getSortIcon('status')}
                 </button>
               </th>
-              <th className="h-11 px-4 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider w-[130px]">
+              <th className="h-10 px-4 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider w-[120px]">
                 <button
                   onClick={() => handleSort('createdAt')}
                   className="flex items-center gap-1 hover:text-text-primary transition-colors"
@@ -231,7 +241,7 @@ export default function DocumentsTable({ documents, onAssign, onOpenDocument }: 
                   Created {getSortIcon('createdAt')}
                 </button>
               </th>
-              <th className="h-11 px-4 w-12" />
+              <th className="h-10 px-4 w-11" />
             </tr>
           </thead>
           <tbody>
@@ -244,42 +254,47 @@ export default function DocumentsTable({ documents, onAssign, onOpenDocument }: 
                   className={`border-b border-border-light last:border-b-0 cursor-pointer transition-colors ${
                     selectedRows.includes(doc.id)
                       ? 'bg-primary-50 hover:bg-primary-50'
-                      : 'hover:bg-gray-50'
+                      : 'hover:bg-gray-50/60'
                   }`}
                 >
-                  <td className="h-12 px-4" onClick={(e) => e.stopPropagation()}>
+                  <td className="py-3.5 px-4" onClick={(e) => e.stopPropagation()}>
                     <Checkbox
                       checked={selectedRows.includes(doc.id)}
                       onChange={() => handleToggleRow(doc.id)}
                     />
                   </td>
-                  <td className="h-12 px-4">
+                  <td className="py-3.5 px-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-gray-50 rounded-md flex items-center justify-center flex-shrink-0">
-                        {getDocTypeIcon(doc.type)}
+                      <div className="w-8 h-8 bg-gray-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                        {getCategoryIcon(doc.category)}
                       </div>
-                      <span className="text-sm font-medium text-text-primary truncate">
-                        {doc.name}
-                      </span>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium text-text-primary truncate leading-5">
+                          {doc.name}
+                        </p>
+                        <p className="text-xs text-text-secondary/70 leading-4">
+                          {categoryLabel[doc.category]}
+                        </p>
+                      </div>
                     </div>
                   </td>
-                  <td className="h-12 px-4">
+                  <td className="py-3.5 px-4">
                     <span className="text-sm text-text-secondary">
                       {doc.type}
                     </span>
                   </td>
-                  <td className="h-12 px-4">
+                  <td className="py-3.5 px-4">
                     <div className="flex items-center gap-2">
-                      <div className={`w-2 h-2 rounded-full flex-shrink-0 ${dotColors[health]}`} />
-                      <span className="text-sm text-text-primary">
+                      <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${dotColors[health]}`} />
+                      <span className="text-sm text-text-primary tabular-nums">
                         {getStatusText(doc)}
                       </span>
                     </div>
                   </td>
-                  <td className="h-12 px-4">
+                  <td className="py-3.5 px-4">
                     <span className="text-sm text-text-secondary">{doc.createdAtFormatted}</span>
                   </td>
-                  <td className="h-12 px-4" onClick={(e) => e.stopPropagation()}>
+                  <td className="py-3.5 px-4" onClick={(e) => e.stopPropagation()}>
                     <ContextMenu items={getMenuItems(doc)} />
                   </td>
                 </tr>

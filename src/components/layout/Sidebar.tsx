@@ -15,17 +15,22 @@ import {
   Settings,
   ChevronLeft,
   ChevronDown,
+  PenLine,
 } from 'lucide-react'
+
+export type AppPage = 'documents' | 'write-ups' | 'team'
 
 interface SidebarProps {
   collapsed: boolean
   onToggle: () => void
+  activePage: AppPage
+  onNavigate: (page: AppPage) => void
 }
 
 interface NavItem {
   icon: React.ElementType
   label: string
-  active?: boolean
+  page?: AppPage
   hasDropdown?: boolean
 }
 
@@ -56,8 +61,9 @@ const navSections: NavSection[] = [
     title: 'TEAM MANAGEMENT',
     items: [
       { icon: UserPlus, label: 'Onboarding', hasDropdown: true },
-      { icon: Users2, label: 'Team' },
-      { icon: FileText, label: 'Documents', active: true },
+      { icon: Users2, label: 'Team', page: 'team' },
+      { icon: FileText, label: 'Documents', page: 'documents' },
+      { icon: PenLine, label: 'Write-ups', page: 'write-ups' },
       { icon: ClipboardCheck, label: 'Surveys' },
     ],
   },
@@ -67,7 +73,7 @@ const navSections: NavSection[] = [
   },
 ]
 
-export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
+export default function Sidebar({ collapsed, onToggle, activePage, onNavigate }: SidebarProps) {
   return (
     <aside className="bg-nav h-full flex flex-col w-60 flex-shrink-0">
       {/* Header */}
@@ -98,7 +104,12 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
               </div>
             )}
             {section.items.map((item, itemIndex) => (
-              <NavItemComponent key={itemIndex} item={item} />
+              <NavItemComponent
+                key={itemIndex}
+                item={item}
+                isActive={!!item.page && item.page === activePage}
+                onClick={item.page ? () => onNavigate(item.page!) : undefined}
+              />
             ))}
           </div>
         ))}
@@ -118,15 +129,16 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
   )
 }
 
-function NavItemComponent({ item }: { item: NavItem }) {
+function NavItemComponent({ item, isActive, onClick }: { item: NavItem; isActive: boolean; onClick?: () => void }) {
   const Icon = item.icon
   
   return (
     <div className="px-3 h-10 flex items-center">
       <button
+        onClick={onClick}
         className={`
           flex items-center gap-2 w-full px-3 py-2 rounded-md transition-colors
-          ${item.active 
+          ${isActive
             ? 'bg-nav text-white font-semibold' 
             : 'text-gray-400 hover:text-white hover:bg-nav-light'
           }
@@ -141,4 +153,3 @@ function NavItemComponent({ item }: { item: NavItem }) {
     </div>
   )
 }
-

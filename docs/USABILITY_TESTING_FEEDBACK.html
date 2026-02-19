@@ -1,0 +1,619 @@
+<h1>Usability Testing Feedback — Documents V2</h1>
+<p><strong>Tester:</strong> Restaurant HR Admin (multi-location, 5 restaurants, ~120 employees)<br><strong>Date:</strong> February 9, 2026<br><strong>Method:</strong> Task-based walkthrough against <a href="./RESTAURANT_HR_USE_CASES_AND_WORKFLOWS.md">Restaurant HR Use Cases &amp; Workflows</a><br><strong>Product State:</strong> Prototype (React app with mock data)</p>
+<hr>
+<h2>Workstream Platform Context</h2>
+<blockquote>
+<p><strong>Important:</strong> This usability test evaluates the <strong>Documents V2</strong> module within the broader Workstream platform. The following capabilities already exist in other Workstream products and are assumed to be available for integration:</p>
+<table>
+<thead>
+<tr>
+<th>Workstream Product</th>
+<th>Relevant Capabilities</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Onboarding</strong></td>
+<td>Onboarding process builder with bundled tasks/documents; new hire portal; progress tracking dashboard; auto-triggered when candidate is marked &quot;hired&quot; in ATS</td>
+</tr>
+<tr>
+<td><strong>I-9 &amp; E-Verify</strong></td>
+<td>Digital Form I-9 completion; automatic E-Verify case submission; Section 2 employer review; reverification reminders; can be added as a module to any onboarding process</td>
+</tr>
+<tr>
+<td><strong>Payroll</strong></td>
+<td>W-4/state tax form collection; direct deposit setup; handled during payroll onboarding</td>
+</tr>
+<tr>
+<td><strong>HRIS / Team Management</strong></td>
+<td>Employee records; location &amp; role assignments; employee status (active/terminated); the source of truth for the team member list</td>
+</tr>
+<tr>
+<td><strong>Hiring (ATS)</strong></td>
+<td>Applicant tracking → hire decision → triggers onboarding automatically</td>
+</tr>
+</tbody></table>
+<p>Documents V2 templates should be <strong>addable as tasks within Workstream Onboarding bundles</strong>, meaning onboarding packet creation is handled at the Onboarding product level — not inside Documents V2 itself.</p>
+</blockquote>
+<hr>
+<h2>Testing Summary</h2>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Blocker</th>
+<th>Major</th>
+<th>Minor</th>
+<th>Enhancement</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Onboarding</td>
+<td>1</td>
+<td>2</td>
+<td>2</td>
+<td>3</td>
+</tr>
+<tr>
+<td>Certifications</td>
+<td>0</td>
+<td>2</td>
+<td>3</td>
+<td>2</td>
+</tr>
+<tr>
+<td>Policy Distribution</td>
+<td>1</td>
+<td>3</td>
+<td>1</td>
+<td>2</td>
+</tr>
+<tr>
+<td>Write-ups</td>
+<td>0</td>
+<td>1</td>
+<td>3</td>
+<td>3</td>
+</tr>
+<tr>
+<td>Data Collection</td>
+<td>2</td>
+<td>1</td>
+<td>0</td>
+<td>1</td>
+</tr>
+<tr>
+<td>Separation/Termination</td>
+<td>1</td>
+<td>2</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>Multi-Location Mgmt</td>
+<td>1</td>
+<td>3</td>
+<td>2</td>
+<td>2</td>
+</tr>
+<tr>
+<td>Audit &amp; Compliance</td>
+<td>1</td>
+<td>2</td>
+<td>1</td>
+<td>2</td>
+</tr>
+<tr>
+<td><strong>Total</strong></td>
+<td><strong>7</strong></td>
+<td><strong>16</strong></td>
+<td><strong>13</strong></td>
+<td><strong>16</strong></td>
+</tr>
+</tbody></table>
+<p><strong>Overall Verdict:</strong> The product has strong bones — write-ups, certifications, and PDF signing are surprisingly well-built. With Workstream&#39;s existing Onboarding (bundles), I-9/E-Verify, and Payroll products already handling the hire-day paperwork pipeline, Documents V2 doesn&#39;t need to solve onboarding bundling or government forms on its own. The remaining gaps are around <strong>data collection forms</strong> (the FormFieldBuilder exists but is locked inside write-ups), <strong>multi-location visibility</strong> (no location-level compliance breakdown), <strong>export/reporting</strong> (data goes in but can&#39;t come out for audits), and <strong>policy version control</strong>. An HR admin managing 5 restaurants would adopt this for write-ups and certifications today and plug it into their existing Workstream onboarding flow — but would still need workarounds for ad-hoc data collection and compliance audits.</p>
+<hr>
+<h2>Test Session 1: New Employee Onboarding</h2>
+<blockquote>
+<p><strong>Platform Context:</strong> Workstream Onboarding already handles bundling documents into onboarding processes, I-9 is a separate module that plugs into onboarding, and W-4/tax forms are handled by Workstream Payroll. This test focuses on how Documents V2 templates integrate into that existing onboarding flow and what gaps remain.</p>
+</blockquote>
+<h3>Scenario</h3>
+<p><em>&quot;It&#39;s Monday morning. I just hired a new line cook at our Downtown location. I need to get them through the full onboarding paperwork: employee handbook, food safety policy, sexual harassment policy, tip reporting agreement, emergency contacts, uniform agreement, and food handler&#39;s certification request. (I-9 and W-4 are already handled via Workstream&#39;s I-9/E-Verify module and Payroll onboarding.)&quot;</em></p>
+<h3>Walkthrough</h3>
+<p><strong>Step 1: I open the Documents page and click &quot;+ Add Document&quot;.</strong></p>
+<blockquote>
+<p>&quot;Okay, I see four options: Upload PDF for Signing, Create a Write Up, Collect Uploads, and Duplicate. Where&#39;s the option to create a form? I need to collect emergency contact info — that&#39;s not a PDF signing, it&#39;s not an &#39;upload&#39; from the employee, and it&#39;s definitely not a write-up. I need them to <em>fill out</em> a form. The only &#39;form builder&#39; I can find is buried inside the Write-Up creation flow, but I can&#39;t use a disciplinary tool to ask for emergency contacts.&quot;</p>
+</blockquote>
+<p>🔴 <strong>BLOCKER — UX-ONB-001:</strong> No &quot;Collect Data / Create Form&quot; document type. The FormFieldBuilder component exists but is locked inside the Write-Up creation flow. There is no way to create a standalone form to collect employee data (emergency contacts, t-shirt sizes, dietary restrictions, etc.). This is one of the most common onboarding use cases — and while I-9, W-4, and direct deposit are handled by other Workstream products, restaurant-specific data collection (emergency contacts, uniform sizes, availability, dietary needs) has no home.</p>
+<p><strong>Step 2: I decide to upload our employee handbook PDF for signing.</strong></p>
+<blockquote>
+<p>&quot;Okay I&#39;ll start with the handbook. Upload PDF, drag and drop — nice, that works well. Next step asks for document name and type. The type dropdown shows... let me look... what are the type options? I don&#39;t see an &#39;Onboarding&#39; category. How do I mark this as an onboarding document so it automatically appears in our Workstream onboarding bundle?&quot;</p>
+</blockquote>
+<p>🟡 <strong>MINOR — UX-ONB-002:</strong> Document type categories don&#39;t include restaurant-specific categories like &quot;Onboarding&quot;, &quot;Safety &amp; Compliance&quot;, &quot;Employment Agreements&quot;, etc. The types come from <code>documentTypes</code> in mock data but aren&#39;t tailored to restaurant workflows. More importantly, there&#39;s no visible connection between a Documents V2 template and the Workstream Onboarding process — I can&#39;t tell which templates are &quot;in my onboarding bundle&quot; vs. standalone.</p>
+<p><strong>Step 3: I click &quot;Continue to Mapping&quot; and get to the document mapping screen.</strong></p>
+<blockquote>
+<p>&quot;Oh nice, this is like DocuSign. I can add signature fields, date fields, text fields, checkboxes. This works for the handbook — I just need a signature and date at the bottom. Now, since onboarding bundles exist in Workstream, I assume this template will just show up as a task in the new hire&#39;s onboarding flow. But... I don&#39;t see any option here to &#39;Add to Onboarding Process&#39; or link this template to an onboarding bundle. How does this template get into the onboarding flow?&quot;</p>
+</blockquote>
+<p>✅ <del>BLOCKER</del> <strong>RESOLVED (Platform) — UX-ONB-003:</strong> <del>No onboarding packet/bundle concept.</del> Workstream Onboarding already handles bundling — Documents V2 templates can be added as tasks within onboarding processes. However, see UX-ONB-005 below for the remaining integration gap.</p>
+<p><strong>Step 4: I try to assign the handbook to my new employee (outside of onboarding).</strong></p>
+<blockquote>
+<p>&quot;For the onboarding flow, the new hire would get this through their Workstream onboarding bundle — that makes sense. But what if I need to assign this handbook to an <em>existing</em> employee who somehow missed it? I go to Documents table, find Employee Handbook, click &#39;Assign.&#39; The modal shows my team members from HRIS. Good — they&#39;re here because Workstream HRIS is the source of truth. I can search, filter by location, filter by role. This works.&quot;</p>
+</blockquote>
+<p>✅ <del>BLOCKER</del> <strong>RESOLVED (Platform) — UX-ONB-004:</strong> <del>No way to add a new employee.</del> New hires enter the system through the Workstream Hiring → Onboarding pipeline and are created in HRIS before documents are assigned. The team member list in the assign modal pulls from HRIS, so the chicken-and-egg problem is solved.</p>
+<p><strong>Step 5: I look for auto-assignment rules on non-certification documents.</strong></p>
+<blockquote>
+<p>&quot;I remember seeing auto-assign in the certification creation flow. But when I create a PDF signing document, there&#39;s no auto-assign step. For onboarding, this is handled by the Onboarding bundle — fine. But what about <em>ongoing</em> documents? If I update our food safety policy next month, I want it to auto-assign to all current employees. That&#39;s not an onboarding event. And the auto-assign rules only exist for &#39;Collect Uploads&#39; (certifications).&quot;</p>
+</blockquote>
+<p>🟠 <strong>MAJOR — UX-ONB-005:</strong> Auto-assign rules only exist for the &quot;Collect Uploads&quot; (certification) document type. PDF signing documents have no auto-assign capability. While onboarding handles new-hire assignment, there&#39;s no way to auto-assign ongoing documents (updated policies, annual re-acknowledgements, role-change documents) to existing employees.</p>
+<p><strong>Step 6: I look for the employee&#39;s unified document view.</strong></p>
+<blockquote>
+<p>&quot;From the new hire&#39;s perspective, they&#39;ll complete I-9 and W-4 in their Workstream onboarding portal, and the handbook/policies will show up there too as onboarding tasks. That&#39;s good. But once onboarding is done — say, after week 2 — where does the employee go to see their ongoing documents? Certifications expiring, new policies to sign, write-ups? There&#39;s no &#39;My Documents&#39; hub that shows everything in one place. The CertificationUploadPage and WriteUpAcknowledgement are standalone views but there&#39;s no unified employee document center.&quot;</p>
+</blockquote>
+<p>🟠 <strong>MAJOR — UX-ONB-006:</strong> No unified employee-facing &quot;My Documents&quot; view. Workstream Onboarding handles the Day 1 task list, but once onboarding is complete, there&#39;s no single place for an employee to see all their document obligations (pending policy signatures, expiring certifications, assigned write-ups). Each document type has its own standalone employee view.</p>
+<p><strong>Step 7: I try to track document progress for this employee.</strong></p>
+<blockquote>
+<p>&quot;I click on the member in the Members table and a slide-over panel opens. I can see their documents grouped by category — &#39;Onboarding&#39;, &#39;Compliance&#39;, etc. Nice. But there&#39;s no progress bar showing &#39;Onboarding 3/7 completed.&#39; And I can&#39;t see which documents they haven&#39;t even been assigned yet. The slide-over only shows what they&#39;ve been assigned, not what they&#39;re <em>missing</em>.&quot;</p>
+</blockquote>
+<p>🟡 <strong>MINOR — UX-ONB-007:</strong> Member slide-over shows existing documents but doesn&#39;t show gaps — documents that <em>should</em> be assigned based on their role/location but haven&#39;t been yet.</p>
+<p><strong>Step 8: I look for document generation capabilities.</strong></p>
+<blockquote>
+<p>&quot;I-9 and W-4 are handled by Workstream&#39;s dedicated modules — great. But I still need to generate an offer letter with the employee&#39;s name, position, start date, and pay rate pre-filled. And a uniform agreement with their location and manager name. Can I create a template that auto-fills employee data? Looking at the PDF mapping tool... no. It only places signature/date/checkbox fields. There&#39;s no &#39;merge field&#39; or &#39;variable&#39; concept.&quot;</p>
+</blockquote>
+<p>🟠 <del>MAJOR</del> <strong>DOWNGRADED TO ENHANCEMENT — UX-ONB-008:</strong> <del>No GENERATE document behavior for tax forms.</del> I-9 and W-4 are now handled by dedicated Workstream products. The remaining gap is generating <em>custom</em> documents with auto-filled employee data (offer letters, uniform agreements, separation agreements). This is a nice-to-have, not a blocker — admins can fill these manually or use PDF signing with text fields.</p>
+<p>✅ <del>MAJOR</del> <strong>RESOLVED (by reframing) — UX-ONB-009:</strong> <del>Document mapping fields are placement-only.</del> With I-9 and W-4 handled by dedicated products that have proper fillable forms, the PDF mapping tool only needs to handle signatures/dates on static documents (handbooks, policies, agreements) — which it does well.</p>
+<p><strong>Step 9: I look for a way to set the order documents should be completed.</strong></p>
+<blockquote>
+<p>&quot;In the Workstream Onboarding bundle, I assume I can order the tasks. But within Documents V2 itself, if I assign multiple documents to someone outside of onboarding, there&#39;s no way to set priority or sequence. They all just show up in whatever order.&quot;</p>
+</blockquote>
+<p>🟢 <strong>ENHANCEMENT — UX-ONB-010:</strong> No document priority/sequencing within a direct assignment (outside of onboarding). All documents are treated equally — there&#39;s no way to say &quot;complete these first&quot; or &quot;these are legally time-sensitive.&quot; (Note: Onboarding task ordering is handled at the Onboarding product level.)</p>
+<p>🟢 <strong>ENHANCEMENT — UX-ONB-011:</strong> No &quot;required by&quot; vs. &quot;nice to have&quot; distinction. All assigned documents appear equal in urgency.</p>
+<p>🟢 <strong>ENHANCEMENT — UX-ONB-012:</strong> No onboarding progress visibility within Documents V2. The compliance dashboard shows overall metrics but doesn&#39;t surface &quot;new hires this week&quot; or &quot;onboarding in progress.&quot; (Note: This may be visible in the Workstream Onboarding dashboard, but not in the Documents V2 compliance view.)</p>
+<hr>
+<h2>Test Session 2: Food Handler&#39;s Permit &amp; Certifications</h2>
+<h3>Scenario</h3>
+<p><em>&quot;I need to make sure every cook and server at all 5 locations has a valid food handler&#39;s certificate. I need to request it from employees who don&#39;t have one, track expiration dates, and get notified before they expire.&quot;</em></p>
+<h3>Walkthrough</h3>
+<p><strong>Step 1: I create a Food Handler Certificate template.</strong></p>
+<blockquote>
+<p>&quot;I go to Add Document → Collect Uploads. Perfect. I enter the name, select &#39;Food Safety&#39; category. Step 2 lets me set expiration tracking — nice, I can toggle it on and set reminders at 60, 30, 14, 7, and 1 days. I can even require manager verification. Step 3 has auto-assign rules — I can set &#39;when employee is hired&#39; as Cook or Server. This is exactly what I need. Great.&quot;</p>
+</blockquote>
+<p>✅ <strong>This flow works well.</strong> The certification creation wizard is thoughtful and restaurant-friendly.</p>
+<p><strong>Step 2: I check the Certifications dashboard.</strong></p>
+<blockquote>
+<p>&quot;Good, I see a table with all employee certifications. Status filter chips at the top — All, Expired, Expiring, Needs Review, Pending Upload, Valid. This is clear. I can see Mike Williams has an expiring food handler cert, Emily Davis has an expired TIPS cert, Chris Brown is pending upload. I can click &#39;Review&#39; on Alex Martinez&#39;s pending verification.&quot;</p>
+</blockquote>
+<p>✅ <strong>The certifications dashboard is solid.</strong> The status chips, sorting, and inline actions are well-designed.</p>
+<p><strong>Step 3: I open the verification modal.</strong></p>
+<blockquote>
+<p>&quot;Nice! I can see a document preview area (placeholder for now), the employee info, certification details, expiration date. There&#39;s a verification checklist — &#39;Document is authentic and readable&#39; and &#39;Expiration date is correct.&#39; I have to check both before I can approve. I can also reject with quick reasons like &#39;Document not readable&#39; or &#39;Expiration date mismatch.&#39; This is really well thought out.&quot;</p>
+</blockquote>
+<p>✅ <strong>Verification flow is excellent.</strong> The checklist prevents rubber-stamping and the quick rejection reasons save time.</p>
+<p><strong>Step 4: I look at the expiry calendar.</strong></p>
+<blockquote>
+<p>&quot;There&#39;s a calendar view! I can see which dates have certifications expiring. Color-coded dots — red for expired, orange for this month, yellow for 60 days, green for valid. I can click a date and see the details on the right. I can send reminders from here. This is genuinely useful for planning. Only issue — I can&#39;t filter by location. I manage 5 restaurants and I want to see &#39;what&#39;s expiring at Downtown this month&#39; specifically.&quot;</p>
+</blockquote>
+<p>🟠 <strong>MAJOR — UX-CERT-001:</strong> Expiry calendar has no location filter. For a multi-location admin, seeing all locations mixed together makes it harder to action items. I need to be able to say &quot;show me Downtown only.&quot;</p>
+<p>🟠 <strong>MAJOR — UX-CERT-002:</strong> No way to bulk-request a certification from all employees missing it. If I create a new &quot;Food Handler Certificate&quot; template, I can auto-assign it to future hires. But for the 50 existing employees who need it? I&#39;d have to individually assign/request it from each one. There should be a &quot;Request from all eligible employees&quot; button on the template.</p>
+<p><strong>Step 5: Employee uploads their certificate.</strong></p>
+<blockquote>
+<p>&quot;The CertificationUploadPage looks great from the employee side. Three-step flow: Upload → Details (expiration date, certificate number) → Review. They can drag-and-drop or take a photo. The review step warns them to check readability and expiration dates. Minor thing — there&#39;s no option to enter the issuing authority or state. Some states have different validity periods.&quot;</p>
+</blockquote>
+<p>🟡 <strong>MINOR — UX-CERT-003:</strong> No custom metadata fields on certification upload. Can&#39;t capture issuing authority, state, or training provider — useful for audit trails.</p>
+<p>🟡 <strong>MINOR — UX-CERT-004:</strong> The certification upload page accepts PDF, JPG, PNG but not HEIC (iPhone default photo format). Many employees will try to upload photos taken on their iPhone.</p>
+<p>🟡 <strong>MINOR — UX-CERT-005:</strong> No OCR or smart date detection. Employee manually enters expiration date — it would be helpful if the system could suggest a date by reading the uploaded document.</p>
+<p>🟢 <strong>ENHANCEMENT — UX-CERT-006:</strong> No integration with state certification databases. Some states (e.g., California&#39;s CFMB) allow looking up food handler certificates by certificate number.</p>
+<p>🟢 <strong>ENHANCEMENT — UX-CERT-007:</strong> No batch import for existing certifications. When first setting up the system, I need to import 100+ existing certifications with dates. There&#39;s no CSV upload or bulk entry.</p>
+<hr>
+<h2>Test Session 3: Policy Distribution &amp; Handbook Acknowledgement</h2>
+<h3>Scenario</h3>
+<p><em>&quot;Our company just updated the sexual harassment policy. I need to send the new version to all 120 employees across all 5 locations and track who has signed it. Also, it&#39;s January — time for annual employee handbook re-acknowledgement.&quot;</em></p>
+<h3>Walkthrough</h3>
+<p><strong>Step 1: I upload the new harassment policy PDF.</strong></p>
+<blockquote>
+<p>&quot;Upload PDF → Document Details → Continue to Mapping. I add a signature and date field at the bottom. Create Template. Good. Now I need to assign it to everyone.&quot;</p>
+</blockquote>
+<p><strong>Step 2: I click Assign on the new policy.</strong></p>
+<blockquote>
+<p>&quot;The assign modal shows &#39;Select by Location&#39; with location pills, and &#39;Select by Role&#39; with role pills. I click each of my 5 locations to select everyone. Then I set a due date and add a message: &#39;Our sexual harassment policy has been updated. Please review and sign by Feb 28.&#39; Send notification is toggled on. Nice.&quot;</p>
+</blockquote>
+<p>✅ <strong>Assignment flow is solid for bulk distribution.</strong> Select by location/role is exactly what&#39;s needed.</p>
+<p><strong>Step 3: But wait — I already had an older version of this policy.</strong></p>
+<blockquote>
+<p>&quot;Hmm, the old policy template is still there in my Documents list. Now I have two: &#39;Sexual Harassment Policy v2.3&#39; and &#39;Sexual Harassment Policy v2.4&#39;. There&#39;s no version control. No way to mark the old one as superseded. No way to link them. If an auditor asks &#39;which version did John Smith sign?&#39; I have to dig through two separate document templates.&quot;</p>
+</blockquote>
+<p>🔴 <strong>BLOCKER — UX-POL-001:</strong> No document version control. When a policy is updated, there&#39;s no way to:</p>
+<ul>
+<li>Mark the old version as superseded/archived</li>
+<li>Link the new version to the old one</li>
+<li>See version history (&quot;v2.3 → v2.4&quot;)</li>
+<li>Automatically void old unsigned assignments and reassign the new version</li>
+<li>Know which version each employee signed</li>
+</ul>
+<p>This is a compliance risk. During audits, you need to prove exactly which version was acknowledged.</p>
+<p><strong>Step 4: I want to trigger annual re-acknowledgement.</strong></p>
+<blockquote>
+<p>&quot;It&#39;s January, time for annual handbook sign-off. But the handbook was already sent last January. I&#39;d have to re-assign it to everyone again manually. There&#39;s no &#39;recurring assignment&#39; or &#39;annual re-sign&#39; feature. Every year, I&#39;ll have to manually reassign to 120 people.&quot;</p>
+</blockquote>
+<p>🟠 <strong>MAJOR — UX-POL-002:</strong> No recurring/scheduled re-assignment. Annual policy acknowledgements are standard in restaurants (and legally required for some policies). The admin has to manually reassign every year.</p>
+<p>🟠 <strong>MAJOR — UX-POL-003:</strong> No &quot;acknowledgement only&quot; option. Some policies just need a &quot;I have read and acknowledge&quot; checkbox — no wet signature required. But the PDF signing flow always requires a placed signature field. For a policy acknowledgement, a simple &quot;I acknowledge&quot; button with a timestamp would be sufficient and faster.</p>
+<p>🟠 <strong>MAJOR — UX-POL-004:</strong> When I re-assign an existing template to the same employees, what happens? The UI doesn&#39;t tell me if an employee already has a completed assignment for this document. I might accidentally send the same document twice. There should be a warning: &quot;12 of these 120 employees already have a completed assignment.&quot;</p>
+<p><strong>Step 5: I check the Document Detail page to track completion.</strong></p>
+<blockquote>
+<p>&quot;I click on the policy in the documents table. The detail page shows a nice summary — total sent, completed count, pending count. I can see who&#39;s completed it and who hasn&#39;t in separate &#39;Needs Attention&#39; and &#39;Completed&#39; sections. Good. I can &#39;Remind All Pending&#39; with one click. But I can&#39;t see this broken down by location. &#39;How many of my Downtown staff have signed vs. Midtown?&#39; — I&#39;d have to eyeball it.&quot;</p>
+</blockquote>
+<p>🟡 <strong>MINOR — UX-POL-005:</strong> Document detail page doesn&#39;t show completion breakdown by location. For multi-location policy rollouts, this is essential.</p>
+<p>🟢 <strong>ENHANCEMENT — UX-POL-006:</strong> No way to set escalation/reminders on regular documents. The escalation timeline (Day 3: reminder, Day 5: notify manager, Day 7: notify HR) only exists for write-ups. Policy documents should have similar automated reminder chains.</p>
+<p>🟢 <strong>ENHANCEMENT — UX-POL-007:</strong> No &quot;Download signed copies&quot; per location for audit binders. Many restaurants keep physical binders of signed policies. Being able to download all signed PDFs for a specific location as a ZIP would be very useful.</p>
+<hr>
+<h2>Test Session 4: Employee Write-ups</h2>
+<h3>Scenario</h3>
+<p><em>&quot;One of my servers, Maria, was 30 minutes late for the third time this month. I need to issue a written warning. Last month she got a verbal warning (also in the system). I need to document the incident, have her sign it, and have it on file.&quot;</em></p>
+<h3>Walkthrough</h3>
+<p><strong>Step 1: I navigate to the Write-ups tab.</strong></p>
+<blockquote>
+<p>&quot;I see all write-ups in a table with status chips — All, Pending, Refused, Acknowledged, Draft, Scheduled. I can search and sort. Good. The dashboard clearly shows which write-ups need attention. I see Juan has a refused write-up — that&#39;s highlighted in red. This is well-organized.&quot;</p>
+</blockquote>
+<p>✅ <strong>Write-ups dashboard is excellent.</strong> The status-based view with filter chips is exactly what a manager needs.</p>
+<p><strong>Step 2: I click the &#39;+ Assign&#39; button (labeled &#39;Issue Write-Up&#39; in the header area).</strong></p>
+<blockquote>
+<p>&quot;Okay, the assign write-up modal opens. Step 1: Search and select employee — I find Maria. Step 2: Select write-up type — I choose &#39;Written Warning.&#39; Step 3: Incident details — date, description, what happened. Step 4: Manager notes — I can add my notes and observations. Step 5: Optional demerit points. Step 6: Send option — now, scheduled, or draft. Step 7: Manager signature. Step 8: Preview. This is thorough.&quot;</p>
+</blockquote>
+<p>✅ <strong>Write-up assignment flow is comprehensive and well-structured.</strong> The step-by-step wizard prevents mistakes.</p>
+<p><strong>Step 3: I want to see Maria&#39;s write-up history before issuing this one.</strong></p>
+<blockquote>
+<p>&quot;Wait — in the assign modal, when I select Maria, I&#39;d love to see her history right there. Like &#39;Maria has 1 previous write-up: Verbal Warning on Jan 15.&#39; That way I can reference it. I have to close this modal, go find Maria in the Members table, open her slide-over, and look at her write-up history section. Then go back and start the assign flow again.&quot;</p>
+</blockquote>
+<p>🟠 <strong>MAJOR — UX-WU-001:</strong> No employee write-up history preview within the assignment flow. When selecting an employee to issue a write-up, the admin should see their previous write-ups inline so they can:</p>
+<ul>
+<li>Reference prior incidents</li>
+<li>Ensure proper progressive discipline escalation (verbal → written → final)</li>
+<li>Avoid issuing a verbal when a written is warranted</li>
+</ul>
+<p><strong>Step 4: I check the write-up history section for Maria.</strong></p>
+<blockquote>
+<p>&quot;The WriteUpHistorySection component is really good. Timeline view, color-coded by severity, shows signatures, points balance. I can expand/collapse it. The point system is visible — &#39;+2 pts&#39; for the verbal warning. This gives me good context.&quot;</p>
+</blockquote>
+<p>✅ <strong>Write-up history section is well-designed.</strong></p>
+<p><strong>Step 5: Employee acknowledgement flow.</strong></p>
+<blockquote>
+<p>&quot;From Maria&#39;s perspective, the WriteUpAcknowledgement component is well-done. She sees the write-up details, checks &#39;I have read and understand,&#39; can choose to Acknowledge &amp; Sign or Decline to Sign. If she acknowledges, she can add a response and sign electronically. If she declines, she has to give a reason and confirm she understands it still goes on file. The info box explaining &#39;signing doesn&#39;t mean agreement&#39; is a nice touch.&quot;</p>
+</blockquote>
+<p>✅ <strong>Employee-facing write-up flow is excellent.</strong> The legal language is clear and protective.</p>
+<p><strong>Step 6: I want to add a witness.</strong></p>
+<blockquote>
+<p>&quot;Hmm, for a written warning, I usually have a witness present. Where do I add a witness signature? I see manager signs and worker signs, but there&#39;s no option for a third party — like my assistant manager who was in the room.&quot;</p>
+</blockquote>
+<p>🟡 <strong>MINOR — UX-WU-002:</strong> No witness/third-party signature option on write-ups. Progressive discipline best practices often require a witness for written and final warnings.</p>
+<p>🟡 <strong>MINOR — UX-WU-003:</strong> No way to attach evidence to a write-up. If Maria&#39;s tardiness was captured by the time clock system, I&#39;d want to attach that screenshot. There&#39;s no file attachment option in the write-up flow.</p>
+<p>🟡 <strong>MINOR — UX-WU-004:</strong> No follow-up/check-in scheduling. After issuing a written warning, I typically set a 30-day follow-up to review improvement. There&#39;s no way to schedule this in the write-up flow.</p>
+<p>🟢 <strong>ENHANCEMENT — UX-WU-005:</strong> Write-up templates could include pre-filled sections. A &quot;Tardiness&quot; template could auto-include fields like &quot;Date(s) of tardiness,&quot; &quot;Scheduled time vs. arrival time,&quot; &quot;Previous warnings for tardiness.&quot; This would standardize documentation.</p>
+<p>🟢 <strong>ENHANCEMENT — UX-WU-006:</strong> No progressive discipline tracking/automation. The system could automatically suggest the next severity level: &quot;Maria has 1 verbal warning for tardiness. System recommends: Written Warning.&quot; This would help managers follow proper discipline protocols.</p>
+<p>🟢 <strong>ENHANCEMENT — UX-WU-007:</strong> No integration with scheduling/time clock data. Write-ups for tardiness could auto-pull time clock data to show scheduled vs. actual arrival times.</p>
+<hr>
+<h2>Test Session 5: Data Collection (T-shirt Sizes, Emergency Contacts, Dietary Needs)</h2>
+<h3>Scenario</h3>
+<p><em>&quot;I need to collect t-shirt sizes from all employees for our new uniforms, update emergency contacts quarterly, and collect dietary restrictions for our annual holiday party.&quot;</em></p>
+<h3>Walkthrough</h3>
+<p><strong>Step 1: I try to create a data collection form.</strong></p>
+<blockquote>
+<p>&quot;Okay, I click + Add Document and... there&#39;s no option for this. &#39;Upload PDF for signing&#39; — nope, I don&#39;t have a PDF. &#39;Create a write up&#39; — that&#39;s for discipline. &#39;Collect uploads&#39; — that&#39;s for certifications/files. &#39;Duplicate&#39; — nothing to duplicate. Where do I create a form that just asks &#39;What&#39;s your t-shirt size? S/M/L/XL/XXL&#39;?&quot;</p>
+</blockquote>
+<p>🔴 <strong>BLOCKER — UX-DC-001:</strong> No standalone form/data collection document type. The FormFieldBuilder component supports open text, single select, multiple choice, and rating — exactly what&#39;s needed for data collection. But it&#39;s trapped inside the write-up creation flow. There needs to be a &quot;Create a Form&quot; or &quot;Collect Information&quot; option in the document type selector.</p>
+<p><strong>Step 2: I try a workaround — using the Write-Up flow.</strong></p>
+<blockquote>
+<p>&quot;Okay maybe I&#39;ll abuse the write-up system. I create a &#39;write-up&#39; titled &#39;T-Shirt Size Collection&#39; with type... &#39;Coaching&#39;? &#39;Other&#39;? None of these types make sense. And when employees receive it, they&#39;ll see a write-up notification. That&#39;s going to cause panic. &#39;You received a write-up&#39; is NOT the same as &#39;Please confirm your t-shirt size.&#39; This is a terrible user experience for the employee.&quot;</p>
+</blockquote>
+<p>🔴 <strong>BLOCKER — UX-DC-002:</strong> Using write-ups as a workaround for data collection would confuse and alarm employees. The notification system, status labels (&quot;acknowledged/refused&quot;), and the entire framing of write-ups is designed for disciplinary contexts. Sending an employee a &quot;write-up&quot; to ask their t-shirt size would undermine trust.</p>
+<p>🟠 <strong>MAJOR — UX-DC-003:</strong> No structured data export. Even if I could collect this data via forms, there&#39;s no way to export the results as a spreadsheet. When ordering uniforms, I need a CSV: Employee Name | Location | T-Shirt Size. The system doesn&#39;t appear to have any reporting/export functionality.</p>
+<p>🟢 <strong>ENHANCEMENT — UX-DC-004:</strong> No &quot;form templates&quot; library. Common restaurant data collection needs (emergency contacts, uniform sizes, availability, dietary restrictions) could be pre-built templates. This would save setup time.</p>
+<hr>
+<h2>Test Session 6: Separation &amp; Termination</h2>
+<blockquote>
+<p><strong>Platform Context:</strong> Workstream HRIS tracks employee status (active/terminated). When an employee is terminated in the system, that status change is available as a trigger. However, there is no &quot;Offboarding&quot; product equivalent to the Onboarding product — no offboarding process builder or termination document bundle exists yet.</p>
+</blockquote>
+<h3>Scenario</h3>
+<p><em>&quot;An employee at our Midtown location has been terminated for cause. I need to issue final paperwork: separation agreement, final paycheck acknowledgement, COBRA notification, property return checklist, and exit interview form.&quot;</em></p>
+<h3>Walkthrough</h3>
+<p><strong>Step 1: I look for a termination workflow.</strong></p>
+<blockquote>
+<p>&quot;I&#39;m on the Dashboard. I don&#39;t see any termination-related section. No &#39;Offboarding&#39; category. No &#39;Separation&#39; documents. I go to the Documents tab — all the templates here are ongoing documents. Workstream has an Onboarding product that bundles hire-day documents — but there&#39;s no equivalent &#39;Offboarding&#39; product that bundles separation documents. And Documents V2 has no termination trigger either.&quot;</p>
+</blockquote>
+<p>🔴 <strong>BLOCKER — UX-SEP-001:</strong> No offboarding/termination workflow. While Workstream HRIS knows when an employee is terminated, there&#39;s no:</p>
+<ul>
+<li>Termination trigger in Documents V2 that auto-assigns exit documents</li>
+<li>Offboarding bundle equivalent to the Onboarding process builder</li>
+<li>Property return checklist/tracker</li>
+</ul>
+<p>Note: Unlike onboarding (which has a dedicated Workstream product), offboarding has no platform-level solution. This is a gap at both the Documents V2 level <em>and</em> the Workstream platform level.</p>
+<p><strong>Step 2: I try to manually create and assign separation documents.</strong></p>
+<blockquote>
+<p>&quot;I can upload a separation agreement PDF and assign it to the terminated employee. But there&#39;s no urgency indicator. This person is leaving TODAY — I need them to sign before they walk out the door. There&#39;s no &#39;immediate/urgent&#39; priority level. The document just goes into the regular queue.&quot;</p>
+</blockquote>
+<p>🟠 <del>BLOCKER</del> <strong>DOWNGRADED TO MAJOR — UX-SEP-002:</strong> No urgency/priority levels on document assignments. Termination paperwork is time-critical (legally, some documents must be provided at time of separation). There&#39;s no way to distinguish &quot;sign this before end of today&quot; from &quot;sign this within 30 days.&quot; Downgraded from blocker because admins can work around this by calling/texting the employee directly — but the system provides no affordance for urgency.</p>
+<p>🟠 <strong>MAJOR — UX-SEP-003:</strong> No ability to revoke/cancel pending assignments when an employee is terminated. If an employee had pending onboarding documents or unsigned policies, those should be automatically canceled when HRIS status changes to &quot;terminated.&quot; Currently they&#39;d just stay as &quot;pending&quot; forever, skewing compliance metrics.</p>
+<p>🟠 <strong>MAJOR — UX-SEP-004:</strong> No separation of &quot;active&quot; vs. &quot;terminated&quot; employees in the Documents V2 member list. The Members table shows all team members with no status filter. While Workstream HRIS tracks status, Documents V2 doesn&#39;t consume it — a terminated employee&#39;s incomplete documents still count toward compliance percentages.</p>
+<p>🟡 <strong>MINOR — UX-SEP-005:</strong> No confidentiality/NDA handling. Separation agreements often include confidentiality clauses that need to be tracked separately with different retention periods.</p>
+<p>🟢 <strong>ENHANCEMENT — UX-SEP-006:</strong> No integration with HRIS termination event. When an employee is terminated in Workstream HRIS, Documents V2 should automatically trigger exit paperwork — or at minimum surface a &quot;This employee has been terminated — assign exit documents?&quot; prompt.</p>
+<hr>
+<h2>Test Session 7: Multi-Location Management</h2>
+<h3>Scenario</h3>
+<p><em>&quot;I oversee HR for 5 restaurants: Downtown, Midtown, Uptown, Westside, and Airport. I need to see which locations are falling behind on compliance, manage location-specific documents (Midtown has a liquor license requirement the others don&#39;t), and ensure each location&#39;s GM has access to only their location&#39;s documents.&quot;</em></p>
+<h3>Walkthrough</h3>
+<p><strong>Step 1: I check the Compliance Dashboard.</strong></p>
+<blockquote>
+<p>&quot;The dashboard shows a single compliance score: 53%. Okay, but is that an average? Is Downtown at 90% and Airport dragging us down at 20%? I can&#39;t tell. The &#39;Members Needing Attention&#39; panel shows individual employees with their location listed, but there&#39;s no way to see location-level compliance. I need a view that says: Downtown 85%, Midtown 72%, Uptown 91%, Westside 65%, Airport 45%.&quot;</p>
+</blockquote>
+<p>🔴 <strong>BLOCKER — UX-ML-001:</strong> No location-level compliance breakdown. The entire dashboard aggregates across all locations. For a multi-location admin, this makes the compliance score nearly meaningless because it hides which locations are the problem.</p>
+<p><strong>Step 2: I try to filter the Documents table by location.</strong></p>
+<blockquote>
+<p>&quot;I go to the Documents tab → By Template view. I see all document templates with their completion progress. But this is template-level, not location-level. I can see &#39;Employee Handbook 2024&#39; is 6/8 completed, but I can&#39;t see &#39;4/4 at Downtown, 1/2 at Midtown, 1/2 at Uptown.&#39; The search bar lets me search by name but there&#39;s no location filter dropdown.&quot;</p>
+</blockquote>
+<p>🟠 <strong>MAJOR — UX-ML-002:</strong> No location filter on the Documents table. Both the &quot;By Template&quot; and &quot;By Member&quot; views lack the ability to filter by location. This is table stakes for multi-location management.</p>
+<p><strong>Step 3: I try to assign a location-specific document.</strong></p>
+<blockquote>
+<p>&quot;Midtown has a liquor license, so only Midtown staff need TIPS certification. When I create the certification template with auto-assign, I can set location conditions in the auto-assign rules. That&#39;s good for future hires. But the main assignment modal shows all employees across all locations — I have to manually find and select Midtown employees. At least there&#39;s the &#39;Select by Location&#39; pills in the assign modal, that helps.&quot;</p>
+</blockquote>
+<p>✅ <strong>The assign modal&#39;s &quot;Select by Location&quot; feature is a strong multi-location affordance.</strong> This is one of the better-designed features for multi-location management.</p>
+<p><strong>Step 4: I want my GMs to only see their own location.</strong></p>
+<blockquote>
+<p>&quot;I&#39;m looking for permission settings or admin roles. When I create a write-up template, I see &#39;Permissions&#39; at the end — I can restrict which locations and roles can use the template. But this is template-level permissions, not user-level. I can&#39;t say &#39;Sarah (GM of Downtown) can only see and manage Downtown employees and documents.&#39; There&#39;s no admin role/permission management.&quot;</p>
+</blockquote>
+<p>🟠 <strong>MAJOR — UX-ML-003:</strong> No user-level access control by location. The permission system only exists at the template level (which locations can use a template), not at the user level (which locations a manager can see). In a multi-location setup, GMs should only see their own location.</p>
+<p>🟠 <strong>MAJOR — UX-ML-004:</strong> No location-level dashboard view. I should be able to click into a location and see that location&#39;s compliance score, action items, team members, and documents — like a mini-dashboard per restaurant.</p>
+<p>🟡 <strong>MINOR — UX-ML-005:</strong> Location names are hardcoded in mock data (Downtown, Midtown, Uptown). There&#39;s no UI to add/remove/rename locations. In practice, restaurants open and close, and the list needs to be dynamic.</p>
+<p>🟡 <strong>MINOR — UX-ML-006:</strong> No cross-location comparison report. Something like a leaderboard: &quot;Uptown 92% compliance ▲, Downtown 85% ▬, Midtown 72% ▼&quot; would motivate GMs.</p>
+<p>🟢 <strong>ENHANCEMENT — UX-ML-007:</strong> No location hierarchy support. Some restaurant groups have regions → districts → locations. The system is flat (one level of locations).</p>
+<p>🟢 <strong>ENHANCEMENT — UX-ML-008:</strong> No location-specific document templates. Currently a template is either &quot;all locations&quot; or restricted to specific ones via permissions. It would be useful to have location-level templates — e.g., &quot;Downtown Employee Parking Policy&quot; that only exists for Downtown.</p>
+<hr>
+<h2>Test Session 8: Audit Preparation &amp; Compliance Reporting</h2>
+<h3>Scenario</h3>
+<p><em>&quot;The health department is coming for an inspection next week. I need to pull all food handler certificates for Downtown, show they&#39;re all valid, and have everything ready. Also, our corporate office wants a quarterly compliance report.&quot;</em></p>
+<h3>Walkthrough</h3>
+<p><strong>Step 1: I try to generate a compliance report.</strong></p>
+<blockquote>
+<p>&quot;The Dashboard shows 53% compliance and lists action items. But there&#39;s no &#39;Export Report&#39; or &#39;Generate Audit Report&#39; button. I can see the data on screen but can&#39;t get it out of the system. If the health inspector asks for proof of food handler certification for all Downtown cooks, I&#39;d have to screenshot the certifications table? That&#39;s not professional.&quot;</p>
+</blockquote>
+<p>🔴 <strong>BLOCKER — UX-AUD-001:</strong> No export/report generation capability. This is a critical gap for any compliance tool. Users need to be able to:</p>
+<ul>
+<li>Export a PDF compliance report by location</li>
+<li>Download all signed documents for a specific employee</li>
+<li>Generate a certification status report for health department audits</li>
+<li>Export data as CSV for corporate reporting</li>
+</ul>
+<p><strong>Step 2: I try to pull all food handler certs for Downtown.</strong></p>
+<blockquote>
+<p>&quot;I go to the Certifications tab. I can filter by status (Valid, Expired, etc.) but NOT by location or certification type simultaneously. I can search by employee name or certification name. If I search &#39;Food Handler&#39; I get all Food Handler certs across all locations. I can&#39;t narrow to just Downtown.&quot;</p>
+</blockquote>
+<p>🟠 <strong>MAJOR — UX-AUD-002:</strong> No multi-dimensional filtering on certifications. An audit view needs to filter by: Location + Certification Type + Status simultaneously. Currently only one dimension (status) is filterable via chips, and free-text search handles the rest.</p>
+<p>🟠 <strong>MAJOR — UX-AUD-003:</strong> No &quot;Download All&quot; for a filtered set of documents. Even if I could filter to Downtown Food Handler certs, there&#39;s no way to download all the uploaded certificates as a ZIP file for the inspector.</p>
+<p><strong>Step 3: I look for historical compliance data.</strong></p>
+<blockquote>
+<p>&quot;The dashboard shows current compliance. But corporate wants to know: &#39;Were you compliant in Q4?&#39; There are no historical snapshots, no trend lines, no &#39;compliance over time&#39; chart. The data only reflects the current moment.&quot;</p>
+</blockquote>
+<p>🟡 <strong>MINOR — UX-AUD-004:</strong> No historical compliance tracking/trending. Compliance is a point-in-time snapshot only.</p>
+<p>🟢 <strong>ENHANCEMENT — UX-AUD-005:</strong> No pre-built audit checklists. Health department inspections have standard requirements. A &quot;Health Department Audit Prep&quot; template that checks all required certifications against current status would be invaluable.</p>
+<p>🟢 <strong>ENHANCEMENT — UX-AUD-006:</strong> No audit log. There&#39;s no visible system audit trail showing who changed what, when a document was created, modified, assigned, signed, or expired. This is important for both internal audits and legal compliance.</p>
+<hr>
+<h2>Test Session 9: Template Creation &amp; Management</h2>
+<h3>Scenario</h3>
+<p><em>&quot;I&#39;m setting up the system from scratch. I need to create all our document templates and configure them properly.&quot;</em></p>
+<h3>Walkthrough</h3>
+<p><strong>Step 1: I start creating templates.</strong></p>
+<blockquote>
+<p>&quot;The Document Type Selector is clean — four big cards with icons and descriptions. That&#39;s a nice entry point. But four types isn&#39;t enough for all my use cases. Where are:</p>
+<ul>
+<li><strong>Create a Form</strong> (for data collection — emergency contacts, direct deposit, equipment checkout)</li>
+<li><strong>Generate from Template</strong> (for offer letters, separation agreements with auto-filled employee data)  </li>
+<li><strong>Create a Checklist</strong> (for onboarding checklists, property return checklists)</li>
+<li><strong>Acknowledgement Only</strong> (for policies that just need a &#39;I read it&#39; click, no signature placement)</li>
+</ul>
+<p>I feel like the four types cover maybe 40% of my document needs.&quot;</p>
+</blockquote>
+<p><em>Note: This is a consolidation of feedback captured in earlier sessions. The four document creation types (PDF Signing, Write-Up, Collect Uploads, Duplicate) leave significant gaps.</em></p>
+<p><strong>Step 2: I try to organize my templates.</strong></p>
+<blockquote>
+<p>&quot;I now have 15 templates in my Documents table. They&#39;re all in one flat list. I can sort by name, type, progress, or created date. But I can&#39;t organize them into folders or categories. There&#39;s no way to group &#39;Onboarding Documents&#39; separately from &#39;Safety Policies&#39; from &#39;HR Forms.&#39; The &#39;Document Type&#39; column shows things like &#39;Policies&#39;, &#39;Certifications&#39;, &#39;Write-ups&#39; but these are broad categories, not custom groupings.&quot;</p>
+</blockquote>
+<p>🟠 <strong>MAJOR — UX-TM-001:</strong> No folder/category system for organizing templates. As the template library grows (restaurants typically have 50-100 document types), a flat list becomes unmanageable.</p>
+<p><strong>Step 3: I look for template drafts and archiving.</strong></p>
+<blockquote>
+<p>&quot;I created a write-up template and saved it as a draft — good, that option exists. But for PDF signing templates, there&#39;s no draft state. It&#39;s created immediately when I click &#39;Continue to Mapping.&#39; If I want to set up a template today but not make it assignable until next month, I can&#39;t. There&#39;s also no archive/inactive status for old templates I don&#39;t use anymore but want to keep for records.&quot;</p>
+</blockquote>
+<p>🟡 <strong>MINOR — UX-TM-002:</strong> Inconsistent draft/archive states across document types. Write-ups have draft support; other types don&#39;t.</p>
+<p>🟡 <strong>MINOR — UX-TM-003:</strong> No template preview. When I&#39;m in the Documents table looking at my templates, I can click into the detail page to see assignment status, but I can&#39;t quickly preview what the document/form actually looks like.</p>
+<p>🟢 <strong>ENHANCEMENT — UX-TM-004:</strong> No template duplication with modifications. The &quot;Duplicate&quot; option in the type selector lets me copy a template, but I can&#39;t choose to duplicate <em>and then modify</em> — it creates an exact copy and I&#39;d have to find and edit it after.</p>
+<hr>
+<h2>Test Session 10: Day-to-Day Operations</h2>
+<h3>Scenario</h3>
+<p><em>&quot;It&#39;s a normal Tuesday. I want to quickly check what needs my attention across all locations and take action.&quot;</em></p>
+<h3>Walkthrough</h3>
+<p><strong>Step 1: I open the Compliance Dashboard.</strong></p>
+<blockquote>
+<p>&quot;The dashboard is a good starting point. The compliance circle (53%), the counter chips (Templates, Certifications, Write-ups, Team Members), and the &#39;Action Required&#39; section are all well-designed. The action items are clearly prioritized — critical (red) and warning (amber). Each item has the names of affected employees and a quick action button. I&#39;d rate this a solid B+.&quot;</p>
+</blockquote>
+<p>✅ <strong>Dashboard is well-designed for daily triage.</strong> The consolidated action items list is effective.</p>
+<p><strong>Step 2: I click through each action item.</strong></p>
+<blockquote>
+<p>&quot;I click &#39;3 expired documents&#39; and it takes me to the Documents tab... but there&#39;s no &#39;expired&#39; filter applied. It just goes to the default Documents view. I expected it to filter to show me only the expired items. Same with &#39;pending signatures&#39; — it navigates to the documents tab but doesn&#39;t apply the pending filter.&quot;</p>
+</blockquote>
+<p>🟠 <strong>MAJOR — UX-DAY-001:</strong> Dashboard action items navigate to the correct tab but don&#39;t apply the relevant filter. The <code>onNavigateToTab(&#39;documents&#39;, &#39;expired&#39;)</code> function accepts a filter parameter, but the Documents page doesn&#39;t seem to consume it to pre-filter the table. The user has to manually find the relevant items after clicking.</p>
+<p><strong>Step 3: I look at the &#39;Incomplete Templates&#39; panel.</strong></p>
+<blockquote>
+<p>&quot;This shows the top 5 templates that aren&#39;t fully assigned. Each shows a progress bar and &#39;X remaining.&#39; I can click to open the template detail. This is useful but the panel only shows 5 — with &#39;View All&#39; going to the full Documents tab. That works.&quot;</p>
+</blockquote>
+<p>✅ <strong>Incomplete Templates panel is useful.</strong></p>
+<p><strong>Step 4: I want to send a quick reminder to everyone with pending items.</strong></p>
+<blockquote>
+<p>&quot;I see pending signatures in the action items. I want to send a reminder to all of them at once. But clicking the action item just navigates me away. There&#39;s no &#39;Remind All&#39; button directly on the action item in the dashboard. I have to navigate to the documents view, find each document, go into the detail page, and click &#39;Remind All Pending&#39; there.&quot;</p>
+</blockquote>
+<p>🟡 <strong>MINOR — UX-DAY-002:</strong> No &quot;Remind All&quot; action directly from the dashboard action items. The action items show &quot;View&quot; which navigates away. A &quot;Remind&quot; action alongside &quot;View&quot; would save clicks.</p>
+<p><strong>Step 5: I check notifications/activity feed.</strong></p>
+<blockquote>
+<p>&quot;Is there an activity feed? Something like &#39;Sarah signed Employee Handbook — 2 hours ago&#39; or &#39;Mike&#39;s Food Handler cert expired — yesterday&#39;? I don&#39;t see one. The dashboard shows counts but not recent activity. I&#39;d love a running log of what&#39;s happening.&quot;</p>
+</blockquote>
+<p>🟡 <strong>MINOR — UX-DAY-003:</strong> No activity feed or recent events log. The dashboard is snapshot-based (current state) rather than event-based (what happened recently).</p>
+<p>🟢 <strong>ENHANCEMENT — UX-DAY-004:</strong> No email digest option. A daily email summary (&quot;3 documents signed yesterday, 2 new expirations, 1 write-up refused&quot;) would help admins stay on top of things without logging in every morning.</p>
+<p>🟢 <strong>ENHANCEMENT — UX-DAY-005:</strong> No mobile-responsive consideration. The layout uses <code>grid-cols-2</code> for dashboard panels, tables with 6+ columns, and slide-overs at 420px width. Restaurant managers often check this on their phones between shifts.</p>
+<hr>
+<h2>Overall UX Observations</h2>
+<h3>What Works Well 👍</h3>
+<ol>
+<li><p><strong>Write-ups flow end-to-end</strong> — Template creation (with form builder), assignment (with employee selection and manager signature), employee acknowledgement (with decline option), history tracking, escalation settings. This is the most complete workflow in the product.</p>
+</li>
+<li><p><strong>Certification management</strong> — Creation with auto-assign, employee upload with photo support, manager verification with checklist, expiry calendar, reminder system. Well thought out.</p>
+</li>
+<li><p><strong>Assignment modal</strong> — &quot;Select by Location&quot; and &quot;Select by Role&quot; chips for bulk selection, plus individual search. The two-step (select → review) flow prevents mistakes.</p>
+</li>
+<li><p><strong>Compliance Dashboard</strong> — Consolidated action items with severity indicators. Clean metric chips. Good visual hierarchy.</p>
+</li>
+<li><p><strong>Consistent UI</strong> — The product uses a consistent design system (buttons, modals, tables, status colors, toasts). The red/amber/green traffic-light pattern for status is intuitive.</p>
+</li>
+<li><p><strong>Bulk selection</strong> — The floating action bar when rows are selected in tables is well-designed. &quot;Remind All&quot; and &quot;Download&quot; bulk actions are accessible.</p>
+</li>
+<li><p><strong>Fits into the Workstream ecosystem</strong> — The product&#39;s team member list, locations, and roles can be sourced from Workstream HRIS. Templates can be plugged into Workstream Onboarding bundles. I-9 and W-4 are handled by dedicated products, so Documents V2 doesn&#39;t need to reinvent government forms.</p>
+</li>
+</ol>
+<h3>What Needs Work 👎</h3>
+<ol>
+<li><p><strong>Only 3 of 5 document behaviors are implemented.</strong> SIGN (PDF + signatures) ✓, UPLOAD (collect files) ✓, and a specialized SIGN variant for write-ups ✓. But COLLECT (structured forms) is completely missing — and it&#39;s the one behavior that no other Workstream product covers for restaurant-specific data (emergency contacts, uniform sizes, availability, dietary needs). GENERATE (templates + data merge) is a nice-to-have now that I-9/W-4 are handled elsewhere.</p>
+</li>
+<li><p><strong>No location-level visibility.</strong> The product aggregates everything across all locations. Multi-location admins can&#39;t answer basic questions like &quot;How&#39;s Downtown doing on compliance?&quot; without manually scanning through every member. This is the biggest operational gap.</p>
+</li>
+<li><p><strong>No export or reporting.</strong> Data goes in but doesn&#39;t come out. No PDF reports, no CSV exports, no audit packages. This is a blocker for any compliance-regulated industry. Workstream&#39;s Onboarding dashboard provides some tracking, but Documents V2 needs its own reporting for certifications, policies, and write-ups.</p>
+</li>
+<li><p><strong>No version control.</strong> Policies change. The system treats each version as a completely separate document with no linking, history, or automatic re-assignment. This is a compliance risk during audits.</p>
+</li>
+<li><p><strong>No offboarding/termination integration.</strong> Workstream Onboarding solves the &quot;hire&quot; side of the employee lifecycle, but there&#39;s no equivalent &quot;termination&quot; trigger. When HRIS status changes to &quot;terminated,&quot; Documents V2 doesn&#39;t react — pending documents stay pending, compliance percentages are skewed, and exit paperwork must be manually assigned.</p>
+</li>
+<li><p><strong>Auto-assign is limited to certifications.</strong> While onboarding handles new-hire document bundling, ongoing document assignment (updated policies, annual re-acknowledgements, role-change documents) still requires manual intervention for non-certification document types.</p>
+</li>
+</ol>
+<h3>What&#39;s Resolved by Workstream Platform ✅</h3>
+<table>
+<thead>
+<tr>
+<th>Original Blocker</th>
+<th>Resolution</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>No onboarding packet/bundle (UX-ONB-003)</td>
+<td>Workstream Onboarding bundles documents into onboarding processes</td>
+</tr>
+<tr>
+<td>No way to add new employee (UX-ONB-004)</td>
+<td>New hires enter system through Hiring → Onboarding pipeline; HRIS is source of truth for team member list</td>
+</tr>
+<tr>
+<td>No I-9/W-4 generation (UX-ONB-008/009)</td>
+<td>I-9 &amp; E-Verify is a dedicated Workstream product; W-4 and tax forms are handled by Workstream Payroll</td>
+</tr>
+</tbody></table>
+<h3>Recommendations (Prioritized)</h3>
+<table>
+<thead>
+<tr>
+<th>Priority</th>
+<th>Item</th>
+<th>Impact</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>P0</td>
+<td>Add COLLECT (form) document type using existing FormFieldBuilder</td>
+<td>Unblocks data collection, emergency contacts, uniform sizing</td>
+<td>No other Workstream product covers this for custom restaurant-specific data</td>
+</tr>
+<tr>
+<td>P0</td>
+<td>Add location filter to all list views + location compliance dashboard</td>
+<td>Unblocks multi-location management</td>
+<td>Table stakes for any multi-location restaurant group</td>
+</tr>
+<tr>
+<td>P0</td>
+<td>Add basic export (CSV + PDF report)</td>
+<td>Unblocks audit compliance</td>
+<td>Critical for health dept inspections, corporate reporting</td>
+</tr>
+<tr>
+<td>P0</td>
+<td>Add document version control (supersede + link versions)</td>
+<td>Unblocks policy update workflows</td>
+<td>Compliance risk without it — auditors need version proof</td>
+</tr>
+<tr>
+<td>P1</td>
+<td>Extend auto-assign rules to all document types</td>
+<td>Enables automated ongoing document workflows</td>
+<td>Onboarding handles new-hire, but policy updates and role changes need auto-assign</td>
+</tr>
+<tr>
+<td>P1</td>
+<td>Consume HRIS employee status in Documents V2</td>
+<td>Enables active/terminated filtering, compliance accuracy</td>
+<td>Terminated employees skew compliance %; pending docs should auto-cancel</td>
+</tr>
+<tr>
+<td>P1</td>
+<td>Add offboarding/termination trigger</td>
+<td>Enables separation document workflows</td>
+<td>Mirror of what Onboarding does for hires — but for exits</td>
+</tr>
+<tr>
+<td>P1</td>
+<td>Make dashboard action items apply filters when navigating</td>
+<td>Fixes broken navigation flow</td>
+<td>Currently navigates to tab but doesn&#39;t pre-filter</td>
+</tr>
+<tr>
+<td>P2</td>
+<td>Add recurring/scheduled assignments</td>
+<td>Enables annual policy re-acknowledgement</td>
+<td>Standard in restaurants for handbooks and safety policies</td>
+</tr>
+<tr>
+<td>P2</td>
+<td>Add acknowledgement-only document type (no PDF/signature)</td>
+<td>Simplifies policy acknowledgements</td>
+<td>Many policies just need &quot;I read it&quot; — not a wet signature</td>
+</tr>
+<tr>
+<td>P2</td>
+<td>Add user-level permissions by location</td>
+<td>Enables GM-level access control</td>
+<td>GMs should only see their own location</td>
+</tr>
+<tr>
+<td>P2</td>
+<td>Build unified employee &quot;My Documents&quot; view</td>
+<td>Gives employees a post-onboarding document hub</td>
+<td>Onboarding portal covers Day 1; this covers ongoing</td>
+</tr>
+<tr>
+<td>P3</td>
+<td>Add GENERATE document type (template + data merge)</td>
+<td>Enables offer letters, separation agreements</td>
+<td>Nice-to-have now that I-9/W-4 are handled by dedicated products</td>
+</tr>
+<tr>
+<td>P3</td>
+<td>Add activity feed / event log</td>
+<td>Improves day-to-day visibility</td>
+<td>Snapshot dashboard misses &quot;what happened today&quot;</td>
+</tr>
+<tr>
+<td>P3</td>
+<td>Add progressive discipline automation</td>
+<td>Differentiates write-up feature</td>
+<td>System could suggest escalation level based on history</td>
+</tr>
+<tr>
+<td>P3</td>
+<td>Add mobile-responsive layouts</td>
+<td>Enables field manager usage</td>
+<td>Restaurant managers check this on phones between shifts</td>
+</tr>
+</tbody></table>
+<hr>
+<p><em>End of usability testing session. Total testing time: ~3 hours. Total issues found: 52 (7 blockers, 16 major, 13 minor, 16 enhancements). Three original blockers resolved by existing Workstream platform capabilities (Onboarding bundles, I-9/E-Verify, HRIS).</em></p>

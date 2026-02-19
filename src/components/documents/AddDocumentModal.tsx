@@ -159,14 +159,18 @@ interface AddDocumentModalProps {
   onSaveWriteUp?: (writeUp: WriteUpTemplateData) => void
 }
 
+export type WriteUpNotifyRecipient = 'direct-manager' | 'hr-admin' | 'department-head' | 'location-manager'
+
 export interface WriteUpTemplateData {
   title: string
   type: string
   description: string
   managerFields: FormField[]
   workerFields: FormField[]
-  allowDecline: boolean
-  escalationDays: number
+  allowManagerRefuse: boolean
+  refuseAfterDays: number
+  autoRefuse: boolean
+  notifyOnAssignment: WriteUpNotifyRecipient[]
   permissions: {
     locations: string[]
     roles: string[]
@@ -187,6 +191,11 @@ const STEPS: Record<DocumentCreationType, { id: string; label: string }[]> = {
   ],
   'collect-uploads': [
     { id: 'setup', label: 'Setup' },
+    { id: 'review', label: 'Review' },
+  ],
+  'custom-form': [
+    { id: 'basics', label: 'Basics' },
+    { id: 'configure', label: 'Configure' },
     { id: 'review', label: 'Review' },
   ],
   duplicate: [{ id: 'select', label: 'Duplicate Document' }],
@@ -219,6 +228,15 @@ const CATEGORY_OPTIONS: Record<string, { id: string; label: string }[]> = {
     { id: 'health', label: 'Health Certificate' },
     { id: 'other', label: 'Other' },
   ],
+  'custom-form': [
+    { id: 'onboarding', label: 'Onboarding' },
+    { id: 'compliance', label: 'Compliance' },
+    { id: 'feedback', label: 'Feedback / Survey' },
+    { id: 'incident', label: 'Incident Report' },
+    { id: 'request', label: 'Request Form' },
+    { id: 'policy', label: 'Policy Acknowledgement' },
+    { id: 'other', label: 'Other' },
+  ],
 }
 
 const PLACEHOLDER_MAP: Record<string, { name: string; description: string }> = {
@@ -233,6 +251,10 @@ const PLACEHOLDER_MAP: Record<string, { name: string; description: string }> = {
   'collect-uploads': {
     name: "e.g., Food Handler Certificate, Driver's License",
     description: 'Instructions for team members when uploading (optional)',
+  },
+  'custom-form': {
+    name: 'e.g., New Hire Checklist, Safety Incident Report',
+    description: 'Describe what this form is used for (optional)',
   },
 }
 
@@ -252,8 +274,10 @@ export default function AddDocumentModal({
   const [workerFields, setWorkerFields] = useState<FormField[]>([])
 
   // Write-up specific state
-  const [allowDecline, setAllowDecline] = useState(true)
-  const [escalationDays, setEscalationDays] = useState(7)
+  const [refuseAfterDays, setRefuseAfterDays] = useState(7)
+  const [allowManagerRefuse, setAllowManagerRefuse] = useState(true)
+  const [autoRefuse, setAutoRefuse] = useState(false)
+  const [notifyOnAssignment, setNotifyOnAssignment] = useState<WriteUpNotifyRecipient[]>(['direct-manager'])
 
   // Shared settings state
   const [selectedLocations, setSelectedLocations] = useState<string[]>([])
@@ -277,6 +301,10 @@ export default function AddDocumentModal({
   const [mappedFields, setMappedFields] = useState<MappedField[]>([])
   const [activeSigner, setActiveSigner] = useState<'team-member' | 'company'>('team-member')
   const [draggedFieldId, setDraggedFieldId] = useState<string | null>(null)
+
+  // Custom form specific state
+  const [customFormMode, setCustomFormMode] = useState<'pdf-upload' | 'digital-form' | null>(null)
+  const [assigneeFields, setAssigneeFields] = useState<FormField[]>([])
 
   // Derived signer booleans
   const teamMemberSigns = signerEntries.some((e) => e.type === 'team-member')
@@ -343,8 +371,10 @@ export default function AddDocumentModal({
     setDescription('')
     setManagerFields([])
     setWorkerFields([])
-    setAllowDecline(true)
-    setEscalationDays(7)
+    setRefuseAfterDays(7)
+    setAllowManagerRefuse(true)
+    setAutoRefuse(false)
+    setNotifyOnAssignment(['direct-manager'])
     setSelectedLocations([])
     setSelectedRoles([])
     setPermissionsExpanded(false)
@@ -358,6 +388,8 @@ export default function AddDocumentModal({
     setMappedFields([])
     setActiveSigner('team-member')
     setDraggedFieldId(null)
+    setCustomFormMode(null)
+    setAssigneeFields([])
     onClose()
   }
 
@@ -389,8 +421,10 @@ export default function AddDocumentModal({
         description,
         managerFields,
         workerFields,
-        allowDecline,
-        escalationDays,
+        allowManagerRefuse,
+        refuseAfterDays,
+        autoRefuse,
+        notifyOnAssignment,
         permissions: {
           locations: selectedLocations,
           roles: selectedRoles,
@@ -415,8 +449,10 @@ export default function AddDocumentModal({
         description,
         managerFields,
         workerFields,
-        allowDecline,
-        escalationDays,
+        allowManagerRefuse,
+        refuseAfterDays,
+        autoRefuse,
+        notifyOnAssignment,
         permissions: {
           locations: selectedLocations,
           roles: selectedRoles,
@@ -438,12 +474,21 @@ export default function AddDocumentModal({
 
     const stepId = steps[currentStep]?.id
     switch (stepId) {
-      case 'basics': // PDF only
-        return !!uploadedFile && !!documentName && signerEntries.length > 0
+      case 'basics':
+        if (documentType === 'pdf-signing') {
+          return !!uploadedFile && !!documentName && signerEntries.length > 0
+        }
+        // custom-form basics — just name & category
+        return !!documentName && !!docType
       case 'setup': // Write-up & Cert combined step
         return !!documentName && !!docType
-      case 'configure': // PDF mapping
-        return true
+      case 'configure':
+        if (documentType === 'custom-form') {
+          if (!customFormMode) return false
+          if (customFormMode === 'pdf-upload') return !!uploadedFile && signerEntries.length > 0
+          return assigneeFields.length > 0
+        }
+        return true // PDF mapping
       case 'review':
         return true
       default:
@@ -969,47 +1014,132 @@ export default function AddDocumentModal({
             Non-acknowledgement handling
           </label>
           <div className="space-y-4">
+            {/* Allow manager to mark as Refused to Sign */}
             <div className="flex items-center justify-between p-3 bg-gray-50 rounded-element">
               <div className="flex items-center gap-3">
-                <Checkbox checked={allowDecline} onChange={setAllowDecline} />
+                <Checkbox checked={allowManagerRefuse} onChange={setAllowManagerRefuse} />
                 <div>
                   <p className="text-sm font-medium text-text-primary">
-                    Allow employee to decline signing
+                    Allow manager to mark as "Refused to sign"
                   </p>
                   <p className="text-xs text-text-secondary">
-                    Employee can refuse with a reason (still valid for records)
+                    Manager can mark the write-up as refused after the employee hasn't responded
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className="flex items-center gap-4">
-              <div className="flex-1">
-                <label className="block text-sm font-medium text-text-primary mb-1.5">
-                  Escalation after
-                </label>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="number"
-                    min="1"
-                    max="30"
-                    value={escalationDays}
-                    onChange={(e) => setEscalationDays(parseInt(e.target.value) || 7)}
-                    className="w-20 h-10 px-3 rounded-element border border-border bg-white text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                  />
-                  <span className="text-sm text-text-secondary">days without response</span>
+            {allowManagerRefuse && (
+              <div className="ml-4 pl-4 border-l-2 border-border-light space-y-4">
+                {/* Days threshold */}
+                <div>
+                  <label className="block text-sm font-medium text-text-primary mb-1.5">
+                    Enable "Refused to sign" after
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="number"
+                      min="1"
+                      max="90"
+                      value={refuseAfterDays}
+                      onChange={(e) => setRefuseAfterDays(parseInt(e.target.value) || 7)}
+                      className="w-20 h-10 px-3 rounded-element border border-border bg-white text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    />
+                    <span className="text-sm text-text-secondary">days without acknowledgement</span>
+                  </div>
+                </div>
+
+                {/* Auto-refuse toggle */}
+                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-element">
+                  <div className="flex-1 mr-3">
+                    <p className="text-sm font-medium text-text-primary">
+                      Automatically mark as "Refused to sign"
+                    </p>
+                    <p className="text-xs text-text-secondary">
+                      After {refuseAfterDays} days, automatically mark as refused without manual action
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setAutoRefuse(!autoRefuse)}
+                    className={`relative w-11 h-6 rounded-full transition-colors flex-shrink-0 ${
+                      autoRefuse ? 'bg-primary-500' : 'bg-gray-300'
+                    }`}
+                  >
+                    <span
+                      className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
+                        autoRefuse ? 'right-1' : 'left-1'
+                      }`}
+                    />
+                  </button>
+                </div>
+
+                {/* Info callout */}
+                <div className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-200 rounded-element">
+                  <Info className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
+                  <p className="text-xs text-amber-800">
+                    {autoRefuse
+                      ? `After ${refuseAfterDays} days without acknowledgement, the write-up will be automatically marked as "Refused to Sign" and HR will be notified.`
+                      : `After ${refuseAfterDays} days without acknowledgement, the manager will be able to manually mark the write-up as "Refused to Sign".`}
+                  </p>
                 </div>
               </div>
-            </div>
+            )}
+          </div>
+        </div>
 
-            <div className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-200 rounded-element">
+        {/* Notifications */}
+        <div className="border-t border-border-light pt-6">
+          <label className="block text-sm font-semibold text-text-primary mb-1">
+            Notifications
+          </label>
+          <p className="text-xs text-text-secondary mb-4">
+            Choose who else should be notified when a write-up is assigned to an employee.
+          </p>
+          <div className="space-y-2">
+            {([
+              { id: 'direct-manager' as WriteUpNotifyRecipient, label: 'Direct manager', desc: "The employee\u2019s direct reporting manager" },
+              { id: 'hr-admin' as WriteUpNotifyRecipient, label: 'HR admin', desc: "HR administrators for the employee\u2019s location" },
+              { id: 'department-head' as WriteUpNotifyRecipient, label: 'Department head', desc: "Head of the employee\u2019s department" },
+              { id: 'location-manager' as WriteUpNotifyRecipient, label: 'Location manager', desc: "General manager of the employee\u2019s location" },
+            ]).map((recipient) => {
+              const isChecked = notifyOnAssignment.includes(recipient.id)
+              return (
+                <div
+                  key={recipient.id}
+                  className={`flex items-center gap-3 p-3 rounded-element cursor-pointer transition-colors ${
+                    isChecked ? 'bg-primary-50 border border-primary-200' : 'bg-gray-50 border border-transparent hover:bg-gray-100'
+                  }`}
+                  onClick={() => {
+                    setNotifyOnAssignment((prev) =>
+                      isChecked ? prev.filter((r) => r !== recipient.id) : [...prev, recipient.id]
+                    )
+                  }}
+                >
+                  <Checkbox
+                    checked={isChecked}
+                    onChange={() => {
+                      setNotifyOnAssignment((prev) =>
+                        isChecked ? prev.filter((r) => r !== recipient.id) : [...prev, recipient.id]
+                      )
+                    }}
+                  />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-text-primary">{recipient.label}</p>
+                    <p className="text-xs text-text-secondary">{recipient.desc}</p>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+          {notifyOnAssignment.length === 0 && (
+            <div className="flex items-start gap-2 p-3 mt-3 bg-amber-50 border border-amber-200 rounded-element">
               <Info className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
               <p className="text-xs text-amber-800">
-                After {escalationDays} days without acknowledgement, the write-up will be marked as
-                "Refused to Sign" and HR will be notified.
+                No one will be notified when a write-up is assigned. Only the assignee will receive the task.
               </p>
             </div>
-          </div>
+          )}
         </div>
       </div>
     )
@@ -1115,8 +1245,317 @@ export default function AddDocumentModal({
   // PDF STEP 2 — CONFIGURE (PDF mapping only now)
   // ══════════════════════════════════════════════════════════════════════
   const renderConfigureStep = () => {
-    if (!documentType || documentType !== 'pdf-signing') return null
-    return renderConfigurePdf()
+    if (!documentType) return null
+    if (documentType === 'pdf-signing') return renderConfigurePdf()
+    if (documentType === 'custom-form') return renderConfigureCustomForm()
+    return null
+  }
+
+  // ── Custom Form Configure ─────────────────────────────────────────
+  const renderConfigureCustomForm = () => {
+    return (
+      <div className="space-y-6">
+        {/* Mode selector */}
+        {!customFormMode && (
+          <>
+            <p className="text-sm text-text-secondary">
+              How would you like to build this form?
+            </p>
+            <div className="grid grid-cols-2 gap-4">
+              <button
+                type="button"
+                onClick={() => setCustomFormMode('pdf-upload')}
+                className="group relative flex flex-col items-center p-6 bg-white border-2 border-border-light rounded-container hover:border-primary-500 hover:shadow-card transition-all text-center"
+              >
+                <div className="w-14 h-14 rounded-xl bg-blue-50 flex items-center justify-center mb-3">
+                  <Upload className="w-7 h-7 text-blue-600" />
+                </div>
+                <h4 className="text-sm font-semibold text-text-primary mb-1">Upload PDF for signing</h4>
+                <p className="text-xs text-text-secondary leading-relaxed">
+                  Upload an existing PDF and map signature fields for signers to complete.
+                </p>
+              </button>
+              <button
+                type="button"
+                onClick={() => setCustomFormMode('digital-form')}
+                className="group relative flex flex-col items-center p-6 bg-white border-2 border-border-light rounded-container hover:border-primary-500 hover:shadow-card transition-all text-center"
+              >
+                <div className="w-14 h-14 rounded-xl bg-indigo-50 flex items-center justify-center mb-3">
+                  <FileText className="w-7 h-7 text-indigo-600" />
+                </div>
+                <h4 className="text-sm font-semibold text-text-primary mb-1">Create digital form</h4>
+                <p className="text-xs text-text-secondary leading-relaxed">
+                  Build a form with custom questions for assignees to fill out online.
+                </p>
+              </button>
+            </div>
+          </>
+        )}
+
+        {/* PDF upload mode */}
+        {customFormMode === 'pdf-upload' && (
+          <div className="space-y-6">
+            {/* Mode indicator with back option */}
+            <div className="flex items-center justify-between p-3 bg-blue-50 border border-blue-200 rounded-element">
+              <div className="flex items-center gap-2">
+                <Upload className="w-4 h-4 text-blue-600" />
+                <span className="text-sm font-medium text-blue-800">Upload PDF for signing</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setCustomFormMode(null)
+                  setUploadedFile(null)
+                  setSignerEntries([{ id: 'se-default', type: 'team-member', personId: 'employee' }])
+                  setMappedFields([])
+                }}
+                className="text-xs font-medium text-blue-600 hover:text-blue-800 underline"
+              >
+                Change
+              </button>
+            </div>
+
+            {/* PDF uploader */}
+            <div>
+              <label className="block text-sm font-semibold text-text-primary mb-2">Upload PDF</label>
+              <div
+                onDragOver={(e) => { e.preventDefault(); setIsDragging(true) }}
+                onDragLeave={() => setIsDragging(false)}
+                onDrop={handleDrop}
+                className={`relative border-2 border-dashed rounded-container p-6 transition-colors ${
+                  isDragging ? 'border-primary-500 bg-primary-50' : 'border-gray-300 hover:border-gray-400'
+                } ${uploadedFile ? 'bg-gray-50' : ''}`}
+              >
+                {uploadedFile ? (
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 bg-gray-200 rounded-lg flex items-center justify-center">
+                      <FileText className="w-5 h-5 text-gray-500" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-text-primary">{uploadedFile.name}</p>
+                      <p className="text-xs text-text-secondary">{(uploadedFile.size / 1024).toFixed(1)} KB</p>
+                    </div>
+                    <button onClick={() => setUploadedFile(null)} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-200 transition-colors">
+                      <X className="w-4 h-4 text-gray-500" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="text-center">
+                    <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                    <p className="text-sm text-text-primary mb-1">
+                      Drag and drop your PDF here, or{' '}
+                      <label className="text-primary-500 hover:underline cursor-pointer">
+                        browse
+                        <input type="file" className="hidden" accept=".pdf" onChange={handleFileSelect} />
+                      </label>
+                    </p>
+                    <p className="text-xs text-text-secondary">Supports PDF files (Max 10MB)</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Signers */}
+            <div>
+              <label className="block text-sm font-semibold text-text-primary mb-1">
+                Who should sign this document?
+              </label>
+              <p className="text-xs text-text-secondary mb-4">
+                Select signer types and set the signing order.
+              </p>
+
+              <div className="flex gap-3 mb-4">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (teamMemberSigns) {
+                      setSignerEntries((prev) => prev.filter((e) => e.type !== 'team-member'))
+                    } else {
+                      setSignerEntries((prev) => [
+                        { id: `se-tm-${Date.now()}`, type: 'team-member', personId: 'employee' },
+                        ...prev,
+                      ])
+                    }
+                  }}
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-element border-2 transition-all ${
+                    teamMemberSigns ? 'border-blue-400 bg-blue-50' : 'border-border-light bg-white hover:border-gray-300'
+                  }`}
+                >
+                  <div className={`w-7 h-7 rounded-full flex items-center justify-center ${
+                    teamMemberSigns ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-500'
+                  }`}>
+                    <User className="w-3.5 h-3.5" />
+                  </div>
+                  <span className={`text-sm font-medium ${teamMemberSigns ? 'text-blue-700' : 'text-text-primary'}`}>
+                    Team member
+                  </span>
+                  {teamMemberSigns && <Check className="w-4 h-4 text-blue-500 ml-1" />}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (companySigns) {
+                      setSignerEntries((prev) => prev.filter((e) => e.type !== 'company'))
+                    } else {
+                      setSignerEntries((prev) => [
+                        ...prev,
+                        { id: `se-co-${Date.now()}`, type: 'company', personId: '' },
+                      ])
+                    }
+                  }}
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-element border-2 transition-all ${
+                    companySigns ? 'border-purple-400 bg-purple-50' : 'border-border-light bg-white hover:border-gray-300'
+                  }`}
+                >
+                  <div className={`w-7 h-7 rounded-full flex items-center justify-center ${
+                    companySigns ? 'bg-purple-500 text-white' : 'bg-gray-200 text-gray-500'
+                  }`}>
+                    <Building2 className="w-3.5 h-3.5" />
+                  </div>
+                  <span className={`text-sm font-medium ${companySigns ? 'text-purple-700' : 'text-text-primary'}`}>
+                    Company
+                  </span>
+                  {companySigns && <Check className="w-4 h-4 text-purple-500 ml-1" />}
+                </button>
+              </div>
+
+              {signerEntries.length === 0 && (
+                <p className="text-xs text-red-500 flex items-center gap-1 mb-4">
+                  <Info className="w-3 h-3" /> Select at least one signer type
+                </p>
+              )}
+
+              {signerEntries.length > 0 && (
+                <div className="border border-border-light rounded-container overflow-hidden">
+                  <div className="px-4 py-2.5 bg-gray-50 border-b border-border-light">
+                    <p className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Signing order</p>
+                  </div>
+                  <div className="divide-y divide-border-light">
+                    {signerEntries.map((entry, idx) => {
+                      const isTeamMember = entry.type === 'team-member'
+                      const companySignerIndex = isTeamMember ? -1 : signerEntries.filter((e, i) => e.type === 'company' && i <= idx).length
+                      const companySignerCount = signerEntries.filter((e) => e.type === 'company').length
+                      return (
+                        <div key={entry.id} className="px-4 py-3">
+                          <div className="flex items-center gap-3">
+                            <span className="w-6 h-6 rounded-full bg-gray-100 text-gray-600 text-xs font-semibold flex items-center justify-center flex-shrink-0">{idx + 1}</span>
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${isTeamMember ? 'bg-blue-100' : 'bg-purple-100'}`}>
+                              {isTeamMember ? <User className="w-4 h-4 text-blue-600" /> : <Building2 className="w-4 h-4 text-purple-600" />}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              {isTeamMember ? (
+                                <div>
+                                  <p className="text-sm font-medium text-text-primary">Team member signer</p>
+                                  <p className="text-xs text-text-secondary">Employee receives and signs</p>
+                                </div>
+                              ) : (
+                                <div>
+                                  <p className="text-sm font-medium text-text-primary mb-1.5">Company signer #{companySignerIndex}</p>
+                                  <select
+                                    value={entry.personId}
+                                    onChange={(e) => setSignerEntries((prev) => prev.map((se) => se.id === entry.id ? { ...se, personId: e.target.value } : se))}
+                                    className="w-full h-9 px-3 rounded-element border border-border bg-white text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                                  >
+                                    <option value="">Select a person…</option>
+                                    {COMPANY_SIGNER_OPTIONS.map((opt) => (
+                                      <option key={opt.id} value={opt.id}>{opt.name}</option>
+                                    ))}
+                                  </select>
+                                </div>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-1 flex-shrink-0">
+                              {signerEntries.length > 1 && (
+                                <>
+                                  <button type="button" disabled={idx === 0} onClick={() => setSignerEntries((prev) => { const arr = [...prev]; [arr[idx - 1], arr[idx]] = [arr[idx], arr[idx - 1]]; return arr })} className="w-7 h-7 flex items-center justify-center rounded hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors" title="Move up">
+                                    <ArrowUp className="w-3.5 h-3.5 text-gray-500" />
+                                  </button>
+                                  <button type="button" disabled={idx === signerEntries.length - 1} onClick={() => setSignerEntries((prev) => { const arr = [...prev]; [arr[idx], arr[idx + 1]] = [arr[idx + 1], arr[idx]]; return arr })} className="w-7 h-7 flex items-center justify-center rounded hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors" title="Move down">
+                                    <ArrowDown className="w-3.5 h-3.5 text-gray-500" />
+                                  </button>
+                                </>
+                              )}
+                              {!isTeamMember && companySignerCount > 1 && (
+                                <button type="button" onClick={() => setSignerEntries((prev) => prev.filter((e) => e.id !== entry.id))} className="w-7 h-7 flex items-center justify-center rounded hover:bg-red-50 transition-colors ml-1" title="Remove signer">
+                                  <X className="w-3.5 h-3.5 text-red-400" />
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                  {companySigns && (
+                    <div className="px-4 py-3 border-t border-border-light">
+                      <button type="button" onClick={() => setSignerEntries((prev) => [...prev, { id: `se-co-${Date.now()}`, type: 'company', personId: '' }])} className="flex items-center gap-2 text-sm font-medium text-primary-500 hover:text-primary-700 transition-colors">
+                        <Plus className="w-4 h-4" /> Add another company signer
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Info callout about PDF mapping */}
+            {uploadedFile && signerEntries.length > 0 && (
+              <div className="flex items-start gap-2.5 p-3 bg-blue-50 border border-blue-200 rounded-element">
+                <Info className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                <p className="text-xs text-blue-800">
+                  After creating the template, you can map signature fields onto the PDF from the template detail page.
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Digital form mode */}
+        {customFormMode === 'digital-form' && (
+          <div className="space-y-6">
+            {/* Mode indicator with back option */}
+            <div className="flex items-center justify-between p-3 bg-indigo-50 border border-indigo-200 rounded-element">
+              <div className="flex items-center gap-2">
+                <FileText className="w-4 h-4 text-indigo-600" />
+                <span className="text-sm font-medium text-indigo-800">Digital form</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setCustomFormMode(null)
+                  setAssigneeFields([])
+                }}
+                className="text-xs font-medium text-indigo-600 hover:text-indigo-800 underline"
+              >
+                Change
+              </button>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-text-primary mb-2">
+                Form questions
+              </label>
+              <p className="text-xs text-text-secondary mb-3">
+                Add the questions that assignees will fill out when completing this form.
+              </p>
+              <FormFieldBuilder
+                fields={assigneeFields}
+                onChange={setAssigneeFields}
+                sectionLabel="Form questions"
+              />
+            </div>
+
+            {assigneeFields.length === 0 && (
+              <div className="flex items-start gap-2.5 p-3 bg-amber-50 border border-amber-200 rounded-element">
+                <Info className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />
+                <p className="text-xs text-amber-800">
+                  Add at least one question for assignees to answer. You can choose from open text, single-select, multi-select, or file upload field types.
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    )
   }
 
   // ── PDF Mapping Widget (embedded in modal) ─────────────────────────
@@ -1461,9 +1900,32 @@ export default function AddDocumentModal({
                   <span className="text-text-secondary">Worker questions</span>
                   <span className="text-text-primary font-medium">{workerFields.length}</span>
                 </div>
+                {allowManagerRefuse && (
+                  <>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-text-secondary">Refuse to sign after</span>
+                      <span className="text-text-primary font-medium">{refuseAfterDays} days</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-text-secondary">Auto-refuse</span>
+                      <span className="text-text-primary font-medium">{autoRefuse ? 'Enabled' : 'Manual'}</span>
+                    </div>
+                  </>
+                )}
                 <div className="flex justify-between text-sm">
-                  <span className="text-text-secondary">Escalation</span>
-                  <span className="text-text-primary font-medium">{escalationDays} days</span>
+                  <span className="text-text-secondary">Notify on assignment</span>
+                  <span className="text-text-primary font-medium">
+                    {notifyOnAssignment.length === 0
+                      ? 'No one'
+                      : notifyOnAssignment
+                          .map((r) =>
+                            r === 'direct-manager' ? 'Direct manager'
+                            : r === 'hr-admin' ? 'HR admin'
+                            : r === 'department-head' ? 'Dept. head'
+                            : 'Location mgr'
+                          )
+                          .join(', ')}
+                  </span>
                 </div>
               </>
             )}
@@ -1489,6 +1951,50 @@ export default function AddDocumentModal({
                     {requireVerification ? 'Required' : 'Not required'}
                   </span>
                 </div>
+              </>
+            )}
+
+            {/* Custom form summary */}
+            {documentType === 'custom-form' && (
+              <>
+                <div className="flex justify-between text-sm">
+                  <span className="text-text-secondary">Form type</span>
+                  <span className="text-text-primary font-medium">
+                    {customFormMode === 'pdf-upload' ? 'PDF for signing' : 'Digital form'}
+                  </span>
+                </div>
+                {customFormMode === 'pdf-upload' && uploadedFile && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-text-secondary">File</span>
+                    <span className="text-text-primary font-medium">{uploadedFile.name}</span>
+                  </div>
+                )}
+                {customFormMode === 'pdf-upload' && (
+                  <>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-text-secondary">Signing order</span>
+                      <span className="text-text-primary font-medium">
+                        {signerEntries
+                          .map((e) => {
+                            if (e.type === 'team-member') return 'Team Member'
+                            const person = COMPANY_SIGNER_OPTIONS.find((o) => o.id === e.personId)
+                            return person ? person.name.split('(')[0].trim() : 'Company Signer'
+                          })
+                          .join(' → ')}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-text-secondary">Total signers</span>
+                      <span className="text-text-primary font-medium">{signerEntries.length}</span>
+                    </div>
+                  </>
+                )}
+                {customFormMode === 'digital-form' && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-text-secondary">Form questions</span>
+                    <span className="text-text-primary font-medium">{assigneeFields.length}</span>
+                  </div>
+                )}
               </>
             )}
           </div>
@@ -1581,8 +2087,8 @@ export default function AddDocumentModal({
           )}
         </div>
 
-        {/* Auto-assign — signing & certification */}
-        {(documentType === 'pdf-signing' || documentType === 'collect-uploads') && (
+        {/* Auto-assign — signing, certification & custom form */}
+        {(documentType === 'pdf-signing' || documentType === 'collect-uploads' || documentType === 'custom-form') && (
           <div className="border border-border-light rounded-container p-4">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
@@ -1786,6 +2292,7 @@ export default function AddDocumentModal({
     'pdf-signing': 'Upload PDF for Signing',
     'write-up': 'Create Write-Up',
     'collect-uploads': 'Collect Uploads',
+    'custom-form': 'Create Custom Form',
     duplicate: 'Duplicate Document',
   }
 
