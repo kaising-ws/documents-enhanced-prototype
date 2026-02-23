@@ -34,11 +34,15 @@ export interface DocumentTemplate {
 
   createdAt: string
   createdAtFormatted: string
+  /** Whether the template has been archived. Archived templates are hidden by default. */
+  archived?: boolean
 }
 
 export interface DocumentRecipient {
   id: string
   name: string
+  email: string
+  phone: string
   role: string
   location: string
   status: 'completed' | 'pending' | 'collecting' | 'expiring' | 'expired' | 'assigned' | 'pending_verification' | 'refused'
@@ -344,36 +348,36 @@ export const documentTemplates: DocumentTemplate[] = [
 
 // ─── Mock employee pool for generating recipients ───
 const EMPLOYEES = [
-  { name: 'Maria Santos', role: 'Server', location: 'Downtown' },
-  { name: 'James Wilson', role: 'Line Cook', location: 'Midtown' },
-  { name: 'Priya Patel', role: 'Bartender', location: 'Downtown' },
-  { name: 'David Chen', role: 'Host', location: 'Uptown' },
-  { name: 'Aaliyah Johnson', role: 'Server', location: 'Eastside' },
-  { name: 'Marcus Rodriguez', role: 'Shift Manager', location: 'Midtown' },
-  { name: 'Emily Tanaka', role: 'Sous Chef', location: 'Downtown' },
-  { name: 'Omar Hassan', role: 'Prep Cook', location: 'Westside' },
-  { name: 'Sarah Kim', role: 'Server', location: 'Uptown' },
-  { name: 'Tyler Brooks', role: 'Dishwasher', location: 'Eastside' },
-  { name: 'Fatima Al-Rashid', role: 'Barista', location: 'Midtown' },
-  { name: 'Ryan O\'Brien', role: 'Bartender', location: 'Downtown' },
-  { name: 'Jessica Nguyen', role: 'Cashier', location: 'Westside' },
-  { name: 'Andre Washington', role: 'Line Cook', location: 'Uptown' },
-  { name: 'Mei Lin', role: 'Host', location: 'Midtown' },
-  { name: 'Carlos Gutierrez', role: 'Server', location: 'Eastside' },
-  { name: 'Rachel Green', role: 'Shift Manager', location: 'Downtown' },
-  { name: 'Kwame Asante', role: 'Prep Cook', location: 'Westside' },
-  { name: 'Sophia Rossi', role: 'Server', location: 'Uptown' },
-  { name: 'Brandon Taylor', role: 'Bartender', location: 'Midtown' },
-  { name: 'Hannah Park', role: 'Line Cook', location: 'Downtown' },
-  { name: 'Damien Lee', role: 'Busser', location: 'Eastside' },
-  { name: 'Nicole Thompson', role: 'Food Runner', location: 'Midtown' },
-  { name: 'Luis Morales', role: 'Sous Chef', location: 'Westside' },
-  { name: 'Aisha Williams', role: 'Server', location: 'Uptown' },
-  { name: 'Kevin Murphy', role: 'General Manager', location: 'Downtown' },
-  { name: 'Diana Cruz', role: 'Cashier', location: 'Eastside' },
-  { name: 'Jamal Carter', role: 'Line Cook', location: 'Midtown' },
-  { name: 'Emma Mitchell', role: 'Host', location: 'Westside' },
-  { name: 'Raj Sharma', role: 'Asst. Manager', location: 'Uptown' },
+  { name: 'Maria Santos', role: 'Server', location: 'Downtown', email: 'maria.santos@workstream.is', phone: '+17701234501' },
+  { name: 'James Wilson', role: 'Line Cook', location: 'Midtown', email: 'james.wilson@workstream.is', phone: '+17701234502' },
+  { name: 'Priya Patel', role: 'Bartender', location: 'Downtown', email: 'priya.patel@workstream.is', phone: '+17701234503' },
+  { name: 'David Chen', role: 'Host', location: 'Uptown', email: 'david.chen@workstream.is', phone: '+17701234504' },
+  { name: 'Aaliyah Johnson', role: 'Server', location: 'Eastside', email: 'aaliyah.johnson@workstream.is', phone: '+17701234505' },
+  { name: 'Marcus Rodriguez', role: 'Shift Manager', location: 'Midtown', email: 'marcus.rodriguez@workstream.is', phone: '+17701234506' },
+  { name: 'Emily Tanaka', role: 'Sous Chef', location: 'Downtown', email: 'emily.tanaka@workstream.is', phone: '+17701234507' },
+  { name: 'Omar Hassan', role: 'Prep Cook', location: 'Westside', email: 'omar.hassan@workstream.is', phone: '+17701234508' },
+  { name: 'Sarah Kim', role: 'Server', location: 'Uptown', email: 'sarah.kim@workstream.is', phone: '+17701234509' },
+  { name: 'Tyler Brooks', role: 'Dishwasher', location: 'Eastside', email: 'tyler.brooks@workstream.is', phone: '+17701234510' },
+  { name: 'Fatima Al-Rashid', role: 'Barista', location: 'Midtown', email: 'fatima.alrashid@workstream.is', phone: '+17701234511' },
+  { name: 'Ryan O\'Brien', role: 'Bartender', location: 'Downtown', email: 'ryan.obrien@workstream.is', phone: '+17701234512' },
+  { name: 'Jessica Nguyen', role: 'Cashier', location: 'Westside', email: 'jessica.nguyen@workstream.is', phone: '+17701234513' },
+  { name: 'Andre Washington', role: 'Line Cook', location: 'Uptown', email: 'andre.washington@workstream.is', phone: '+17701234514' },
+  { name: 'Mei Lin', role: 'Host', location: 'Midtown', email: 'mei.lin@workstream.is', phone: '+17701234515' },
+  { name: 'Carlos Gutierrez', role: 'Server', location: 'Eastside', email: 'carlos.gutierrez@workstream.is', phone: '+17701234516' },
+  { name: 'Rachel Green', role: 'Shift Manager', location: 'Downtown', email: 'rachel.green@workstream.is', phone: '+17701234517' },
+  { name: 'Kwame Asante', role: 'Prep Cook', location: 'Westside', email: 'kwame.asante@workstream.is', phone: '+17701234518' },
+  { name: 'Sophia Rossi', role: 'Server', location: 'Uptown', email: 'sophia.rossi@workstream.is', phone: '+17701234519' },
+  { name: 'Brandon Taylor', role: 'Bartender', location: 'Midtown', email: 'brandon.taylor@workstream.is', phone: '+17701234520' },
+  { name: 'Hannah Park', role: 'Line Cook', location: 'Downtown', email: 'hannah.park@workstream.is', phone: '+17701234521' },
+  { name: 'Damien Lee', role: 'Busser', location: 'Eastside', email: 'damien.lee@workstream.is', phone: '+17701234522' },
+  { name: 'Nicole Thompson', role: 'Food Runner', location: 'Midtown', email: 'nicole.thompson@workstream.is', phone: '+17701234523' },
+  { name: 'Luis Morales', role: 'Sous Chef', location: 'Westside', email: 'luis.morales@workstream.is', phone: '+17701234524' },
+  { name: 'Aisha Williams', role: 'Server', location: 'Uptown', email: 'aisha.williams@workstream.is', phone: '+17701234525' },
+  { name: 'Kevin Murphy', role: 'General Manager', location: 'Downtown', email: 'kevin.murphy@workstream.is', phone: '+17701234526' },
+  { name: 'Diana Cruz', role: 'Cashier', location: 'Eastside', email: 'diana.cruz@workstream.is', phone: '+17701234527' },
+  { name: 'Jamal Carter', role: 'Line Cook', location: 'Midtown', email: 'jamal.carter@workstream.is', phone: '+17701234528' },
+  { name: 'Emma Mitchell', role: 'Host', location: 'Westside', email: 'emma.mitchell@workstream.is', phone: '+17701234529' },
+  { name: 'Raj Sharma', role: 'Asst. Manager', location: 'Uptown', email: 'raj.sharma@workstream.is', phone: '+17701234530' },
 ]
 
 const COMPLETED_DATES = [
@@ -452,6 +456,8 @@ function makeRecipients(
     return {
       id: `${prefix}-r${i + 1}`,
       name: emp.name,
+      email: emp.email,
+      phone: emp.phone,
       role: emp.role,
       location: emp.location,
       status,

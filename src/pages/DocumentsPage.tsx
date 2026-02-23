@@ -1,18 +1,38 @@
 import { useMemo, useState } from 'react'
-import { Plus, AlertTriangle, Eye, FileCheck } from 'lucide-react'
+import { Plus, AlertTriangle, Eye, FileCheck, Archive } from 'lucide-react'
 import SearchBox from '../components/ui/SearchBox'
 import Button from '../components/ui/Button'
 import DocumentsTable from '../components/documents/DocumentsTable'
 import DocumentTypeSelector, { DocumentCreationType } from '../components/documents/DocumentTypeSelector'
-import AddDocumentModal from '../components/documents/AddDocumentModal'
+import AddDocumentModal, { EditingTemplateData } from '../components/documents/AddDocumentModal'
 import AssignDocumentModal from '../components/documents/AssignDocumentModal'
+import RecommendedDocumentsModal from '../components/documents/RecommendedDocumentsModal'
 import { useToast } from '../components/ui/Toast'
-import { documentTemplates, documentDetails, DocumentTemplate, TemplateCategory } from '../data/mockData'
+import { documentDetails, DocumentTemplate, TemplateCategory } from '../data/mockData'
 
 interface DocumentsPageProps {
+  templates: DocumentTemplate[]
   onOpenDocument: (documentId: string) => void
+  onAddTemplate: (template: DocumentTemplate) => void
+  onArchiveTemplates: (ids: string[]) => void
+  onUnarchiveTemplates: (ids: string[]) => void
+  onDeleteTemplates: (ids: string[]) => void
   /** When set, lock the page to a single category (hides category tabs). */
   lockedCategory?: TemplateCategory
+}
+
+/** Map a template category to the corresponding document creation type */
+function categoryToDocType(category: TemplateCategory): DocumentCreationType {
+  switch (category) {
+    case 'signing':
+      return 'pdf-signing'
+    case 'write-up':
+      return 'write-up'
+    case 'certification':
+      return 'collect-uploads'
+    case 'custom-form':
+      return 'custom-form'
+  }
 }
 
 /** Category tabs — "All" plus one per category (excluding write-ups, which have their own page) */
@@ -23,14 +43,17 @@ const CATEGORY_TABS: { id: TemplateCategory | 'all'; label: string }[] = [
   { id: 'custom-form', label: 'Custom Forms' },
 ]
 
-export default function DocumentsPage({ onOpenDocument, lockedCategory }: DocumentsPageProps) {
+export default function DocumentsPage({ templates: documentTemplates, onOpenDocument, onAddTemplate, onArchiveTemplates, onUnarchiveTemplates, onDeleteTemplates, lockedCategory }: DocumentsPageProps) {
   const [searchQuery, setSearchQuery] = useState('')
   const [activeCategory, setActiveCategory] = useState<TemplateCategory | 'all'>('all')
+  const [showArchived, setShowArchived] = useState(false)
   const [isTypeSelectorOpen, setIsTypeSelectorOpen] = useState(false)
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [selectedDocType, setSelectedDocType] = useState<DocumentCreationType | null>(null)
   const [isAssignDocModalOpen, setIsAssignDocModalOpen] = useState(false)
   const [assignDocumentTemplate, setAssignDocumentTemplate] = useState<DocumentTemplate | null>(null)
+  const [isRecommendedModalOpen, setIsRecommendedModalOpen] = useState(false)
+  const [editingTemplate, setEditingTemplate] = useState<EditingTemplateData | null>(null)
 
   const { addToast } = useToast()
 
@@ -39,19 +62,35 @@ export default function DocumentsPage({ onOpenDocument, lockedCategory }: Docume
     setIsAssignDocModalOpen(true)
   }
 
+  const handleEdit = (doc: DocumentTemplate) => {
+    setEditingTemplate({
+      id: doc.id,
+      name: doc.name,
+      category: doc.category,
+      type: doc.type,
+    })
+    setSelectedDocType(categoryToDocType(doc.category))
+    setIsAddModalOpen(true)
+  }
+
   const handleAddClick = () => {
     setIsTypeSelectorOpen(true)
   }
 
   const handleTypeSelect = (type: DocumentCreationType) => {
-    setSelectedDocType(type)
     setIsTypeSelectorOpen(false)
+    if (type === 'recommended') {
+      setIsRecommendedModalOpen(true)
+      return
+    }
+    setSelectedDocType(type)
     setIsAddModalOpen(true)
   }
 
   const handleCloseAddModal = () => {
     setIsAddModalOpen(false)
     setSelectedDocType(null)
+    setEditingTemplate(null)
   }
 
   // The effective category: either locked from props, or user-selected from tabs
@@ -62,15 +101,21 @@ export default function DocumentsPage({ onOpenDocument, lockedCategory }: Docume
     ? documentTemplates.filter((t) => t.category === lockedCategory)
     : documentTemplates
 
-  // Count templates per category (for tab badges) — exclude write-ups since they have their own page
+  // Count templates per category (for tab badges) — exclude write-ups and archived
   const categoryCounts = useMemo(() => {
-    const nonWriteUp = documentTemplates.filter((t) => t.category !== 'write-up')
-    const counts: Record<string, number> = { all: nonWriteUp.length }
+    const active = documentTemplates.filter((t) => t.category !== 'write-up' && !t.archived)
+    const counts: Record<string, number> = { all: active.length }
     for (const cat of ['signing', 'certification', 'custom-form'] as TemplateCategory[]) {
-      counts[cat] = nonWriteUp.filter((t) => t.category === cat).length
+      counts[cat] = active.filter((t) => t.category === cat).length
     }
     return counts
-  }, [])
+  }, [documentTemplates])
+
+  // Count archived templates (excluding write-ups)
+  const archivedCount = useMemo(
+    () => documentTemplates.filter((t) => t.archived && t.category !== 'write-up').length,
+    [documentTemplates]
+  )
 
   // Filter documents — search matches name AND type
   const filteredDocuments = baseTemplates.filter((doc) => {
@@ -79,14 +124,16 @@ export default function DocumentsPage({ onOpenDocument, lockedCategory }: Docume
     const matchesCategory = lockedCategory || effectiveCategory === 'all' || doc.category === effectiveCategory
     // When not locked, exclude write-ups from the Documents page (they have their own page)
     const notWriteUp = lockedCategory ? true : doc.category !== 'write-up'
-    return matchesSearch && matchesCategory && notWriteUp
+    // Archive filter: show only archived when toggled, or only active when not
+    const matchesArchive = showArchived ? !!doc.archived : !doc.archived
+    return matchesSearch && matchesCategory && notWriteUp && matchesArchive
   })
 
   // ── Analytics ──
   const analytics = useMemo(() => {
     const scopedTemplates = lockedCategory
-      ? documentTemplates.filter((t) => t.category === lockedCategory)
-      : documentTemplates.filter((t) => t.category !== 'write-up')
+      ? documentTemplates.filter((t) => t.category === lockedCategory && !t.archived)
+      : documentTemplates.filter((t) => t.category !== 'write-up' && !t.archived)
     const totalAttention = scopedTemplates.reduce((sum, t) => sum + t.stats.attention, 0)
     const totalAssigned = scopedTemplates.reduce((sum, t) => sum + t.stats.total, 0)
 
@@ -103,7 +150,7 @@ export default function DocumentsPage({ onOpenDocument, lockedCategory }: Docume
     const templatesWithIssues = scopedTemplates.filter((t) => t.stats.attention > 0).length
 
     return { totalAttention, totalAssigned, pendingYourReview, templatesWithIssues, templateCount: scopedTemplates.length }
-  }, [lockedCategory])
+  }, [lockedCategory, documentTemplates])
 
   return (
     <div className="p-6 max-w-[1400px] mx-auto">
@@ -146,20 +193,38 @@ export default function DocumentsPage({ onOpenDocument, lockedCategory }: Docume
 
       {/* ─── Toolbar ─── */}
       <div className="flex items-center justify-between mb-1">
-        <SearchBox
-          value={searchQuery}
-          onChange={setSearchQuery}
-          placeholder="Search by name or type..."
-          className="w-72"
-        />
+        <div className="flex items-center gap-3">
+          <SearchBox
+            value={searchQuery}
+            onChange={setSearchQuery}
+            placeholder="Search by name or type..."
+            className="w-72"
+          />
+          {archivedCount > 0 && (
+            <button
+              onClick={() => setShowArchived(!showArchived)}
+              className={`flex items-center gap-1.5 h-9 px-3 rounded-full border text-xs font-medium transition-colors ${
+                showArchived
+                  ? 'bg-primary-50 border-primary-300 text-primary-700'
+                  : 'bg-white border-border text-text-secondary hover:border-gray-400'
+              }`}
+            >
+              <Archive className="w-3.5 h-3.5" />
+              Archived
+              <span className="tabular-nums">{archivedCount}</span>
+            </button>
+          )}
+        </div>
 
-        <Button
-          variant="primary"
-          leftIcon={<Plus className="w-4 h-4" />}
-          onClick={handleAddClick}
-        >
-          Add Template
-        </Button>
+        {!showArchived && (
+          <Button
+            variant="primary"
+            leftIcon={<Plus className="w-4 h-4" />}
+            onClick={handleAddClick}
+          >
+            Add Template
+          </Button>
+        )}
       </div>
 
       {/* ─── Category Tabs (hidden when page is locked to a category) ─── */}
@@ -197,6 +262,11 @@ export default function DocumentsPage({ onOpenDocument, lockedCategory }: Docume
         documents={filteredDocuments}
         onAssign={handleAssign}
         onOpenDocument={onOpenDocument}
+        onEdit={handleEdit}
+        onArchive={onArchiveTemplates}
+        onUnarchive={onUnarchiveTemplates}
+        onDelete={onDeleteTemplates}
+        isArchivedView={showArchived}
       />
 
       {/* Pagination */}
@@ -222,11 +292,24 @@ export default function DocumentsPage({ onOpenDocument, lockedCategory }: Docume
         excludeTypes={['write-up']}
       />
 
-      {/* Add Document Modal */}
+      {/* Add / Edit Document Modal */}
       <AddDocumentModal
         isOpen={isAddModalOpen}
         onClose={handleCloseAddModal}
         documentType={selectedDocType}
+        onCreateTemplate={onAddTemplate}
+        editingTemplate={editingTemplate}
+      />
+
+      {/* Recommended Documents Modal */}
+      <RecommendedDocumentsModal
+        isOpen={isRecommendedModalOpen}
+        onClose={() => setIsRecommendedModalOpen(false)}
+        existingTemplates={documentTemplates}
+        onAddTemplates={(templates) => {
+          templates.forEach((t) => onAddTemplate(t))
+          addToast(`Added ${templates.length} recommended template${templates.length !== 1 ? 's' : ''}`, 'success')
+        }}
       />
 
       {/* Assign Document Modal */}

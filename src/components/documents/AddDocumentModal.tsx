@@ -152,12 +152,25 @@ const COMPANY_SIGNER_OPTIONS = [
   { id: 'cs-7', name: 'Lisa Park (Store Manager)' },
 ]
 
+interface EditingTemplateData {
+  id: string
+  name: string
+  category: import('../../data/mockData').TemplateCategory
+  type: string
+  description?: string
+}
+
 interface AddDocumentModalProps {
   isOpen: boolean
   onClose: () => void
   documentType: DocumentCreationType | null
   onSaveWriteUp?: (writeUp: WriteUpTemplateData) => void
+  onCreateTemplate?: (template: import('../../data/mockData').DocumentTemplate) => void
+  /** When provided, the modal opens in "edit" mode with fields pre-filled. */
+  editingTemplate?: EditingTemplateData | null
 }
+
+export type { EditingTemplateData }
 
 export type WriteUpNotifyRecipient = 'direct-manager' | 'hr-admin' | 'department-head' | 'location-manager'
 
@@ -199,6 +212,7 @@ const STEPS: Record<DocumentCreationType, { id: string; label: string }[]> = {
     { id: 'review', label: 'Review' },
   ],
   duplicate: [{ id: 'select', label: 'Duplicate Document' }],
+  recommended: [],
 }
 
 // ── Default pre-fills ────────────────────────────────────────────────
@@ -263,7 +277,9 @@ export default function AddDocumentModal({
   onClose,
   documentType,
   onSaveWriteUp,
+  editingTemplate,
 }: AddDocumentModalProps) {
+  const isEditing = !!editingTemplate
   const [currentStep, setCurrentStep] = useState(0)
   const [documentName, setDocumentName] = useState('')
   const [docType, setDocType] = useState('')
@@ -316,18 +332,46 @@ export default function AddDocumentModal({
   useEffect(() => {
     if (!isOpen || !documentType) return
 
-    // Pre-fill name + category for write-ups and certifications
-    const prefill = PREFILLS[documentType]
-    if (prefill) {
-      if (!documentName) setDocumentName(prefill.name)
-      if (!docType) setDocType(prefill.category)
+    // ── Edit mode: pre-fill from existing template ──
+    if (editingTemplate) {
+      setDocumentName(editingTemplate.name)
+      // For pdf-signing, the type dropdown uses documentTypes (e.g. "Payroll", "Onboarding")
+      // For other types, use the category options
+      if (documentType === 'pdf-signing') {
+        setDocType(editingTemplate.type)
+      } else if (documentType === 'collect-uploads') {
+        // map the type string to a category option id
+        const catOpts = CATEGORY_OPTIONS['collect-uploads'] || []
+        const match = catOpts.find((o) => o.label.toLowerCase() === editingTemplate.type.toLowerCase())
+        setDocType(match?.id || catOpts[0]?.id || '')
+      } else if (documentType === 'custom-form') {
+        const catOpts = CATEGORY_OPTIONS['custom-form'] || []
+        const match = catOpts.find((o) => o.label.toLowerCase() === editingTemplate.type.toLowerCase())
+        setDocType(match?.id || catOpts[0]?.id || '')
+      } else if (documentType === 'write-up') {
+        const catOpts = CATEGORY_OPTIONS['write-up'] || []
+        const match = catOpts.find((o) => o.label.toLowerCase() === editingTemplate.type.toLowerCase())
+        setDocType(match?.id || catOpts[0]?.id || '')
+      }
+      if (editingTemplate.description) {
+        setDescription(editingTemplate.description)
+      }
+    }
+
+    // Pre-fill name + category for write-ups and certifications (only in create mode)
+    if (!editingTemplate) {
+      const prefill = PREFILLS[documentType]
+      if (prefill) {
+        if (!documentName) setDocumentName(prefill.name)
+        if (!docType) setDocType(prefill.category)
+      }
     }
 
     if (documentType === 'write-up') {
       setManagerFields(DEFAULT_MANAGER_FIELDS.map((f) => ({ ...f })))
       setWorkerFields(DEFAULT_WORKER_FIELDS.map((f) => ({ ...f })))
     }
-  }, [isOpen, documentType])
+  }, [isOpen, documentType, editingTemplate])
 
   const steps = documentType ? STEPS[documentType] : []
   const totalSteps = steps.length
@@ -407,9 +451,10 @@ export default function AddDocumentModal({
   }
 
   const handleSubmit = () => {
+    const actionLabel = isEditing ? 'updated' : 'created'
+
     if (documentType === 'pdf-signing') {
-      // Save template directly — mapping is already done in step 2
-      addToast(`"${documentName}" template created successfully`, 'success')
+      addToast(`"${documentName}" template ${actionLabel} successfully`, 'success')
       handleClose()
       return
     }
@@ -432,12 +477,12 @@ export default function AddDocumentModal({
         status: 'active',
       }
       onSaveWriteUp?.(writeUpData)
-      addToast('Write-up template created successfully', 'success')
+      addToast(`Write-up template ${actionLabel} successfully`, 'success')
       handleClose()
       return
     }
 
-    addToast(`"${documentName}" template created successfully`, 'success')
+    addToast(`"${documentName}" template ${actionLabel} successfully`, 'success')
     handleClose()
   }
 
@@ -476,7 +521,9 @@ export default function AddDocumentModal({
     switch (stepId) {
       case 'basics':
         if (documentType === 'pdf-signing') {
-          return !!uploadedFile && !!documentName && signerEntries.length > 0
+          // In edit mode, the file is already uploaded — only require name + signers
+          const fileOk = isEditing || !!uploadedFile
+          return fileOk && !!documentName && signerEntries.length > 0
         }
         // custom-form basics — just name & category
         return !!documentName && !!docType
@@ -631,6 +678,25 @@ export default function AddDocumentModal({
                   >
                     <X className="w-4 h-4 text-gray-500" />
                   </button>
+                </div>
+              ) : isEditing && editingTemplate ? (
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center">
+                    <FileText className="w-6 h-6 text-blue-500" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-text-primary">{editingTemplate.name}</p>
+                    <p className="text-xs text-text-secondary">Previously uploaded PDF</p>
+                  </div>
+                  <label className="text-xs text-primary-500 hover:underline cursor-pointer font-medium">
+                    Replace file
+                    <input
+                      type="file"
+                      className="hidden"
+                      accept=".pdf"
+                      onChange={handleFileSelect}
+                    />
+                  </label>
                 </div>
               ) : (
                 <div className="text-center">
@@ -2243,6 +2309,7 @@ export default function AddDocumentModal({
 
   // ──────── FOOTER ────────
   const getSubmitLabel = () => {
+    if (isEditing) return 'Save Changes'
     if (documentType === 'duplicate') return 'Duplicate'
     return 'Create Template'
   }
@@ -2294,9 +2361,21 @@ export default function AddDocumentModal({
     'collect-uploads': 'Collect Uploads',
     'custom-form': 'Create Custom Form',
     duplicate: 'Duplicate Document',
+    recommended: 'Recommended Template',
   }
 
-  const modalTitle = documentType ? typeLabels[documentType] : 'Add Document Template'
+  const editTypeLabels: Record<DocumentCreationType, string> = {
+    'pdf-signing': 'Edit Signing Template',
+    'write-up': 'Edit Write-Up Template',
+    'collect-uploads': 'Edit Upload Template',
+    'custom-form': 'Edit Custom Form',
+    duplicate: 'Duplicate Document',
+    recommended: 'Recommended Template',
+  }
+
+  const modalTitle = documentType
+    ? (isEditing ? editTypeLabels[documentType] : typeLabels[documentType])
+    : 'Add Document Template'
 
   return (
     <Modal

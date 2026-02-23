@@ -1,7 +1,7 @@
-import { FileSignature, PenLine, Upload, Copy, ClipboardList } from 'lucide-react'
+import { FileSignature, PenLine, Upload, Copy, ClipboardList, Sparkles } from 'lucide-react'
 import Modal from '../ui/Modal'
 
-export type DocumentCreationType = 'pdf-signing' | 'write-up' | 'collect-uploads' | 'custom-form' | 'duplicate'
+export type DocumentCreationType = 'pdf-signing' | 'write-up' | 'collect-uploads' | 'custom-form' | 'duplicate' | 'recommended'
 
 interface DocumentTypeSelectorProps {
   isOpen: boolean
@@ -54,6 +54,13 @@ const options: DocumentTypeOption[] = [
     title: 'Duplicate from existing document',
     description: 'Copy an existing template to create a new version quickly.',
     iconBgColor: 'bg-purple-50 text-purple-600',
+  },
+  {
+    id: 'recommended',
+    icon: <Sparkles className="w-8 h-8" />,
+    title: 'Explore recommended documents',
+    description: 'Discover documents recommended for your locations, roles, and industry.',
+    iconBgColor: 'bg-gradient-to-br from-orange-50 to-amber-50 text-orange-500',
   },
 ]
 
