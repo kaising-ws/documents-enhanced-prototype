@@ -344,6 +344,16 @@ export const documentTemplates: DocumentTemplate[] = [
     createdAt: '2024-05-05',
     createdAtFormatted: 'May 5, 2024',
   },
+  {
+    id: 'cf-3',
+    name: 'Team Member Contribution and Support',
+    category: 'custom-form',
+    type: 'Feedback / Survey',
+    trackingMode: 'progress',
+    stats: { total: 18, completed: 12, attention: 6 },
+    createdAt: '2025-11-12',
+    createdAtFormatted: 'Nov 12, 2025',
+  },
 ]
 
 // ─── Mock employee pool for generating recipients ───
@@ -649,6 +659,14 @@ export const documentDetails: Record<string, DocumentDetail> = {
     createdAt: 'May 5, 2024',
     recipients: makeRecipients('cf2', 12, issuanceStatuses(10, 2)),
     assignmentHistory: makeHistory('cf2', 12, 10),
+  },
+  'cf-3': {
+    id: 'cf-3',
+    name: 'Team Member Contribution and Support',
+    type: 'Feedback / Survey',
+    createdAt: 'Nov 12, 2025',
+    recipients: makeRecipients('cf3', 18, progressStatuses(12, 6)),
+    assignmentHistory: makeHistory('cf3', 18, 12),
   },
 }
 

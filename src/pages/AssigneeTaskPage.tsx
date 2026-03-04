@@ -134,6 +134,113 @@ interface OcrResult {
 
 type CertStep = 'upload' | 'review' | 'submitted'
 type WriteUpStep = 'form' | 'submitted'
+type CustomFormStep = 'overview' | 'filling' | 'submitted'
+
+// ── Mock custom form workflow steps ──
+interface CustomFormWorkflowStep {
+  id: string
+  label: string
+  status: 'completed' | 'current' | 'pending'
+  managerOnly: boolean
+  completedBy?: string
+  completedAt?: string
+  questions: {
+    id: string
+    label: string
+    type: 'open-text' | 'single-select' | 'rating'
+    required: boolean
+    options?: string[]
+    answer?: string // pre-filled if completed by previous person
+  }[]
+}
+
+const MOCK_CUSTOM_FORM_STEPS: CustomFormWorkflowStep[] = [
+  {
+    id: 'cf-step-1',
+    label: 'Team Member Self-Reflection',
+    status: 'completed',
+    managerOnly: false,
+    completedBy: 'Maria Santos',
+    completedAt: 'Feb 20, 2026 at 3:15 PM',
+    questions: [
+      {
+        id: 'q1',
+        label: 'How would you rate your overall contribution to the team this quarter?',
+        type: 'rating',
+        required: true,
+        answer: '4',
+      },
+      {
+        id: 'q2',
+        label: 'Describe how you supported your teammates during busy shifts or challenging situations.',
+        type: 'open-text',
+        required: true,
+        answer: 'I stayed late to help close twice when we were short-staffed, covered two shifts for coworkers with family emergencies, and helped train a new server during their first week.',
+      },
+      {
+        id: 'q3',
+        label: 'What is one thing your team does well that you want to continue?',
+        type: 'open-text',
+        required: true,
+        answer: 'We communicate really well during peak hours. Everyone calls out when they need help and we jump in without being asked.',
+      },
+      {
+        id: 'q4',
+        label: 'What is one area where the team could improve collaboration?',
+        type: 'open-text',
+        required: true,
+        answer: 'I think we could do better with side-work handoffs between shifts. Sometimes things get missed when the dinner crew takes over from lunch.',
+      },
+      {
+        id: 'q5',
+        label: 'Do you feel comfortable asking your manager or teammates for help when you need it?',
+        type: 'single-select',
+        required: true,
+        options: ['Always', 'Most of the time', 'Sometimes', 'Rarely', 'Never'],
+        answer: 'Most of the time',
+      },
+    ],
+  },
+  {
+    id: 'cf-step-2',
+    label: 'Manager Assessment',
+    status: 'current',
+    managerOnly: true,
+    questions: [
+      {
+        id: 'q6',
+        label: 'How would you rate this team member\'s contribution and support to their peers?',
+        type: 'rating',
+        required: true,
+      },
+      {
+        id: 'q7',
+        label: 'Provide examples of how this team member contributed positively to the team.',
+        type: 'open-text',
+        required: true,
+      },
+      {
+        id: 'q8',
+        label: 'Are there areas where this team member could better support their colleagues?',
+        type: 'open-text',
+        required: true,
+      },
+      {
+        id: 'q9',
+        label: 'What support or resources can you provide to help this team member grow?',
+        type: 'open-text',
+        required: true,
+      },
+      {
+        id: 'q10',
+        label: 'Would you recommend this team member for a peer mentor or leadership role?',
+        type: 'single-select',
+        required: true,
+        options: ['Yes — ready now', 'Yes — with some development', 'Not at this time'],
+      },
+    ],
+  },
+]
 
 export default function AssigneeTaskPage({
   documentName,
@@ -144,6 +251,7 @@ export default function AssigneeTaskPage({
 }: AssigneeTaskPageProps) {
   // ── Decide which flow ──
   const isWriteUp = category === 'write-up'
+  const isCustomForm = category === 'custom-form'
 
   // ── Certificate state ──
   const [certStep, setCertStep] = useState<CertStep>('upload')
@@ -162,6 +270,10 @@ export default function AssigneeTaskPage({
   // ── Write-up state ──
   const [writeUpStep, setWriteUpStep] = useState<WriteUpStep>('form')
   const [workerAnswers, setWorkerAnswers] = useState<Record<string, string>>({})
+
+  // ── Custom form state ──
+  const [customFormStep, setCustomFormStep] = useState<CustomFormStep>('overview')
+  const [customFormAnswers, setCustomFormAnswers] = useState<Record<string, string>>({})
 
   // Certificate helpers
   const simulateOcr = useCallback(
@@ -237,23 +349,51 @@ export default function AssigneeTaskPage({
 
   const handleWriteUpSubmit = () => setWriteUpStep('submitted')
 
+  // ── Custom form helpers ──
+  const currentWorkflowStep = MOCK_CUSTOM_FORM_STEPS.find(s => s.status === 'current')
+
+  const setCustomFormAnswer = (fieldId: string, value: string) => {
+    setCustomFormAnswers((prev) => ({ ...prev, [fieldId]: value }))
+  }
+
+  const isCustomFormValid = () => {
+    if (!currentWorkflowStep) return false
+    return currentWorkflowStep.questions
+      .filter(q => q.required)
+      .every(q => customFormAnswers[q.id] && customFormAnswers[q.id].trim().length > 0)
+  }
+
+  const handleCustomFormSubmit = () => setCustomFormStep('submitted')
+
   // ── Shared header icon ──
   const headerIcon = isWriteUp ? (
     <PenLine className="w-6 h-6 text-amber-500" />
+  ) : isCustomForm ? (
+    <FileText className="w-6 h-6 text-indigo-500" />
   ) : (
     <Shield className="w-6 h-6 text-blue-500" />
   )
-  const headerBg = isWriteUp ? 'bg-amber-50' : 'bg-blue-50'
+  const headerBg = isWriteUp ? 'bg-amber-50' : isCustomForm ? 'bg-indigo-50' : 'bg-blue-50'
 
   // ── Steps for stepper ──
-  const isSubmitted = isWriteUp ? writeUpStep === 'submitted' : certStep === 'submitted'
+  const isSubmitted = isWriteUp
+    ? writeUpStep === 'submitted'
+    : isCustomForm
+    ? customFormStep === 'submitted'
+    : certStep === 'submitted'
   const stepLabels = isWriteUp
     ? ['Review & Respond', 'Submitted']
+    : isCustomForm
+    ? MOCK_CUSTOM_FORM_STEPS.map(s => s.label)
     : ['Upload', 'Review & Confirm', 'Submitted']
   const currentStepIdx = isWriteUp
     ? writeUpStep === 'form'
       ? 0
       : 1
+    : isCustomForm
+    ? customFormStep === 'submitted'
+      ? MOCK_CUSTOM_FORM_STEPS.length
+      : MOCK_CUSTOM_FORM_STEPS.findIndex(s => s.status === 'current')
     : certStep === 'upload'
     ? 0
     : certStep === 'review'
@@ -501,9 +641,301 @@ export default function AssigneeTaskPage({
         )}
 
         {/* ════════════════════════════════════════════════════════════════
+            CUSTOM FORM FLOW
+           ════════════════════════════════════════════════════════════════ */}
+        {isCustomForm && customFormStep === 'overview' && (
+          <div className="space-y-6">
+            {/* Workflow progress */}
+            {MOCK_CUSTOM_FORM_STEPS.map((step, idx) => {
+              const isCompleted = step.status === 'completed'
+              const isCurrent = step.status === 'current'
+
+              return (
+                <div
+                  key={step.id}
+                  className={`bg-white rounded-xl border overflow-hidden ${
+                    isCurrent ? 'border-primary-500 ring-2 ring-primary-100' : 'border-border-light'
+                  }`}
+                >
+                  {/* Step header */}
+                  <div className={`px-6 py-4 border-b ${
+                    isCompleted
+                      ? 'bg-green-50 border-green-100'
+                      : isCurrent
+                      ? 'bg-primary-50 border-primary-100'
+                      : 'bg-gray-50 border-border-light'
+                  }`}>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${
+                          isCompleted
+                            ? 'bg-green-500 text-white'
+                            : isCurrent
+                            ? 'bg-primary-500 text-white'
+                            : 'bg-gray-200 text-gray-500'
+                        }`}>
+                          {isCompleted ? <Check className="w-4 h-4" /> : idx + 1}
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <h3 className="text-sm font-semibold text-text-primary">{step.label}</h3>
+                            {step.managerOnly && (
+                              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-purple-100 text-purple-700 font-semibold">
+                                Managers only
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-xs text-text-secondary">
+                            {isCompleted
+                              ? `Completed by ${step.completedBy} · ${step.completedAt}`
+                              : isCurrent
+                              ? `${step.questions.length} questions · Pending your action`
+                              : `${step.questions.length} questions · Waiting`}
+                          </p>
+                        </div>
+                      </div>
+                      {isCurrent && (
+                        <Button
+                          onClick={() => setCustomFormStep('filling')}
+                          leftIcon={<PenLine className="w-4 h-4" />}
+                        >
+                          Start
+                        </Button>
+                      )}
+                      {isCompleted && (
+                        <span className="inline-flex items-center gap-1.5 text-xs font-medium text-green-600 bg-green-100 px-2.5 py-1 rounded-full">
+                          <CheckCircle2 className="w-3.5 h-3.5" />
+                          Completed
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Completed step answers (read-only preview) */}
+                  {isCompleted && (
+                    <div className="p-6 space-y-4">
+                      {step.questions.map((q) => (
+                        <div key={q.id}>
+                          <label className="flex items-center gap-2 text-sm font-medium text-text-secondary mb-1.5">
+                            {q.type === 'rating' ? (
+                              <span className="text-yellow-500">★</span>
+                            ) : q.type === 'single-select' ? (
+                              <CircleDot className="w-3.5 h-3.5 text-gray-400" />
+                            ) : (
+                              <AlignLeft className="w-3.5 h-3.5 text-gray-400" />
+                            )}
+                            {q.label}
+                          </label>
+                          {q.type === 'rating' ? (
+                            <div className="flex items-center gap-1">
+                              {[1, 2, 3, 4, 5].map((star) => (
+                                <span
+                                  key={star}
+                                  className={`text-lg ${
+                                    star <= Number(q.answer || 0) ? 'text-yellow-400' : 'text-gray-300'
+                                  }`}
+                                >
+                                  ★
+                                </span>
+                              ))}
+                              <span className="text-xs text-text-secondary ml-2">{q.answer}/5</span>
+                            </div>
+                          ) : (
+                            <div className="px-3 py-2.5 rounded-lg border border-border-light bg-gray-50 text-sm text-text-primary whitespace-pre-wrap min-h-[36px]">
+                              {q.answer}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        )}
+
+        {/* Custom form filling step */}
+        {isCustomForm && customFormStep === 'filling' && currentWorkflowStep && (
+          <div className="space-y-6">
+            {/* Previous completed steps (collapsed read-only) */}
+            {MOCK_CUSTOM_FORM_STEPS.filter(s => s.status === 'completed').map((step, idx) => (
+              <div key={step.id} className="bg-white rounded-xl border border-border-light overflow-hidden">
+                <div className="px-6 py-4 bg-green-50 border-b border-green-100">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center">
+                      <Check className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-semibold text-text-primary">{step.label}</h3>
+                      <p className="text-xs text-text-secondary">
+                        Completed by {step.completedBy} · {step.completedAt}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div className="p-6 space-y-4">
+                  {step.questions.map((q) => (
+                    <div key={q.id}>
+                      <label className="flex items-center gap-2 text-sm font-medium text-text-secondary mb-1.5">
+                        {q.type === 'rating' ? (
+                          <span className="text-yellow-500">★</span>
+                        ) : q.type === 'single-select' ? (
+                          <CircleDot className="w-3.5 h-3.5 text-gray-400" />
+                        ) : (
+                          <AlignLeft className="w-3.5 h-3.5 text-gray-400" />
+                        )}
+                        {q.label}
+                      </label>
+                      {q.type === 'rating' ? (
+                        <div className="flex items-center gap-1">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <span
+                              key={star}
+                              className={`text-lg ${
+                                star <= Number(q.answer || 0) ? 'text-yellow-400' : 'text-gray-300'
+                              }`}
+                            >
+                              ★
+                            </span>
+                          ))}
+                          <span className="text-xs text-text-secondary ml-2">{q.answer}/5</span>
+                        </div>
+                      ) : (
+                        <div className="px-3 py-2.5 rounded-lg border border-border-light bg-gray-50 text-sm text-text-primary whitespace-pre-wrap min-h-[36px]">
+                          {q.answer}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+
+            {/* Current step — editable form */}
+            <div className="bg-white rounded-xl border border-primary-500 ring-2 ring-primary-100 overflow-hidden">
+              <div className="px-6 py-4 bg-primary-50 border-b border-primary-100">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-primary-100 flex items-center justify-center">
+                    <PenLine className="w-4 h-4 text-primary-600" />
+                  </div>
+                  <div>
+                    <h2 className="text-sm font-semibold text-text-primary">
+                      {currentWorkflowStep.label}
+                    </h2>
+                    <p className="text-xs text-text-secondary">
+                      Fill out the questions below
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-6 space-y-5">
+                {currentWorkflowStep.questions.map((question) => (
+                  <div key={question.id}>
+                    <label className="flex items-center gap-2 text-sm font-semibold text-text-primary mb-2">
+                      {question.type === 'rating' ? (
+                        <span className="text-yellow-500 text-base">★</span>
+                      ) : question.type === 'single-select' ? (
+                        <CircleDot className="w-3.5 h-3.5 text-gray-400" />
+                      ) : (
+                        <AlignLeft className="w-3.5 h-3.5 text-gray-400" />
+                      )}
+                      {question.label}
+                      {question.required && <span className="text-red-500 text-xs">*</span>}
+                    </label>
+
+                    {question.type === 'rating' ? (
+                      <div className="flex items-center gap-2">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <button
+                            key={star}
+                            type="button"
+                            onClick={() => setCustomFormAnswer(question.id, String(star))}
+                            className="text-2xl transition-colors hover:scale-110"
+                          >
+                            <span className={
+                              star <= Number(customFormAnswers[question.id] || 0)
+                                ? 'text-yellow-400'
+                                : 'text-gray-300'
+                            }>
+                              ★
+                            </span>
+                          </button>
+                        ))}
+                        {customFormAnswers[question.id] && (
+                          <span className="text-xs text-text-secondary ml-2">{customFormAnswers[question.id]}/5</span>
+                        )}
+                      </div>
+                    ) : question.type === 'single-select' && question.options ? (
+                      <div className="flex gap-3 flex-wrap">
+                        {question.options.map((opt) => (
+                          <button
+                            key={opt}
+                            type="button"
+                            onClick={() => setCustomFormAnswer(question.id, opt)}
+                            className={`px-4 h-10 rounded-lg border text-sm font-medium transition-all ${
+                              customFormAnswers[question.id] === opt
+                                ? 'border-primary-500 bg-primary-50 text-primary-700 ring-2 ring-primary-200'
+                                : 'border-border-light bg-white text-text-primary hover:border-gray-300 hover:bg-gray-50'
+                            }`}
+                          >
+                            {opt}
+                          </button>
+                        ))}
+                      </div>
+                    ) : (
+                      <textarea
+                        value={customFormAnswers[question.id] || ''}
+                        onChange={(e) => setCustomFormAnswer(question.id, e.target.value)}
+                        placeholder="Type your response..."
+                        className="w-full px-3 py-2.5 rounded-lg border border-border bg-white text-sm text-text-primary placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none min-h-[80px]"
+                      />
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Submit */}
+            <div className="flex items-center justify-between">
+              <Button variant="outline" onClick={() => setCustomFormStep('overview')}>
+                Back to Overview
+              </Button>
+              <Button
+                leftIcon={<Check className="w-4 h-4" />}
+                onClick={handleCustomFormSubmit}
+                disabled={!isCustomFormValid()}
+              >
+                Submit {currentWorkflowStep.label}
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Custom form submitted */}
+        {isCustomForm && customFormStep === 'submitted' && (
+          <div className="bg-white rounded-xl border border-border-light p-8 text-center">
+            <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
+              <CheckCircle2 className="w-8 h-8 text-green-500" />
+            </div>
+            <h2 className="text-xl font-bold text-text-primary mb-2">Step Submitted!</h2>
+            <p className="text-sm text-text-secondary mb-6 max-w-md mx-auto">
+              Your "{currentWorkflowStep?.label}" responses have been recorded.
+              {MOCK_CUSTOM_FORM_STEPS.some(s => s.status === 'pending')
+                ? ' The next step will be sent to the assigned recipient.'
+                : ' All steps have been completed.'}
+            </p>
+            <Button onClick={onBack}>
+              Back to Document
+            </Button>
+          </div>
+        )}
+
+        {/* ════════════════════════════════════════════════════════════════
             CERTIFICATE FLOW
            ════════════════════════════════════════════════════════════════ */}
-        {!isWriteUp && certStep === 'upload' && !isScanning && (
+        {!isWriteUp && !isCustomForm && certStep === 'upload' && !isScanning && (
           <CertUploadStep
             isDragging={isDragging}
             onDrop={handleDrop}
@@ -513,9 +945,9 @@ export default function AssigneeTaskPage({
           />
         )}
 
-        {!isWriteUp && isScanning && <ScanningOverlay />}
+        {!isWriteUp && !isCustomForm && isScanning && <ScanningOverlay />}
 
-        {!isWriteUp && certStep === 'review' && (
+        {!isWriteUp && !isCustomForm && certStep === 'review' && (
           <CertReviewStep
             uploadedFile={uploadedFile}
             previewUrl={previewUrl}
@@ -537,7 +969,7 @@ export default function AssigneeTaskPage({
           />
         )}
 
-        {!isWriteUp && certStep === 'submitted' && (
+        {!isWriteUp && !isCustomForm && certStep === 'submitted' && (
           <CertSubmittedView
             documentName={documentName}
             certificateHolder={certificateHolder}

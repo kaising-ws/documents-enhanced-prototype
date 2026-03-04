@@ -6,6 +6,7 @@ import DocumentsTable from '../components/documents/DocumentsTable'
 import DocumentTypeSelector, { DocumentCreationType } from '../components/documents/DocumentTypeSelector'
 import AddDocumentModal, { EditingTemplateData } from '../components/documents/AddDocumentModal'
 import AssignDocumentModal from '../components/documents/AssignDocumentModal'
+import AssignCustomFormModal from '../components/documents/AssignCustomFormModal'
 import RecommendedDocumentsModal from '../components/documents/RecommendedDocumentsModal'
 import { useToast } from '../components/ui/Toast'
 import { documentDetails, DocumentTemplate, TemplateCategory } from '../data/mockData'
@@ -51,6 +52,7 @@ export default function DocumentsPage({ templates: documentTemplates, onOpenDocu
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [selectedDocType, setSelectedDocType] = useState<DocumentCreationType | null>(null)
   const [isAssignDocModalOpen, setIsAssignDocModalOpen] = useState(false)
+  const [isAssignCustomFormModalOpen, setIsAssignCustomFormModalOpen] = useState(false)
   const [assignDocumentTemplate, setAssignDocumentTemplate] = useState<DocumentTemplate | null>(null)
   const [isRecommendedModalOpen, setIsRecommendedModalOpen] = useState(false)
   const [editingTemplate, setEditingTemplate] = useState<EditingTemplateData | null>(null)
@@ -59,7 +61,11 @@ export default function DocumentsPage({ templates: documentTemplates, onOpenDocu
 
   const handleAssign = (doc: DocumentTemplate) => {
     setAssignDocumentTemplate(doc)
-    setIsAssignDocModalOpen(true)
+    if (doc.category === 'custom-form') {
+      setIsAssignCustomFormModalOpen(true)
+    } else {
+      setIsAssignDocModalOpen(true)
+    }
   }
 
   const handleEdit = (doc: DocumentTemplate) => {
@@ -325,6 +331,22 @@ export default function DocumentsPage({ templates: documentTemplates, onOpenDocu
           setIsAssignDocModalOpen(false)
           setAssignDocumentTemplate(null)
           addToast(`Document assigned to ${assignment.recipientIds.length} recipient(s)`, 'success')
+        }}
+      />
+
+      {/* Assign Custom Form Modal */}
+      <AssignCustomFormModal
+        isOpen={isAssignCustomFormModalOpen}
+        onClose={() => {
+          setIsAssignCustomFormModalOpen(false)
+          setAssignDocumentTemplate(null)
+        }}
+        document={assignDocumentTemplate}
+        onAssign={(assignment) => {
+          console.log('Custom form assigned:', assignment)
+          setIsAssignCustomFormModalOpen(false)
+          setAssignDocumentTemplate(null)
+          addToast(`Custom form assigned with ${assignment.stepAssignments.length} step(s)`, 'success')
         }}
       />
     </div>

@@ -283,3 +283,4 @@ export default function WriteUpQuickView({ writeUp, onClose }: WriteUpQuickViewP
   )
 }
 
+

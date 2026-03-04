@@ -10,26 +10,25 @@ export default function SegmentedControl({
   onChange,
 }: SegmentedControlProps) {
   return (
-    <div className="inline-flex rounded-element border border-border-light overflow-hidden">
-      {segments.map((segment, index) => (
+    <div className="inline-flex bg-surface-gray rounded-lg px-2">
+      {segments.map((segment) => (
         <button
           key={segment.id}
           onClick={() => onChange(segment.id)}
           className={`
-            h-10 px-4 text-sm font-semibold transition-all
+            relative h-12 px-6 text-sm font-semibold transition-all
             ${segment.id === activeSegment
-              ? 'bg-nav text-white'
-              : 'bg-white text-text-primary hover:bg-gray-50'
+              ? 'text-text-primary'
+              : 'text-text-secondary hover:text-text-primary'
             }
-            ${index > 0 ? 'border-l border-border-light' : ''}
           `}
         >
           {segment.label}
+          {segment.id === activeSegment && (
+            <span className="absolute bottom-0 left-2 right-2 h-[3px] bg-primary-500 rounded-t-full" />
+          )}
         </button>
       ))}
     </div>
   )
 }
-
-
-

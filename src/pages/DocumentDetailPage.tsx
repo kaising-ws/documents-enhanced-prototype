@@ -37,6 +37,7 @@ import SegmentedControl from '../components/ui/SegmentedControl'
 import SearchBox from '../components/ui/SearchBox'
 import Button from '../components/ui/Button'
 import Checkbox from '../components/ui/Checkbox'
+import MultiSelectDropdown from '../components/ui/MultiSelectDropdown'
 import ContextMenu, { ContextMenuItem } from '../components/ui/ContextMenu'
 import { useToast } from '../components/ui/Toast'
 import { DocumentDetail, AssignmentInstance, DocumentRecipient, TemplateCategory, locations, roles } from '../data/mockData'
@@ -73,28 +74,15 @@ export default function DocumentDetailPage({ document, documentCategory, onBack,
 
   // Template Settings state
   const [autoAssignEnabled, setAutoAssignEnabled] = useState(true)
-  const [autoAssignTrigger, setAutoAssignTrigger] = useState<'hire' | 'job_change' | 'location_change'>('hire')
   const [autoAssignJobTitles, setAutoAssignJobTitles] = useState<string[]>(['Server', 'Cook', 'Bartender'])
   const [autoAssignLocations, setAutoAssignLocations] = useState<string[]>([])
+  const [autoAssignDelayDays, setAutoAssignDelayDays] = useState<number>(0)
+  const [autoAssignDueDays, setAutoAssignDueDays] = useState<number>(7)
   const [selectedPermLocations, setSelectedPermLocations] = useState<string[]>([])
   const [selectedPermRoles, setSelectedPermRoles] = useState<string[]>([])
   const [permissionsExpanded, setPermissionsExpanded] = useState(true)
   const [autoAssignExpanded, setAutoAssignExpanded] = useState(true)
   const [settingsDirty, setSettingsDirty] = useState(false)
-
-  const toggleAutoAssignJobTitle = (title: string) => {
-    setAutoAssignJobTitles((prev) =>
-      prev.includes(title) ? prev.filter((t) => t !== title) : [...prev, title]
-    )
-    setSettingsDirty(true)
-  }
-
-  const toggleAutoAssignLocation = (locId: string) => {
-    setAutoAssignLocations((prev) =>
-      prev.includes(locId) ? prev.filter((l) => l !== locId) : [...prev, locId]
-    )
-    setSettingsDirty(true)
-  }
 
   const togglePermLocation = (locId: string) => {
     setSelectedPermLocations((prev) =>
@@ -464,13 +452,7 @@ export default function DocumentDetailPage({ document, documentCategory, onBack,
                   <p className="text-sm font-semibold text-text-primary">Auto-Assignment Rules</p>
                   <p className="text-xs text-text-secondary">
                     {autoAssignEnabled
-                      ? `Automatically assign on ${
-                          autoAssignTrigger === 'hire'
-                            ? 'new hire'
-                            : autoAssignTrigger === 'job_change'
-                            ? 'job title change'
-                            : 'location change'
-                        }`
+                      ? `Enabled${autoAssignJobTitles.length > 0 ? ` · ${autoAssignJobTitles.length} job title(s)` : ' · all job titles'}${autoAssignDelayDays > 0 ? ` · ${autoAssignDelayDays}d delay` : ''}${autoAssignDueDays > 0 ? ` · due in ${autoAssignDueDays}d` : ''}`
                       : 'Manual assignment only'}
                   </p>
                 </div>
@@ -489,7 +471,7 @@ export default function DocumentDetailPage({ document, documentCategory, onBack,
                   <div>
                     <label className="text-sm font-medium text-text-primary">Enable auto-assignment</label>
                     <p className="text-xs text-text-secondary mt-0.5">
-                      Automatically request this document when conditions are met
+                      Automatically assign this document when conditions are met
                     </p>
                   </div>
                   <button
@@ -509,31 +491,12 @@ export default function DocumentDetailPage({ document, documentCategory, onBack,
 
                 {autoAssignEnabled && (
                   <>
-                    {/* Trigger selection */}
-                    <div>
-                      <label className="block text-sm font-medium text-text-primary mb-2">
-                        Assign when
-                      </label>
-                      <div className="flex gap-2">
-                        {([
-                          { id: 'hire' as const, label: 'Employee is hired' },
-                          { id: 'job_change' as const, label: 'Job title changes' },
-                          { id: 'location_change' as const, label: 'Location changes' },
-                        ]).map((trigger) => (
-                          <button
-                            key={trigger.id}
-                            type="button"
-                            onClick={() => { setAutoAssignTrigger(trigger.id); setSettingsDirty(true) }}
-                            className={`flex-1 px-3 py-2.5 rounded-element border text-sm font-medium transition-all ${
-                              autoAssignTrigger === trigger.id
-                                ? 'border-primary-500 bg-primary-50 text-primary-700'
-                                : 'border-border-light hover:border-gray-300 text-text-primary'
-                            }`}
-                          >
-                            {trigger.label}
-                          </button>
-                        ))}
-                      </div>
+                    {/* How it works */}
+                    <div className="flex items-start gap-3 p-3 bg-blue-50 border border-blue-200 rounded-element">
+                      <Info className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
+                      <p className="text-xs text-blue-800">
+                        This document will be automatically assigned when a <strong>new employee is hired</strong> or an <strong>existing employee's job title changes</strong> to one of the selected job titles below.
+                      </p>
                     </div>
 
                     {/* Job titles */}
@@ -541,22 +504,13 @@ export default function DocumentDetailPage({ document, documentCategory, onBack,
                       <label className="block text-sm font-medium text-text-primary mb-2">
                         For employees with job title
                       </label>
-                      <div className="flex flex-wrap gap-2">
-                        {JOB_TITLE_OPTIONS.map((title) => (
-                          <button
-                            key={title}
-                            type="button"
-                            onClick={() => toggleAutoAssignJobTitle(title)}
-                            className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                              autoAssignJobTitles.includes(title)
-                                ? 'bg-primary-500 text-white'
-                                : 'bg-gray-100 text-text-primary hover:bg-gray-200'
-                            }`}
-                          >
-                            {title}
-                          </button>
-                        ))}
-                      </div>
+                      <MultiSelectDropdown
+                        options={JOB_TITLE_OPTIONS.map((t) => ({ id: t, label: t }))}
+                        selected={autoAssignJobTitles}
+                        onChange={(values) => { setAutoAssignJobTitles(values); setSettingsDirty(true) }}
+                        placeholder="Select job titles…"
+                        allLabel="All"
+                      />
                       {autoAssignJobTitles.length === 0 && (
                         <p className="text-xs text-amber-600 mt-2 flex items-center gap-1">
                           <Info className="w-3 h-3" />
@@ -570,22 +524,16 @@ export default function DocumentDetailPage({ document, documentCategory, onBack,
                       <label className="block text-sm font-medium text-text-primary mb-2">
                         At locations
                       </label>
-                      <div className="flex flex-wrap gap-2">
-                        {locations.map((location) => (
-                          <button
-                            key={location.id}
-                            type="button"
-                            onClick={() => toggleAutoAssignLocation(location.id)}
-                            className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                              autoAssignLocations.includes(location.id)
-                                ? 'bg-primary-500 text-white'
-                                : 'bg-gray-100 text-text-primary hover:bg-gray-200'
-                            }`}
-                          >
-                            {location.name}
-                          </button>
-                        ))}
-                      </div>
+                      <p className="text-xs text-text-secondary mb-3">
+                        Only employees at selected locations will be auto-assigned this document
+                      </p>
+                      <MultiSelectDropdown
+                        options={locations.map((l) => ({ id: l.id, label: l.name }))}
+                        selected={autoAssignLocations}
+                        onChange={(values) => { setAutoAssignLocations(values); setSettingsDirty(true) }}
+                        placeholder="Select locations…"
+                        allLabel="All"
+                      />
                       {autoAssignLocations.length === 0 && (
                         <p className="text-xs text-text-secondary mt-1.5">
                           No locations selected — will apply at all locations
@@ -593,22 +541,74 @@ export default function DocumentDetailPage({ document, documentCategory, onBack,
                       )}
                     </div>
 
+                    {/* Timing */}
+                    <div className="p-4 bg-gray-50 border border-border-light rounded-element space-y-4">
+                      <p className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Timing</p>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-text-primary mb-1.5">
+                            Assign date
+                          </label>
+                          <p className="text-xs text-text-secondary mb-2">
+                            Delay before the document is sent to the employee
+                          </p>
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="number"
+                              min={0}
+                              value={autoAssignDelayDays}
+                              onChange={(e) => { setAutoAssignDelayDays(Math.max(0, parseInt(e.target.value) || 0)); setSettingsDirty(true) }}
+                              className="w-20 h-9 px-3 rounded-element border border-border bg-white text-sm text-text-primary text-center focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                            />
+                            <span className="text-sm text-text-secondary">
+                              day{autoAssignDelayDays !== 1 ? 's' : ''} after trigger
+                            </span>
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-text-primary mb-1.5">
+                            Due date
+                          </label>
+                          <p className="text-xs text-text-secondary mb-2">
+                            Deadline for the employee to complete the document
+                          </p>
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="number"
+                              min={1}
+                              value={autoAssignDueDays}
+                              onChange={(e) => { setAutoAssignDueDays(Math.max(1, parseInt(e.target.value) || 1)); setSettingsDirty(true) }}
+                              className="w-20 h-9 px-3 rounded-element border border-border bg-white text-sm text-text-primary text-center focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                            />
+                            <span className="text-sm text-text-secondary">
+                              day{autoAssignDueDays !== 1 ? 's' : ''} after trigger
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      {autoAssignDelayDays >= autoAssignDueDays && (
+                        <div className="flex items-center gap-2 text-xs text-amber-600">
+                          <Info className="w-3 h-3 flex-shrink-0" />
+                          The due date should be after the assign date. The document would be sent on day {autoAssignDelayDays} but due on day {autoAssignDueDays}.
+                        </div>
+                      )}
+                    </div>
+
                     {/* Rule preview */}
                     <div className="p-3 bg-blue-50 border border-blue-200 rounded-element">
                       <p className="text-xs text-blue-800">
-                        <strong>Rule preview:</strong> When{' '}
-                        {autoAssignTrigger === 'hire'
-                          ? 'a new employee is hired'
-                          : autoAssignTrigger === 'job_change'
-                          ? "an employee's job title changes"
-                          : "an employee's location changes"}
+                        <strong>Rule preview:</strong> When a new employee is hired or an existing employee acquires a job title
                         {autoAssignJobTitles.length > 0
-                          ? ` as ${autoAssignJobTitles.join(' or ')}`
+                          ? ` matching ${autoAssignJobTitles.join(', ')}`
                           : ''}
                         {autoAssignLocations.length > 0
                           ? ` at ${autoAssignLocations.map(id => locations.find(l => l.id === id)?.name).filter(Boolean).join(' or ')}`
                           : ''}
-                        , automatically assign "{document.name}".
+                        , "{document.name}" will be assigned
+                        {autoAssignDelayDays > 0
+                          ? ` ${autoAssignDelayDays} day${autoAssignDelayDays !== 1 ? 's' : ''} after the trigger`
+                          : ' immediately'}
+                        {`, due within ${autoAssignDueDays} day${autoAssignDueDays !== 1 ? 's' : ''}`}.
                       </p>
                     </div>
                   </>
@@ -633,7 +633,7 @@ export default function DocumentDetailPage({ document, documentCategory, onBack,
                   <p className="text-xs text-text-secondary">
                     {selectedPermLocations.length === 0 && selectedPermRoles.length === 0
                       ? 'All locations and roles can use this template'
-                      : `${selectedPermLocations.length} location(s), ${selectedPermRoles.length} role(s) selected`}
+                      : `Restricted to ${selectedPermLocations.length || 'all'} location${selectedPermLocations.length !== 1 ? 's' : ''} · ${selectedPermRoles.length || 'all'} role${selectedPermRoles.length !== 1 ? 's' : ''}`}
                   </p>
                 </div>
               </div>
@@ -646,85 +646,74 @@ export default function DocumentDetailPage({ document, documentCategory, onBack,
 
             {permissionsExpanded && (
               <div className="border-t border-border-light p-5 space-y-5">
-                {/* Location permissions */}
+                {/* Location restrictions */}
                 <div>
-                  <label className="flex items-center gap-2 text-sm font-medium text-text-primary mb-2">
+                  <label className="flex items-center gap-2 text-sm font-medium text-text-primary mb-1">
                     <MapPin className="w-4 h-4 text-gray-500" />
-                    Locations
+                    Recipient locations
                   </label>
                   <p className="text-xs text-text-secondary mb-3">
-                    Restrict which locations can use and assign this template
+                    Only employees at selected locations can receive this document. When assigning, only employees at these locations will appear in the recipient list.
                   </p>
-                  <div className="flex flex-wrap gap-2">
-                    {locations.map((location) => (
-                      <button
-                        key={location.id}
-                        type="button"
-                        onClick={() => togglePermLocation(location.id)}
-                        className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                          selectedPermLocations.includes(location.id)
-                            ? 'bg-primary-500 text-white'
-                            : 'bg-gray-100 text-text-primary hover:bg-gray-200'
-                        }`}
-                      >
-                        {location.name}
-                      </button>
-                    ))}
-                  </div>
-                  {selectedPermLocations.length === 0 && (
+                  <MultiSelectDropdown
+                    options={locations.map((l) => ({ id: l.id, label: l.name }))}
+                    selected={selectedPermLocations}
+                    onChange={(values) => { setSelectedPermLocations(values); setSettingsDirty(true) }}
+                    placeholder="Select locations…"
+                    allLabel="All"
+                  />
+                  {selectedPermLocations.length === 0 ? (
                     <p className="text-xs text-text-secondary mt-1.5">
-                      No locations selected = available at all locations
+                      No restrictions — employees at any location can receive this document
+                    </p>
+                  ) : (
+                    <p className="text-xs text-primary-600 mt-1.5">
+                      Only employees at {selectedPermLocations.map(id => locations.find(l => l.id === id)?.name).filter(Boolean).join(', ')} can receive this document
                     </p>
                   )}
                 </div>
 
                 {/* Role permissions */}
                 <div>
-                  <label className="flex items-center gap-2 text-sm font-medium text-text-primary mb-2">
+                  <label className="flex items-center gap-2 text-sm font-medium text-text-primary mb-1">
                     <Users className="w-4 h-4 text-gray-500" />
-                    Roles that can use this template
+                    Manager roles
                   </label>
                   <p className="text-xs text-text-secondary mb-3">
-                    Restrict which manager roles can assign and manage this template
+                    Only users with selected roles can see this template and assign it to employees. Users without these roles will not see this template in their Documents page.
                   </p>
-                  <div className="flex flex-wrap gap-2">
-                    {roles.map((role) => (
-                      <button
-                        key={role.id}
-                        type="button"
-                        onClick={() => togglePermRole(role.id)}
-                        className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                          selectedPermRoles.includes(role.id)
-                            ? 'bg-primary-500 text-white'
-                            : 'bg-gray-100 text-text-primary hover:bg-gray-200'
-                        }`}
-                      >
-                        {role.name}
-                      </button>
-                    ))}
-                  </div>
-                  {selectedPermRoles.length === 0 && (
+                  <MultiSelectDropdown
+                    options={roles.map((r) => ({ id: r.id, label: r.name }))}
+                    selected={selectedPermRoles}
+                    onChange={(values) => { setSelectedPermRoles(values); setSettingsDirty(true) }}
+                    placeholder="Select roles…"
+                    allLabel="All"
+                  />
+                  {selectedPermRoles.length === 0 ? (
                     <p className="text-xs text-text-secondary mt-1.5">
-                      No roles selected = available to all managers
+                      No restrictions — all managers can see and assign this template
+                    </p>
+                  ) : (
+                    <p className="text-xs text-primary-600 mt-1.5">
+                      Only {selectedPermRoles.map(id => roles.find(r => r.id === id)?.name).filter(Boolean).join(', ')} can see and assign this template
                     </p>
                   )}
                 </div>
 
                 {/* Summary info box */}
-                <div className="p-3 bg-purple-50 border border-purple-200 rounded-element">
+                <div className="p-3 bg-purple-50 border border-purple-200 rounded-element space-y-1">
+                  <p className="text-xs font-semibold text-purple-800">Access summary</p>
                   <p className="text-xs text-purple-800">
-                    <strong>Access summary:</strong>{' '}
-                    {selectedPermLocations.length === 0 && selectedPermRoles.length === 0
-                      ? 'All managers at all locations can use this template.'
-                      : `${
-                          selectedPermRoles.length > 0
-                            ? selectedPermRoles.map(id => roles.find(r => r.id === id)?.name).filter(Boolean).join(', ')
-                            : 'All roles'
-                        } at ${
-                          selectedPermLocations.length > 0
-                            ? selectedPermLocations.map(id => locations.find(l => l.id === id)?.name).filter(Boolean).join(', ')
-                            : 'all locations'
-                        } can use this template.`}
+                    <strong>Who can receive:</strong>{' '}
+                    {selectedPermLocations.length === 0
+                      ? 'Employees at any location.'
+                      : `Only employees at ${selectedPermLocations.map(id => locations.find(l => l.id === id)?.name).filter(Boolean).join(', ')}.`}
+                  </p>
+                  <p className="text-xs text-purple-800">
+                    <strong>Who can assign:</strong>{' '}
+                    {selectedPermRoles.length === 0
+                      ? 'All managers.'
+                      : `Only ${selectedPermRoles.map(id => roles.find(r => r.id === id)?.name).filter(Boolean).join(', ')}.`}
                   </p>
                 </div>
               </div>

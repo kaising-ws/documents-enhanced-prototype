@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { MoreHorizontal } from 'lucide-react'
 
 export interface ContextMenuItem {
@@ -18,7 +18,9 @@ interface ContextMenuProps {
 
 export default function ContextMenu({ items, trigger, align = 'right' }: ContextMenuProps) {
   const [isOpen, setIsOpen] = useState(false)
+  const [openUpward, setOpenUpward] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
+  const dropdownRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -30,13 +32,25 @@ export default function ContextMenu({ items, trigger, align = 'right' }: Context
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
+  const handleToggle = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (!isOpen) {
+      // Check if the dropdown would overflow below the viewport
+      const rect = menuRef.current?.getBoundingClientRect()
+      if (rect) {
+        const spaceBelow = window.innerHeight - rect.bottom
+        // rough estimate: ~40px per item + 8px padding
+        const dropdownHeight = items.length * 40 + 8
+        setOpenUpward(spaceBelow < dropdownHeight)
+      }
+    }
+    setIsOpen(!isOpen)
+  }, [isOpen, items.length])
+
   return (
     <div ref={menuRef} className="relative">
       <button
-        onClick={(e) => {
-          e.stopPropagation()
-          setIsOpen(!isOpen)
-        }}
+        onClick={handleToggle}
         className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-gray-100 transition-colors"
       >
         {trigger || <MoreHorizontal className="w-5 h-5 text-gray-500" />}
@@ -44,9 +58,10 @@ export default function ContextMenu({ items, trigger, align = 'right' }: Context
 
       {isOpen && (
         <div
-          className={`absolute z-50 mt-1 min-w-[180px] bg-white rounded-element border border-border-light shadow-dropdown py-1 ${
+          ref={dropdownRef}
+          className={`absolute z-50 min-w-[180px] bg-white rounded-element border border-border-light shadow-dropdown py-1 ${
             align === 'right' ? 'right-0' : 'left-0'
-          }`}
+          } ${openUpward ? 'bottom-full mb-1' : 'top-full mt-1'}`}
         >
           {items.map((item) => (
             <button
@@ -77,6 +92,3 @@ export default function ContextMenu({ items, trigger, align = 'right' }: Context
     </div>
   )
 }
-
-
-

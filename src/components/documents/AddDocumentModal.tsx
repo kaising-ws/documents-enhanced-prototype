@@ -27,6 +27,7 @@ import {
 import Modal from '../ui/Modal'
 import Button from '../ui/Button'
 import Dropdown from '../ui/Dropdown'
+import MultiSelectDropdown from '../ui/MultiSelectDropdown'
 import Checkbox from '../ui/Checkbox'
 import FormFieldBuilder, { FormField } from './FormFieldBuilder'
 import { useToast } from '../ui/Toast'
@@ -304,10 +305,9 @@ export default function AddDocumentModal({
   const [expirationRequired, setExpirationRequired] = useState(true)
   const [reminderDays, setReminderDays] = useState<number[]>([30, 14, 7, 1])
   const [autoAssignEnabled, setAutoAssignEnabled] = useState(false)
-  const [autoAssignTrigger, setAutoAssignTrigger] = useState<'hire' | 'job_change' | 'manual'>(
-    'hire'
-  )
   const [autoAssignJobTitles, setAutoAssignJobTitles] = useState<string[]>([])
+  const [autoAssignDelayDays, setAutoAssignDelayDays] = useState<number>(0)
+  const [autoAssignDueDays, setAutoAssignDueDays] = useState<number>(7)
   const [requireVerification, setRequireVerification] = useState(true)
 
   // PDF signing specific state
@@ -321,6 +321,19 @@ export default function AddDocumentModal({
   // Custom form specific state
   const [customFormMode, setCustomFormMode] = useState<'pdf-upload' | 'digital-form' | null>(null)
   const [assigneeFields, setAssigneeFields] = useState<FormField[]>([])
+
+  // Multi-step custom form workflow state
+  interface FormWorkflowStep {
+    id: string
+    label: string
+    fields: FormField[]
+    managerOnly: boolean
+    saveToProfile: boolean
+  }
+  const [formWorkflowSteps, setFormWorkflowSteps] = useState<FormWorkflowStep[]>([
+    { id: 'step-1', label: 'Step 1', fields: [], managerOnly: false, saveToProfile: false },
+  ])
+  const [activeWorkflowStep, setActiveWorkflowStep] = useState<string>('step-1')
 
   // Derived signer booleans
   const teamMemberSigns = signerEntries.some((e) => e.type === 'team-member')
@@ -425,8 +438,9 @@ export default function AddDocumentModal({
     setExpirationRequired(true)
     setReminderDays([30, 14, 7, 1])
     setAutoAssignEnabled(false)
-    setAutoAssignTrigger('hire')
     setAutoAssignJobTitles([])
+    setAutoAssignDelayDays(0)
+    setAutoAssignDueDays(7)
     setRequireVerification(true)
     setSignerEntries([{ id: 'se-default', type: 'team-member', personId: 'employee' }])
     setMappedFields([])
@@ -434,6 +448,8 @@ export default function AddDocumentModal({
     setDraggedFieldId(null)
     setCustomFormMode(null)
     setAssigneeFields([])
+    setFormWorkflowSteps([{ id: 'step-1', label: 'Step 1', fields: [], managerOnly: false, saveToProfile: false }])
+    setActiveWorkflowStep('step-1')
     onClose()
   }
 
@@ -533,7 +549,8 @@ export default function AddDocumentModal({
         if (documentType === 'custom-form') {
           if (!customFormMode) return false
           if (customFormMode === 'pdf-upload') return !!uploadedFile && signerEntries.length > 0
-          return assigneeFields.length > 0
+          // For digital form, check that every workflow step has at least one field
+          return formWorkflowSteps.length > 0 && formWorkflowSteps.every(s => s.fields.length > 0)
         }
         return true // PDF mapping
       case 'review':
@@ -558,12 +575,6 @@ export default function AddDocumentModal({
   const toggleReminderDay = (day: number) => {
     setReminderDays((prev) =>
       prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day].sort((a, b) => b - a)
-    )
-  }
-
-  const toggleJobTitle = (title: string) => {
-    setAutoAssignJobTitles((prev) =>
-      prev.includes(title) ? prev.filter((t) => t !== title) : [...prev, title]
     )
   }
 
@@ -1575,20 +1586,22 @@ export default function AddDocumentModal({
           </div>
         )}
 
-        {/* Digital form mode */}
+        {/* Digital form mode — multi-step workflow */}
         {customFormMode === 'digital-form' && (
-          <div className="space-y-6">
+          <div className="space-y-5">
             {/* Mode indicator with back option */}
             <div className="flex items-center justify-between p-3 bg-indigo-50 border border-indigo-200 rounded-element">
               <div className="flex items-center gap-2">
                 <FileText className="w-4 h-4 text-indigo-600" />
-                <span className="text-sm font-medium text-indigo-800">Digital form</span>
+                <span className="text-sm font-medium text-indigo-800">Digital form — Multi-step workflow</span>
               </div>
               <button
                 type="button"
                 onClick={() => {
                   setCustomFormMode(null)
                   setAssigneeFields([])
+                  setFormWorkflowSteps([{ id: 'step-1', label: 'Step 1', fields: [], managerOnly: false, saveToProfile: false }])
+                  setActiveWorkflowStep('step-1')
                 }}
                 className="text-xs font-medium text-indigo-600 hover:text-indigo-800 underline"
               >
@@ -1596,26 +1609,218 @@ export default function AddDocumentModal({
               </button>
             </div>
 
-            <div>
-              <label className="block text-sm font-semibold text-text-primary mb-2">
-                Form questions
-              </label>
-              <p className="text-xs text-text-secondary mb-3">
-                Add the questions that assignees will fill out when completing this form.
+            {/* Info */}
+            <div className="flex items-start gap-2.5 p-3 bg-blue-50 border border-blue-200 rounded-element">
+              <Info className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
+              <p className="text-xs text-blue-800">
+                Build a multi-step form workflow. Each step can be filled by a different person — for example, the employee fills Step 1, then a manager fills Step 2. Assignees for each step are configured when you assign the form.
               </p>
-              <FormFieldBuilder
-                fields={assigneeFields}
-                onChange={setAssigneeFields}
-                sectionLabel="Form questions"
-              />
             </div>
 
-            {assigneeFields.length === 0 && (
-              <div className="flex items-start gap-2.5 p-3 bg-amber-50 border border-amber-200 rounded-element">
-                <Info className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />
-                <p className="text-xs text-amber-800">
-                  Add at least one question for assignees to answer. You can choose from open text, single-select, multi-select, or file upload field types.
-                </p>
+            {/* Workflow step tabs */}
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <div className="flex items-center gap-1 flex-1 overflow-x-auto pb-1">
+                  {formWorkflowSteps.map((step, idx) => (
+                    <button
+                      key={step.id}
+                      type="button"
+                      onClick={() => setActiveWorkflowStep(step.id)}
+                      className={`relative flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
+                        activeWorkflowStep === step.id
+                          ? 'bg-primary-500 text-white shadow-sm'
+                          : 'bg-gray-100 text-text-primary hover:bg-gray-200'
+                      }`}
+                    >
+                      <span className={`w-5 h-5 rounded-full text-xs font-bold flex items-center justify-center ${
+                        activeWorkflowStep === step.id
+                          ? 'bg-white/25 text-white'
+                          : 'bg-gray-300 text-gray-600'
+                      }`}>
+                        {idx + 1}
+                      </span>
+                      {step.label}
+                      {step.managerOnly && (
+                        <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-semibold ${
+                          activeWorkflowStep === step.id
+                            ? 'bg-white/20 text-white'
+                            : 'bg-purple-100 text-purple-700'
+                        }`}>
+                          Manager
+                        </span>
+                      )}
+                      {formWorkflowSteps.length > 1 && activeWorkflowStep === step.id && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            const newSteps = formWorkflowSteps.filter(s => s.id !== step.id)
+                            setFormWorkflowSteps(newSteps)
+                            setActiveWorkflowStep(newSteps[Math.max(0, idx - 1)].id)
+                          }}
+                          className="w-4 h-4 flex items-center justify-center rounded-full hover:bg-white/30 transition-colors ml-1"
+                          title="Remove step"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      )}
+                    </button>
+                  ))}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const newId = `step-${Date.now()}`
+                    setFormWorkflowSteps(prev => [...prev, {
+                      id: newId,
+                      label: `Step ${prev.length + 1}`,
+                      fields: [],
+                      managerOnly: false,
+                      saveToProfile: false,
+                    }])
+                    setActiveWorkflowStep(newId)
+                  }}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-lg border-2 border-dashed border-gray-300 text-sm font-medium text-gray-500 hover:border-gray-400 hover:text-gray-600 transition-colors whitespace-nowrap"
+                >
+                  <Plus className="w-4 h-4" />
+                  Add step
+                </button>
+              </div>
+
+              {/* Active step content */}
+              {formWorkflowSteps.map((step) => {
+                if (step.id !== activeWorkflowStep) return null
+                const stepIdx = formWorkflowSteps.findIndex(s => s.id === step.id)
+
+                return (
+                  <div key={step.id} className="space-y-4">
+                    {/* Step name */}
+                    <div>
+                      <label className="block text-xs font-semibold text-text-secondary mb-1.5">
+                        Step name
+                      </label>
+                      <input
+                        type="text"
+                        value={step.label}
+                        onChange={(e) => {
+                          setFormWorkflowSteps(prev => prev.map(s =>
+                            s.id === step.id ? { ...s, label: e.target.value } : s
+                          ))
+                        }}
+                        placeholder={`e.g., Self-Assessment, Manager Review`}
+                        className="w-full h-9 px-3 rounded-element border border-border bg-white text-sm text-text-primary placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      />
+                    </div>
+
+                    {/* Step options */}
+                    <div className="flex items-center gap-6 p-3 bg-gray-50 rounded-element border border-border-light">
+                      {/* Manager-only toggle */}
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setFormWorkflowSteps(prev => prev.map(s =>
+                              s.id === step.id ? { ...s, managerOnly: !s.managerOnly } : s
+                            ))
+                          }}
+                          className={`relative w-9 h-5 rounded-full transition-colors ${
+                            step.managerOnly ? 'bg-purple-500' : 'bg-gray-300'
+                          }`}
+                        >
+                          <span className={`absolute top-0.5 w-4 h-4 bg-white rounded-full transition-transform ${
+                            step.managerOnly ? 'right-0.5' : 'left-0.5'
+                          }`} />
+                        </button>
+                        <span className="text-xs font-medium text-text-primary">Managers only</span>
+                      </div>
+
+                      <div className="w-px h-5 bg-border-light" />
+
+                      {/* Save to profile toggle */}
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setFormWorkflowSteps(prev => prev.map(s =>
+                              s.id === step.id ? { ...s, saveToProfile: !s.saveToProfile } : s
+                            ))
+                          }}
+                          className={`relative w-9 h-5 rounded-full transition-colors ${
+                            step.saveToProfile ? 'bg-green-500' : 'bg-gray-300'
+                          }`}
+                        >
+                          <span className={`absolute top-0.5 w-4 h-4 bg-white rounded-full transition-transform ${
+                            step.saveToProfile ? 'right-0.5' : 'left-0.5'
+                          }`} />
+                        </button>
+                        <span className="text-xs font-medium text-text-primary">Save to assignee's profile</span>
+                      </div>
+                    </div>
+
+                    {/* Questions for this step */}
+                    <div>
+                      <label className="block text-sm font-semibold text-text-primary mb-2">
+                        Questions for {step.label || `Step ${stepIdx + 1}`}
+                      </label>
+                      <p className="text-xs text-text-secondary mb-3">
+                        {step.managerOnly
+                          ? 'Only managers can fill out these questions.'
+                          : 'The assignee for this step will fill out these questions.'}
+                      </p>
+                      <FormFieldBuilder
+                        fields={step.fields}
+                        onChange={(fields) => {
+                          setFormWorkflowSteps(prev => prev.map(s =>
+                            s.id === step.id ? { ...s, fields } : s
+                          ))
+                        }}
+                        sectionLabel={step.label || `Step ${stepIdx + 1}`}
+                      />
+                    </div>
+
+                    {step.fields.length === 0 && (
+                      <div className="flex items-start gap-2.5 p-3 bg-amber-50 border border-amber-200 rounded-element">
+                        <Info className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />
+                        <p className="text-xs text-amber-800">
+                          Add at least one question for this step.
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+
+            {/* Workflow summary */}
+            {formWorkflowSteps.length > 1 && (
+              <div className="p-4 bg-gray-50 border border-border-light rounded-element">
+                <p className="text-xs font-semibold text-text-secondary uppercase tracking-wider mb-3">Workflow Summary</p>
+                <div className="space-y-2">
+                  {formWorkflowSteps.map((step, idx) => (
+                    <div key={step.id} className="flex items-center gap-3">
+                      <div className="flex items-center gap-2 flex-1">
+                        <span className="w-6 h-6 rounded-full bg-primary-100 text-primary-700 text-xs font-bold flex items-center justify-center flex-shrink-0">
+                          {idx + 1}
+                        </span>
+                        <span className="text-sm font-medium text-text-primary">{step.label || `Step ${idx + 1}`}</span>
+                        {step.managerOnly && (
+                          <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-purple-100 text-purple-700 font-semibold">
+                            Managers only
+                          </span>
+                        )}
+                        {step.saveToProfile && (
+                          <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-green-100 text-green-700 font-semibold">
+                            Saves to profile
+                          </span>
+                        )}
+                      </div>
+                      <span className="text-xs text-text-secondary">{step.fields.length} question{step.fields.length !== 1 ? 's' : ''}</span>
+                      {idx < formWorkflowSteps.length - 1 && (
+                        <ArrowRight className="w-3 h-3 text-gray-400 flex-shrink-0" />
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </div>
@@ -2056,10 +2261,32 @@ export default function AddDocumentModal({
                   </>
                 )}
                 {customFormMode === 'digital-form' && (
-                  <div className="flex justify-between text-sm">
-                    <span className="text-text-secondary">Form questions</span>
-                    <span className="text-text-primary font-medium">{assigneeFields.length}</span>
-                  </div>
+                  <>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-text-secondary">Workflow steps</span>
+                      <span className="text-text-primary font-medium">{formWorkflowSteps.length}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-text-secondary">Total questions</span>
+                      <span className="text-text-primary font-medium">{formWorkflowSteps.reduce((sum, s) => sum + s.fields.length, 0)}</span>
+                    </div>
+                    {formWorkflowSteps.length > 0 && (
+                      <div className="pt-2 mt-2 border-t border-border-light">
+                        <p className="text-xs font-semibold text-text-secondary mb-2">Workflow</p>
+                        <div className="space-y-1.5">
+                          {formWorkflowSteps.map((step, idx) => (
+                            <div key={step.id} className="flex items-center gap-2 text-xs">
+                              <span className="w-5 h-5 rounded-full bg-primary-100 text-primary-700 font-bold flex items-center justify-center flex-shrink-0">{idx + 1}</span>
+                              <span className="text-text-primary font-medium">{step.label}</span>
+                              <span className="text-text-secondary">({step.fields.length} Q)</span>
+                              {step.managerOnly && <span className="px-1.5 py-0.5 rounded-full bg-purple-100 text-purple-700 text-[10px] font-semibold">Manager</span>}
+                              {step.saveToProfile && <span className="px-1.5 py-0.5 rounded-full bg-green-100 text-green-700 text-[10px] font-semibold">Profile</span>}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </>
                 )}
               </>
             )}
@@ -2100,22 +2327,13 @@ export default function AddDocumentModal({
                   <MapPin className="w-4 h-4 text-gray-500" />
                   Locations
                 </label>
-                <div className="flex flex-wrap gap-2">
-                  {locations.map((location) => (
-                    <button
-                      key={location.id}
-                      type="button"
-                      onClick={() => toggleLocation(location.id)}
-                      className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                        selectedLocations.includes(location.id)
-                          ? 'bg-primary-500 text-white'
-                          : 'bg-gray-100 text-text-primary hover:bg-gray-200'
-                      }`}
-                    >
-                      {location.name}
-                    </button>
-                  ))}
-                </div>
+                <MultiSelectDropdown
+                  options={locations.map((l) => ({ id: l.id, label: l.name }))}
+                  selected={selectedLocations}
+                  onChange={setSelectedLocations}
+                  placeholder="Select locations…"
+                  allLabel="All"
+                />
                 {selectedLocations.length === 0 && (
                   <p className="text-xs text-text-secondary mt-1.5">
                     No locations selected = available at all locations
@@ -2127,22 +2345,13 @@ export default function AddDocumentModal({
                   <Users className="w-4 h-4 text-gray-500" />
                   Roles that can use this template
                 </label>
-                <div className="flex flex-wrap gap-2">
-                  {roles.map((role) => (
-                    <button
-                      key={role.id}
-                      type="button"
-                      onClick={() => toggleRole(role.id)}
-                      className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                        selectedRoles.includes(role.id)
-                          ? 'bg-primary-500 text-white'
-                          : 'bg-gray-100 text-text-primary hover:bg-gray-200'
-                      }`}
-                    >
-                      {role.name}
-                    </button>
-                  ))}
-                </div>
+                <MultiSelectDropdown
+                  options={roles.map((r) => ({ id: r.id, label: r.name }))}
+                  selected={selectedRoles}
+                  onChange={setSelectedRoles}
+                  placeholder="Select roles…"
+                  allLabel="All"
+                />
                 {selectedRoles.length === 0 && (
                   <p className="text-xs text-text-secondary mt-1.5">
                     No roles selected = available to all managers
@@ -2164,9 +2373,7 @@ export default function AddDocumentModal({
                 <p className="text-sm font-semibold text-text-primary">Auto-assign rules</p>
                 <p className="text-xs text-text-secondary">
                   {autoAssignEnabled
-                    ? `Automatically assign on ${
-                        autoAssignTrigger === 'hire' ? 'new hire' : 'job change'
-                      }`
+                    ? `Enabled${autoAssignJobTitles.length > 0 ? ` · ${autoAssignJobTitles.length} job title(s)` : ' · all job titles'}`
                     : 'Manually assign when needed'}
                 </p>
               </div>
@@ -2192,52 +2399,25 @@ export default function AddDocumentModal({
               </div>
               {autoAssignEnabled && (
                 <>
-                  <div>
-                    <label className="block text-sm font-medium text-text-primary mb-2">
-                      Assign when
-                    </label>
-                    <div className="flex gap-2">
-                      {[
-                        { id: 'hire', label: 'Employee is hired' },
-                        { id: 'job_change', label: 'Job title changes' },
-                      ].map((trigger) => (
-                        <button
-                          key={trigger.id}
-                          type="button"
-                          onClick={() =>
-                            setAutoAssignTrigger(trigger.id as 'hire' | 'job_change')
-                          }
-                          className={`flex-1 px-3 py-2 rounded-element border text-sm font-medium transition-all ${
-                            autoAssignTrigger === trigger.id
-                              ? 'border-primary-500 bg-primary-50 text-primary-700'
-                              : 'border-border-light hover:border-gray-300 text-text-primary'
-                          }`}
-                        >
-                          {trigger.label}
-                        </button>
-                      ))}
-                    </div>
+                  {/* How it works */}
+                  <div className="flex items-start gap-3 p-3 bg-blue-50 border border-blue-200 rounded-element">
+                    <Info className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
+                    <p className="text-xs text-blue-800">
+                      This document will be automatically assigned when a <strong>new employee is hired</strong> or an <strong>existing employee's job title changes</strong> to one of the selected job titles below.
+                    </p>
                   </div>
+
                   <div>
                     <label className="block text-sm font-medium text-text-primary mb-2">
                       For employees with job title
                     </label>
-                    <div className="flex flex-wrap gap-2">
-                      {jobTitleOptions.map((title) => (
-                        <button
-                          key={title}
-                          type="button"
-                          onClick={() => toggleJobTitle(title)}
-                          className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                            autoAssignJobTitles.includes(title)
-                              ? 'bg-primary-500 text-white'
-                              : 'bg-gray-100 text-text-primary hover:bg-gray-200'
-                          }`}
-                        >
-                          {title}
-                        </button>
-                      ))}
-                    </div>
+                    <MultiSelectDropdown
+                      options={jobTitleOptions.map((t) => ({ id: t, label: t }))}
+                      selected={autoAssignJobTitles}
+                      onChange={setAutoAssignJobTitles}
+                      placeholder="Select job titles…"
+                      allLabel="All"
+                    />
                     {autoAssignJobTitles.length === 0 && (
                       <p className="text-xs text-amber-600 mt-2 flex items-center gap-1">
                         <Info className="w-3 h-3" />
@@ -2245,16 +2425,72 @@ export default function AddDocumentModal({
                       </p>
                     )}
                   </div>
+
+                  {/* Timing */}
+                  <div className="p-4 bg-gray-50 border border-border-light rounded-element space-y-4">
+                    <p className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Timing</p>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-text-primary mb-1.5">
+                          Assign date
+                        </label>
+                        <p className="text-xs text-text-secondary mb-2">
+                          Delay before the document is sent to the employee
+                        </p>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="number"
+                            min={0}
+                            value={autoAssignDelayDays}
+                            onChange={(e) => setAutoAssignDelayDays(Math.max(0, parseInt(e.target.value) || 0))}
+                            className="w-20 h-9 px-3 rounded-element border border-border bg-white text-sm text-text-primary text-center focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                          />
+                          <span className="text-sm text-text-secondary">
+                            day{autoAssignDelayDays !== 1 ? 's' : ''} after trigger
+                          </span>
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-text-primary mb-1.5">
+                          Due date
+                        </label>
+                        <p className="text-xs text-text-secondary mb-2">
+                          Deadline for the employee to complete the document
+                        </p>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="number"
+                            min={1}
+                            value={autoAssignDueDays}
+                            onChange={(e) => setAutoAssignDueDays(Math.max(1, parseInt(e.target.value) || 1))}
+                            className="w-20 h-9 px-3 rounded-element border border-border bg-white text-sm text-text-primary text-center focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                          />
+                          <span className="text-sm text-text-secondary">
+                            day{autoAssignDueDays !== 1 ? 's' : ''} after trigger
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    {autoAssignDelayDays >= autoAssignDueDays && (
+                      <div className="flex items-center gap-2 text-xs text-amber-600">
+                        <Info className="w-3 h-3 flex-shrink-0" />
+                        The due date should be after the assign date. The document would be sent on day {autoAssignDelayDays} but due on day {autoAssignDueDays}.
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Rule preview */}
                   <div className="p-3 bg-blue-50 border border-blue-200 rounded-element">
                     <p className="text-xs text-blue-800">
-                      <strong>Rule preview:</strong> When{' '}
-                      {autoAssignTrigger === 'hire'
-                        ? 'a new employee is hired'
-                        : "an employee's job title changes"}
+                      <strong>Rule preview:</strong> When a new employee is hired or an existing employee acquires a job title
                       {autoAssignJobTitles.length > 0
-                        ? ` as ${autoAssignJobTitles.join(' or ')}`
+                        ? ` matching ${autoAssignJobTitles.join(', ')}`
                         : ''}
-                      , automatically assign this document.
+                      , this document will be assigned
+                      {autoAssignDelayDays > 0
+                        ? ` ${autoAssignDelayDays} day${autoAssignDelayDays !== 1 ? 's' : ''} after the trigger`
+                        : ' immediately'}
+                      {`, due within ${autoAssignDueDays} day${autoAssignDueDays !== 1 ? 's' : ''}`}.
                     </p>
                   </div>
                 </>

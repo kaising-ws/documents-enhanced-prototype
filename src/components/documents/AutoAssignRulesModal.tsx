@@ -7,25 +7,23 @@ import {
   Trash2, 
   Play, 
   CheckCircle2,
-  AlertCircle,
   ChevronDown,
   ChevronUp,
   Info
 } from 'lucide-react'
 import Modal from '../ui/Modal'
 import Button from '../ui/Button'
-import Dropdown from '../ui/Dropdown'
-import Checkbox from '../ui/Checkbox'
+import MultiSelectDropdown from '../ui/MultiSelectDropdown'
 import { locations, teamMembers } from '../../data/mockData'
 
 interface AutoAssignRule {
   id: string
-  trigger: 'hire' | 'job_change' | 'location_change'
   conditions: {
     jobTitles: string[]
     locations: string[]
-    roles: string[]
   }
+  delayDays: number
+  dueDays: number
   enabled: boolean
 }
 
@@ -43,25 +41,13 @@ const jobTitleOptions = [
   'Prep Cook', 'Delivery Driver', 'Cashier'
 ]
 
-const roleOptions = [
-  { id: 'manager', label: 'Manager' },
-  { id: 'supervisor', label: 'Supervisor' },
-  { id: 'staff', label: 'Staff' },
-]
-
-const triggerOptions = [
-  { id: 'hire', label: 'Employee is hired', description: 'Request when a new employee joins' },
-  { id: 'job_change', label: 'Job title changes', description: 'Request when job title is updated' },
-  { id: 'location_change', label: 'Location changes', description: 'Request when employee moves location' },
-]
-
 const defaultRule: Omit<AutoAssignRule, 'id'> = {
-  trigger: 'hire',
   conditions: {
     jobTitles: [],
     locations: [],
-    roles: [],
   },
+  delayDays: 0,
+  dueDays: 7,
   enabled: true,
 }
 
@@ -100,27 +86,6 @@ export default function AutoAssignRulesModal({
     setRules(rules.map(r => 
       r.id === ruleId ? { ...r, ...updates } : r
     ))
-  }
-
-  const toggleCondition = (
-    ruleId: string, 
-    conditionType: 'jobTitles' | 'locations' | 'roles', 
-    value: string
-  ) => {
-    const rule = rules.find(r => r.id === ruleId)
-    if (!rule) return
-
-    const currentValues = rule.conditions[conditionType]
-    const newValues = currentValues.includes(value)
-      ? currentValues.filter(v => v !== value)
-      : [...currentValues, value]
-
-    updateRule(ruleId, {
-      conditions: {
-        ...rule.conditions,
-        [conditionType]: newValues,
-      },
-    })
   }
 
   const testRules = () => {
@@ -193,8 +158,8 @@ export default function AutoAssignRulesModal({
           <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
           <div>
             <p className="text-sm text-blue-800">
-              Auto-assign rules automatically request this certification from employees when certain conditions are met.
-              Rules are checked when employees are hired, when their job title changes, or when their location changes.
+              Auto-assign rules automatically request this certification when a <strong>new employee is hired</strong> or
+              an <strong>existing employee's job title changes</strong> to one matching the conditions below.
             </p>
           </div>
         </div>
@@ -221,7 +186,7 @@ export default function AutoAssignRulesModal({
                   </div>
                   <div>
                     <p className="text-sm font-medium text-text-primary">
-                      {triggerOptions.find(t => t.id === rule.trigger)?.label || 'Rule'}
+                      Rule {index + 1}
                     </p>
                     <p className="text-xs text-text-secondary">
                       {rule.conditions.jobTitles.length > 0 
@@ -230,6 +195,7 @@ export default function AutoAssignRulesModal({
                       {rule.conditions.locations.length > 0 
                         ? ` · ${rule.conditions.locations.length} location(s)` 
                         : ' · All locations'}
+                      {` · ${rule.delayDays}d delay · due in ${rule.dueDays}d`}
                     </p>
                   </div>
                 </div>
@@ -274,50 +240,23 @@ export default function AutoAssignRulesModal({
               {/* Rule Content */}
               {expandedRule === rule.id && (
                 <div className="p-4 space-y-4 border-t border-border-light">
-                  {/* Trigger */}
-                  <div>
-                    <label className="block text-sm font-medium text-text-primary mb-2">
-                      When
-                    </label>
-                    <div className="grid grid-cols-3 gap-2">
-                      {triggerOptions.map((trigger) => (
-                        <button
-                          key={trigger.id}
-                          onClick={() => updateRule(rule.id, { trigger: trigger.id as AutoAssignRule['trigger'] })}
-                          className={`p-3 rounded-element border text-left transition-all ${
-                            rule.trigger === trigger.id
-                              ? 'border-primary-500 bg-primary-50'
-                              : 'border-border-light hover:border-gray-300'
-                          }`}
-                        >
-                          <p className="text-sm font-medium text-text-primary">{trigger.label}</p>
-                          <p className="text-xs text-text-secondary mt-0.5">{trigger.description}</p>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
                   {/* Job Titles */}
                   <div>
                     <label className="flex items-center gap-2 text-sm font-medium text-text-primary mb-2">
                       <Briefcase className="w-4 h-4 text-gray-500" />
-                      If job title is
+                      For employees with job title
                     </label>
-                    <div className="flex flex-wrap gap-2">
-                      {jobTitleOptions.map((title) => (
-                        <button
-                          key={title}
-                          onClick={() => toggleCondition(rule.id, 'jobTitles', title)}
-                          className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                            rule.conditions.jobTitles.includes(title)
-                              ? 'bg-primary-500 text-white'
-                              : 'bg-gray-100 text-text-primary hover:bg-gray-200'
-                          }`}
-                        >
-                          {title}
-                        </button>
-                      ))}
-                    </div>
+                    <MultiSelectDropdown
+                      options={jobTitleOptions.map((t) => ({ id: t, label: t }))}
+                      selected={rule.conditions.jobTitles}
+                      onChange={(values) =>
+                        updateRule(rule.id, {
+                          conditions: { ...rule.conditions, jobTitles: values },
+                        })
+                      }
+                      placeholder="Select job titles…"
+                      allLabel="All"
+                    />
                     {rule.conditions.jobTitles.length === 0 && (
                       <p className="text-xs text-text-secondary mt-2">
                         No job titles selected = applies to all job titles
@@ -331,25 +270,68 @@ export default function AutoAssignRulesModal({
                       <MapPin className="w-4 h-4 text-gray-500" />
                       At location
                     </label>
-                    <div className="flex flex-wrap gap-2">
-                      {locations.map((location) => (
-                        <button
-                          key={location.id}
-                          onClick={() => toggleCondition(rule.id, 'locations', location.id)}
-                          className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                            rule.conditions.locations.includes(location.id)
-                              ? 'bg-primary-500 text-white'
-                              : 'bg-gray-100 text-text-primary hover:bg-gray-200'
-                          }`}
-                        >
-                          {location.name}
-                        </button>
-                      ))}
-                    </div>
+                    <MultiSelectDropdown
+                      options={locations.map((l) => ({ id: l.id, label: l.name }))}
+                      selected={rule.conditions.locations}
+                      onChange={(values) =>
+                        updateRule(rule.id, {
+                          conditions: { ...rule.conditions, locations: values },
+                        })
+                      }
+                      placeholder="Select locations…"
+                      allLabel="All"
+                    />
                     {rule.conditions.locations.length === 0 && (
                       <p className="text-xs text-text-secondary mt-2">
                         No locations selected = applies to all locations
                       </p>
+                    )}
+                  </div>
+
+                  {/* Timing */}
+                  <div className="p-4 bg-gray-50 border border-border-light rounded-element space-y-4">
+                    <p className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Timing</p>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-text-primary mb-1.5">
+                          Assign date
+                        </label>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="number"
+                            min={0}
+                            value={rule.delayDays}
+                            onChange={(e) => updateRule(rule.id, { delayDays: Math.max(0, parseInt(e.target.value) || 0) })}
+                            className="w-20 h-9 px-3 rounded-element border border-border bg-white text-sm text-text-primary text-center focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                          />
+                          <span className="text-sm text-text-secondary">
+                            day{rule.delayDays !== 1 ? 's' : ''} after trigger
+                          </span>
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-text-primary mb-1.5">
+                          Due date
+                        </label>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="number"
+                            min={1}
+                            value={rule.dueDays}
+                            onChange={(e) => updateRule(rule.id, { dueDays: Math.max(1, parseInt(e.target.value) || 1) })}
+                            className="w-20 h-9 px-3 rounded-element border border-border bg-white text-sm text-text-primary text-center focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                          />
+                          <span className="text-sm text-text-secondary">
+                            day{rule.dueDays !== 1 ? 's' : ''} after trigger
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    {rule.delayDays >= rule.dueDays && (
+                      <div className="flex items-center gap-2 text-xs text-amber-600">
+                        <Info className="w-3 h-3 flex-shrink-0" />
+                        The due date should be after the assign date.
+                      </div>
                     )}
                   </div>
                 </div>
@@ -426,6 +408,7 @@ export default function AutoAssignRulesModal({
     </Modal>
   )
 }
+
 
 
 
