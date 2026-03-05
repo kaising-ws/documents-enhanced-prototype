@@ -490,17 +490,112 @@ function makeRecipients(
   })
 }
 
-/** Build a single assignment history entry */
+const ASSIGNERS = [
+  'Sarah Johnson (HR Manager)',
+  'Michael Chen (Operations Director)',
+  'Emily Rodriguez (General Manager)',
+  'David Kim (District Manager)',
+  'Rachel Green (Shift Manager)',
+  'Kevin Murphy (General Manager)',
+]
+
+const ASSIGNMENT_DATES = [
+  'Mar 4, 2026',
+  'Mar 3, 2026',
+  'Feb 27, 2026',
+  'Feb 18, 2026',
+  'Feb 5, 2026',
+  'Jan 22, 2026',
+  'Jan 10, 2026',
+  'Dec 18, 2025',
+  'Nov 30, 2025',
+]
+
+function buildHistoryRecipients(
+  prefix: string,
+  employees: typeof EMPLOYEES,
+  statusDist: RecipientStatusType[],
+  assignedDate: string,
+): DocumentRecipient[] {
+  return employees.map((emp, i) => {
+    const status = statusDist[i % statusDist.length]
+    const isCompleted = status === 'completed'
+    const isRefused = status === 'refused'
+    const isExpired = status === 'expired'
+    const isExpiring = status === 'expiring'
+    const isPendingVerification = status === 'pending_verification'
+
+    return {
+      id: `${prefix}-r${i + 1}`,
+      name: emp.name,
+      email: emp.email,
+      phone: emp.phone,
+      role: emp.role,
+      location: emp.location,
+      status,
+      statusText:
+        isCompleted ? 'Completed' :
+        isRefused ? 'Refused to sign' :
+        isExpired ? 'Expired' :
+        isExpiring ? 'Expiring soon' :
+        isPendingVerification ? 'Pending verification' :
+        status === 'collecting' ? 'Collecting signatures' :
+        status === 'assigned' ? 'Assigned' :
+        'Pending',
+      completedDate: (isCompleted || isRefused) ? COMPLETED_DATES[i % COMPLETED_DATES.length] : undefined,
+      lastAssignedDate: assignedDate,
+      dueDate: !isCompleted && !isPendingVerification ? 'Mar 15, 2026' : undefined,
+      expiryDate: (isExpired || isExpiring) ? EXPIRY_DATES[i % EXPIRY_DATES.length] : undefined,
+    }
+  })
+}
+
+/** Build multiple assignment history entries with real recipients */
 function makeHistory(prefix: string, total: number, completed: number): AssignmentInstance[] {
-  return [{
-    id: `${prefix}-h1`,
-    assignedBy: 'HR Admin',
-    assignedDate: 'Jan 15, 2024',
-    recipientCount: total,
-    completedCount: completed,
-    cancelledCount: 0,
-    recipients: [],
-  }]
+  const assignments: AssignmentInstance[] = []
+  let remaining = total
+  let completedRemaining = completed
+  let empOffset = 0
+  let batchIndex = 0
+
+  // Split into 3-5 assignment batches
+  const batchCount = Math.min(total <= 8 ? 2 : total <= 15 ? 3 : 4, Math.ceil(total / 3))
+  const batchSizes: number[] = []
+  for (let i = 0; i < batchCount; i++) {
+    const size = i === batchCount - 1 ? remaining : Math.max(2, Math.floor(remaining / (batchCount - i) + (i % 2 === 0 ? 2 : -1)))
+    batchSizes.push(Math.min(size, remaining))
+    remaining -= batchSizes[i]
+  }
+
+  for (const size of batchSizes) {
+    const batchCompleted = Math.min(size, Math.max(0, Math.round(completedRemaining * (size / (total - empOffset + size)))))
+    completedRemaining -= batchCompleted
+    const batchPending = size - batchCompleted
+    const cancelled = batchIndex > 0 && batchPending > 2 ? 1 : 0
+    const assignDate = ASSIGNMENT_DATES[batchIndex % ASSIGNMENT_DATES.length]
+
+    const statuses: RecipientStatusType[] = []
+    for (let c = 0; c < batchCompleted; c++) statuses.push('completed')
+    for (let p = 0; p < batchPending; p++) statuses.push(p % 3 === 0 ? 'pending' : p % 3 === 1 ? 'collecting' : 'assigned')
+
+    const batchEmployees = EMPLOYEES.slice(empOffset, empOffset + size)
+    const recipients = buildHistoryRecipients(`${prefix}-h${batchIndex + 1}`, batchEmployees, statuses, assignDate)
+
+    assignments.push({
+      id: `${prefix}-h${batchIndex + 1}`,
+      assignedBy: ASSIGNERS[batchIndex % ASSIGNERS.length],
+      assignedDate: assignDate,
+      recipientCount: size,
+      completedCount: batchCompleted,
+      cancelledCount: cancelled,
+      recipients,
+    })
+
+    empOffset += size
+    batchIndex++
+  }
+
+  return assignments
 }
 
 // ── Progress-mode status distributions ──

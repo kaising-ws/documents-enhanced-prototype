@@ -5,7 +5,6 @@ import {
   ChevronLeft,
   ChevronRight,
   ChevronDown,
-  ChevronUp,
   CheckCircle2,
   AlertTriangle,
   Bell,
@@ -29,9 +28,7 @@ import {
   MessageSquare,
   Copy,
   Users,
-  Settings,
   Info,
-  Shield,
 } from 'lucide-react'
 import SegmentedControl from '../components/ui/SegmentedControl'
 import SearchBox from '../components/ui/SearchBox'
@@ -53,7 +50,8 @@ interface DocumentDetailPageProps {
 const tabs = [
   { id: 'status', label: 'Status' },
   { id: 'history', label: 'History' },
-  { id: 'settings', label: 'Template Settings' },
+  { id: 'permissions', label: 'Permissions' },
+  { id: 'auto-assign', label: 'Auto-assignment rules' },
 ]
 
 const JOB_TITLE_OPTIONS = [
@@ -68,7 +66,7 @@ export default function DocumentDetailPage({ document, documentCategory, onBack,
   const [filterRole, setFilterRole] = useState<string>('all')
   const [filterStatus, setFilterStatus] = useState<string>('all')
   const [expandedGroups, setExpandedGroups] = useState<string[]>(
-    document.assignmentHistory?.map((a) => a.id) || []
+    document.assignmentHistory?.length > 0 ? [document.assignmentHistory[0].id] : []
   )
   const { addToast } = useToast()
 
@@ -80,8 +78,6 @@ export default function DocumentDetailPage({ document, documentCategory, onBack,
   const [autoAssignDueDays, setAutoAssignDueDays] = useState<number>(7)
   const [selectedPermLocations, setSelectedPermLocations] = useState<string[]>([])
   const [selectedPermRoles, setSelectedPermRoles] = useState<string[]>([])
-  const [permissionsExpanded, setPermissionsExpanded] = useState(true)
-  const [autoAssignExpanded, setAutoAssignExpanded] = useState(true)
   const [settingsDirty, setSettingsDirty] = useState(false)
 
   const togglePermLocation = (locId: string) => {
@@ -228,12 +224,6 @@ export default function DocumentDetailPage({ document, documentCategory, onBack,
                   icon: <Download className="w-4 h-4" />,
                   onClick: () => addToast('Downloading all documents...', 'info'),
                 },
-                {
-                  id: 'remind-all',
-                  label: 'Remind All Pending',
-                  icon: <Bell className="w-4 h-4" />,
-                  onClick: () => addToast('Reminders sent to all pending recipients', 'success'),
-                },
               ]}
             />
           </div>
@@ -265,7 +255,7 @@ export default function DocumentDetailPage({ document, documentCategory, onBack,
           activeSegment={activeTab}
           onChange={setActiveTab}
         />
-        {activeTab !== 'settings' && (
+        {(activeTab === 'status' || activeTab === 'history') && (
           <SearchBox
             value={searchQuery}
             onChange={setSearchQuery}
@@ -410,317 +400,268 @@ export default function DocumentDetailPage({ document, documentCategory, onBack,
 
       {/* History Tab */}
       {activeTab === 'history' && (
-        <div className="space-y-8">
-          <div>
-            <h2 className="text-base font-semibold text-text-primary mb-4">Assignment History</h2>
-            <div className="space-y-4">
-              {document.assignmentHistory?.map((assignment) => (
-                <AssignmentCard
-                  key={assignment.id}
-                  assignment={assignment}
-                  isExpanded={expandedGroups.includes(assignment.id)}
-                  onToggle={() => toggleGroup(assignment.id)}
-                  searchQuery={searchQuery}
-                  documentName={document.name}
-                />
-              ))}
-              {(!document.assignmentHistory || document.assignmentHistory.length === 0) && (
-                <div className="bg-white rounded-container border border-border-light p-8 text-center">
-                  <p className="text-sm text-text-secondary">No assignment history</p>
-                </div>
-              )}
+        <div className="space-y-4">
+          {document.assignmentHistory?.map((assignment) => (
+            <AssignmentCard
+              key={assignment.id}
+              assignment={assignment}
+              isExpanded={expandedGroups.includes(assignment.id)}
+              onToggle={() => toggleGroup(assignment.id)}
+              searchQuery={searchQuery}
+              documentName={document.name}
+            />
+          ))}
+          {(!document.assignmentHistory || document.assignmentHistory.length === 0) && (
+            <div className="bg-white rounded-container border border-border-light p-8 text-center">
+              <p className="text-sm text-text-secondary">No assignment history</p>
             </div>
-          </div>
+          )}
         </div>
       )}
 
-      {/* Template Settings Tab */}
-      {activeTab === 'settings' && (
+      {/* Permissions Tab */}
+      {activeTab === 'permissions' && (
         <div className="space-y-6 max-w-[800px]">
-          {/* ── Auto-Assignment Rules ── */}
           <div className="bg-white rounded-container border border-border-light overflow-hidden">
-            <button
-              type="button"
-              onClick={() => setAutoAssignExpanded(!autoAssignExpanded)}
-              className="flex items-center justify-between w-full p-5 text-left hover:bg-gray-50 transition-colors"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
-                  <Users className="w-5 h-5 text-blue-600" />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-text-primary">Auto-Assignment Rules</p>
-                  <p className="text-xs text-text-secondary">
-                    {autoAssignEnabled
-                      ? `Enabled${autoAssignJobTitles.length > 0 ? ` · ${autoAssignJobTitles.length} job title(s)` : ' · all job titles'}${autoAssignDelayDays > 0 ? ` · ${autoAssignDelayDays}d delay` : ''}${autoAssignDueDays > 0 ? ` · due in ${autoAssignDueDays}d` : ''}`
-                      : 'Manual assignment only'}
+            <div className="p-5 space-y-5">
+              {/* Location restrictions */}
+              <div>
+                <label className="flex items-center gap-2 text-sm font-medium text-text-primary mb-1">
+                  <MapPin className="w-4 h-4 text-gray-500" />
+                  Recipient locations
+                </label>
+                <p className="text-xs text-text-secondary mb-3">
+                  Only employees at selected locations can receive this document. When assigning, only employees at these locations will appear in the recipient list.
+                </p>
+                <MultiSelectDropdown
+                  options={locations.map((l) => ({ id: l.id, label: l.name }))}
+                  selected={selectedPermLocations}
+                  onChange={(values) => { setSelectedPermLocations(values); setSettingsDirty(true) }}
+                  placeholder="Select locations…"
+                  allLabel="All"
+                />
+                {selectedPermLocations.length === 0 ? (
+                  <p className="text-xs text-text-secondary mt-1.5">
+                    No restrictions — employees at any location can receive this document
                   </p>
-                </div>
-              </div>
-              {autoAssignExpanded ? (
-                <ChevronUp className="w-5 h-5 text-gray-400" />
-              ) : (
-                <ChevronDown className="w-5 h-5 text-gray-400" />
-              )}
-            </button>
-
-            {autoAssignExpanded && (
-              <div className="border-t border-border-light p-5 space-y-5">
-                {/* Enable toggle */}
-                <div className="flex items-center justify-between">
-                  <div>
-                    <label className="text-sm font-medium text-text-primary">Enable auto-assignment</label>
-                    <p className="text-xs text-text-secondary mt-0.5">
-                      Automatically assign this document when conditions are met
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => { setAutoAssignEnabled(!autoAssignEnabled); setSettingsDirty(true) }}
-                    className={`relative w-11 h-6 rounded-full transition-colors ${
-                      autoAssignEnabled ? 'bg-primary-500' : 'bg-gray-300'
-                    }`}
-                  >
-                    <span
-                      className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
-                        autoAssignEnabled ? 'right-1' : 'left-1'
-                      }`}
-                    />
-                  </button>
-                </div>
-
-                {autoAssignEnabled && (
-                  <>
-                    {/* How it works */}
-                    <div className="flex items-start gap-3 p-3 bg-blue-50 border border-blue-200 rounded-element">
-                      <Info className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
-                      <p className="text-xs text-blue-800">
-                        This document will be automatically assigned when a <strong>new employee is hired</strong> or an <strong>existing employee's job title changes</strong> to one of the selected job titles below.
-                      </p>
-                    </div>
-
-                    {/* Job titles */}
-                    <div>
-                      <label className="block text-sm font-medium text-text-primary mb-2">
-                        For employees with job title
-                      </label>
-                      <MultiSelectDropdown
-                        options={JOB_TITLE_OPTIONS.map((t) => ({ id: t, label: t }))}
-                        selected={autoAssignJobTitles}
-                        onChange={(values) => { setAutoAssignJobTitles(values); setSettingsDirty(true) }}
-                        placeholder="Select job titles…"
-                        allLabel="All"
-                      />
-                      {autoAssignJobTitles.length === 0 && (
-                        <p className="text-xs text-amber-600 mt-2 flex items-center gap-1">
-                          <Info className="w-3 h-3" />
-                          No job titles selected — will apply to all employees
-                        </p>
-                      )}
-                    </div>
-
-                    {/* Locations for auto-assign */}
-                    <div>
-                      <label className="block text-sm font-medium text-text-primary mb-2">
-                        At locations
-                      </label>
-                      <p className="text-xs text-text-secondary mb-3">
-                        Only employees at selected locations will be auto-assigned this document
-                      </p>
-                      <MultiSelectDropdown
-                        options={locations.map((l) => ({ id: l.id, label: l.name }))}
-                        selected={autoAssignLocations}
-                        onChange={(values) => { setAutoAssignLocations(values); setSettingsDirty(true) }}
-                        placeholder="Select locations…"
-                        allLabel="All"
-                      />
-                      {autoAssignLocations.length === 0 && (
-                        <p className="text-xs text-text-secondary mt-1.5">
-                          No locations selected — will apply at all locations
-                        </p>
-                      )}
-                    </div>
-
-                    {/* Timing */}
-                    <div className="p-4 bg-gray-50 border border-border-light rounded-element space-y-4">
-                      <p className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Timing</p>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-sm font-medium text-text-primary mb-1.5">
-                            Assign date
-                          </label>
-                          <p className="text-xs text-text-secondary mb-2">
-                            Delay before the document is sent to the employee
-                          </p>
-                          <div className="flex items-center gap-2">
-                            <input
-                              type="number"
-                              min={0}
-                              value={autoAssignDelayDays}
-                              onChange={(e) => { setAutoAssignDelayDays(Math.max(0, parseInt(e.target.value) || 0)); setSettingsDirty(true) }}
-                              className="w-20 h-9 px-3 rounded-element border border-border bg-white text-sm text-text-primary text-center focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                            />
-                            <span className="text-sm text-text-secondary">
-                              day{autoAssignDelayDays !== 1 ? 's' : ''} after trigger
-                            </span>
-                          </div>
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-text-primary mb-1.5">
-                            Due date
-                          </label>
-                          <p className="text-xs text-text-secondary mb-2">
-                            Deadline for the employee to complete the document
-                          </p>
-                          <div className="flex items-center gap-2">
-                            <input
-                              type="number"
-                              min={1}
-                              value={autoAssignDueDays}
-                              onChange={(e) => { setAutoAssignDueDays(Math.max(1, parseInt(e.target.value) || 1)); setSettingsDirty(true) }}
-                              className="w-20 h-9 px-3 rounded-element border border-border bg-white text-sm text-text-primary text-center focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                            />
-                            <span className="text-sm text-text-secondary">
-                              day{autoAssignDueDays !== 1 ? 's' : ''} after trigger
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                      {autoAssignDelayDays >= autoAssignDueDays && (
-                        <div className="flex items-center gap-2 text-xs text-amber-600">
-                          <Info className="w-3 h-3 flex-shrink-0" />
-                          The due date should be after the assign date. The document would be sent on day {autoAssignDelayDays} but due on day {autoAssignDueDays}.
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Rule preview */}
-                    <div className="p-3 bg-blue-50 border border-blue-200 rounded-element">
-                      <p className="text-xs text-blue-800">
-                        <strong>Rule preview:</strong> When a new employee is hired or an existing employee acquires a job title
-                        {autoAssignJobTitles.length > 0
-                          ? ` matching ${autoAssignJobTitles.join(', ')}`
-                          : ''}
-                        {autoAssignLocations.length > 0
-                          ? ` at ${autoAssignLocations.map(id => locations.find(l => l.id === id)?.name).filter(Boolean).join(' or ')}`
-                          : ''}
-                        , "{document.name}" will be assigned
-                        {autoAssignDelayDays > 0
-                          ? ` ${autoAssignDelayDays} day${autoAssignDelayDays !== 1 ? 's' : ''} after the trigger`
-                          : ' immediately'}
-                        {`, due within ${autoAssignDueDays} day${autoAssignDueDays !== 1 ? 's' : ''}`}.
-                      </p>
-                    </div>
-                  </>
+                ) : (
+                  <p className="text-xs text-primary-600 mt-1.5">
+                    Only employees at {selectedPermLocations.map(id => locations.find(l => l.id === id)?.name).filter(Boolean).join(', ')} can receive this document
+                  </p>
                 )}
               </div>
-            )}
+
+              {/* Role permissions */}
+              <div>
+                <label className="flex items-center gap-2 text-sm font-medium text-text-primary mb-1">
+                  <Users className="w-4 h-4 text-gray-500" />
+                  Manager roles
+                </label>
+                <p className="text-xs text-text-secondary mb-3">
+                  Only users with selected roles can see this template and assign it to employees. Users without these roles will not see this template in their Documents page.
+                </p>
+                <MultiSelectDropdown
+                  options={roles.map((r) => ({ id: r.id, label: r.name }))}
+                  selected={selectedPermRoles}
+                  onChange={(values) => { setSelectedPermRoles(values); setSettingsDirty(true) }}
+                  placeholder="Select roles…"
+                  allLabel="All"
+                />
+                {selectedPermRoles.length === 0 ? (
+                  <p className="text-xs text-text-secondary mt-1.5">
+                    No restrictions — all managers can see and assign this template
+                  </p>
+                ) : (
+                  <p className="text-xs text-primary-600 mt-1.5">
+                    Only {selectedPermRoles.map(id => roles.find(r => r.id === id)?.name).filter(Boolean).join(', ')} can see and assign this template
+                  </p>
+                )}
+              </div>
+
+              {/* Summary info box */}
+              <div className="p-3 bg-purple-50 border border-purple-200 rounded-element space-y-1">
+                <p className="text-xs font-semibold text-purple-800">Access summary</p>
+                <p className="text-xs text-purple-800">
+                  <strong>Who can receive:</strong>{' '}
+                  {selectedPermLocations.length === 0
+                    ? 'Employees at any location.'
+                    : `Only employees at ${selectedPermLocations.map(id => locations.find(l => l.id === id)?.name).filter(Boolean).join(', ')}.`}
+                </p>
+                <p className="text-xs text-purple-800">
+                  <strong>Who can assign:</strong>{' '}
+                  {selectedPermRoles.length === 0
+                    ? 'All managers.'
+                    : `Only ${selectedPermRoles.map(id => roles.find(r => r.id === id)?.name).filter(Boolean).join(', ')}.`}
+                </p>
+              </div>
+            </div>
           </div>
 
-          {/* ── Permissions ── */}
+          {settingsDirty && (
+            <div className="flex justify-end pt-2">
+              <Button variant="primary" onClick={handleSaveSettings}>
+                Save Settings
+              </Button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Auto-assignment rules Tab */}
+      {activeTab === 'auto-assign' && (
+        <div className="space-y-6 max-w-[800px]">
           <div className="bg-white rounded-container border border-border-light overflow-hidden">
-            <button
-              type="button"
-              onClick={() => setPermissionsExpanded(!permissionsExpanded)}
-              className="flex items-center justify-between w-full p-5 text-left hover:bg-gray-50 transition-colors"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center">
-                  <Shield className="w-5 h-5 text-purple-600" />
-                </div>
+            <div className="p-5 space-y-5">
+              {/* Enable toggle */}
+              <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-semibold text-text-primary">Permissions</p>
-                  <p className="text-xs text-text-secondary">
-                    {selectedPermLocations.length === 0 && selectedPermRoles.length === 0
-                      ? 'All locations and roles can use this template'
-                      : `Restricted to ${selectedPermLocations.length || 'all'} location${selectedPermLocations.length !== 1 ? 's' : ''} · ${selectedPermRoles.length || 'all'} role${selectedPermRoles.length !== 1 ? 's' : ''}`}
+                  <label className="text-sm font-medium text-text-primary">Enable auto-assignment</label>
+                  <p className="text-xs text-text-secondary mt-0.5">
+                    Automatically assign this document when conditions are met
                   </p>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => { setAutoAssignEnabled(!autoAssignEnabled); setSettingsDirty(true) }}
+                  className={`relative w-11 h-6 rounded-full transition-colors ${
+                    autoAssignEnabled ? 'bg-primary-500' : 'bg-gray-300'
+                  }`}
+                >
+                  <span
+                    className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
+                      autoAssignEnabled ? 'right-1' : 'left-1'
+                    }`}
+                  />
+                </button>
               </div>
-              {permissionsExpanded ? (
-                <ChevronUp className="w-5 h-5 text-gray-400" />
-              ) : (
-                <ChevronDown className="w-5 h-5 text-gray-400" />
+
+              {autoAssignEnabled && (
+                <>
+                  {/* How it works */}
+                  <div className="flex items-start gap-3 p-3 bg-blue-50 border border-blue-200 rounded-element">
+                    <Info className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
+                    <p className="text-xs text-blue-800">
+                      This document will be automatically assigned when a <strong>new employee is hired</strong> or an <strong>existing employee's job title changes</strong> to one of the selected job titles below.
+                    </p>
+                  </div>
+
+                  {/* Job titles */}
+                  <div>
+                    <label className="block text-sm font-medium text-text-primary mb-2">
+                      For employees with job title
+                    </label>
+                    <MultiSelectDropdown
+                      options={JOB_TITLE_OPTIONS.map((t) => ({ id: t, label: t }))}
+                      selected={autoAssignJobTitles}
+                      onChange={(values) => { setAutoAssignJobTitles(values); setSettingsDirty(true) }}
+                      placeholder="Select job titles…"
+                      allLabel="All"
+                    />
+                    {autoAssignJobTitles.length === 0 && (
+                      <p className="text-xs text-amber-600 mt-2 flex items-center gap-1">
+                        <Info className="w-3 h-3" />
+                        No job titles selected — will apply to all employees
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Locations for auto-assign */}
+                  <div>
+                    <label className="block text-sm font-medium text-text-primary mb-2">
+                      At locations
+                    </label>
+                    <p className="text-xs text-text-secondary mb-3">
+                      Only employees at selected locations will be auto-assigned this document
+                    </p>
+                    <MultiSelectDropdown
+                      options={locations.map((l) => ({ id: l.id, label: l.name }))}
+                      selected={autoAssignLocations}
+                      onChange={(values) => { setAutoAssignLocations(values); setSettingsDirty(true) }}
+                      placeholder="Select locations…"
+                      allLabel="All"
+                    />
+                    {autoAssignLocations.length === 0 && (
+                      <p className="text-xs text-text-secondary mt-1.5">
+                        No locations selected — will apply at all locations
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Timing */}
+                  <div className="p-4 bg-gray-50 border border-border-light rounded-element space-y-4">
+                    <p className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Timing</p>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-text-primary mb-1.5">
+                          Assign date
+                        </label>
+                        <p className="text-xs text-text-secondary mb-2">
+                          Delay before the document is sent to the employee
+                        </p>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="number"
+                            min={0}
+                            value={autoAssignDelayDays}
+                            onChange={(e) => { setAutoAssignDelayDays(Math.max(0, parseInt(e.target.value) || 0)); setSettingsDirty(true) }}
+                            className="w-20 h-9 px-3 rounded-element border border-border bg-white text-sm text-text-primary text-center focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                          />
+                          <span className="text-sm text-text-secondary">
+                            day{autoAssignDelayDays !== 1 ? 's' : ''} after trigger
+                          </span>
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-text-primary mb-1.5">
+                          Due date
+                        </label>
+                        <p className="text-xs text-text-secondary mb-2">
+                          Deadline for the employee to complete the document
+                        </p>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="number"
+                            min={1}
+                            value={autoAssignDueDays}
+                            onChange={(e) => { setAutoAssignDueDays(Math.max(1, parseInt(e.target.value) || 1)); setSettingsDirty(true) }}
+                            className="w-20 h-9 px-3 rounded-element border border-border bg-white text-sm text-text-primary text-center focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                          />
+                          <span className="text-sm text-text-secondary">
+                            day{autoAssignDueDays !== 1 ? 's' : ''} after trigger
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    {autoAssignDelayDays >= autoAssignDueDays && (
+                      <div className="flex items-center gap-2 text-xs text-amber-600">
+                        <Info className="w-3 h-3 flex-shrink-0" />
+                        The due date should be after the assign date. The document would be sent on day {autoAssignDelayDays} but due on day {autoAssignDueDays}.
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Rule preview */}
+                  <div className="p-3 bg-blue-50 border border-blue-200 rounded-element">
+                    <p className="text-xs text-blue-800">
+                      <strong>Rule preview:</strong> When a new employee is hired or an existing employee acquires a job title
+                      {autoAssignJobTitles.length > 0
+                        ? ` matching ${autoAssignJobTitles.join(', ')}`
+                        : ''}
+                      {autoAssignLocations.length > 0
+                        ? ` at ${autoAssignLocations.map(id => locations.find(l => l.id === id)?.name).filter(Boolean).join(' or ')}`
+                        : ''}
+                      , "{document.name}" will be assigned
+                      {autoAssignDelayDays > 0
+                        ? ` ${autoAssignDelayDays} day${autoAssignDelayDays !== 1 ? 's' : ''} after the trigger`
+                        : ' immediately'}
+                      {`, due within ${autoAssignDueDays} day${autoAssignDueDays !== 1 ? 's' : ''}`}.
+                    </p>
+                  </div>
+                </>
               )}
-            </button>
-
-            {permissionsExpanded && (
-              <div className="border-t border-border-light p-5 space-y-5">
-                {/* Location restrictions */}
-                <div>
-                  <label className="flex items-center gap-2 text-sm font-medium text-text-primary mb-1">
-                    <MapPin className="w-4 h-4 text-gray-500" />
-                    Recipient locations
-                  </label>
-                  <p className="text-xs text-text-secondary mb-3">
-                    Only employees at selected locations can receive this document. When assigning, only employees at these locations will appear in the recipient list.
-                  </p>
-                  <MultiSelectDropdown
-                    options={locations.map((l) => ({ id: l.id, label: l.name }))}
-                    selected={selectedPermLocations}
-                    onChange={(values) => { setSelectedPermLocations(values); setSettingsDirty(true) }}
-                    placeholder="Select locations…"
-                    allLabel="All"
-                  />
-                  {selectedPermLocations.length === 0 ? (
-                    <p className="text-xs text-text-secondary mt-1.5">
-                      No restrictions — employees at any location can receive this document
-                    </p>
-                  ) : (
-                    <p className="text-xs text-primary-600 mt-1.5">
-                      Only employees at {selectedPermLocations.map(id => locations.find(l => l.id === id)?.name).filter(Boolean).join(', ')} can receive this document
-                    </p>
-                  )}
-                </div>
-
-                {/* Role permissions */}
-                <div>
-                  <label className="flex items-center gap-2 text-sm font-medium text-text-primary mb-1">
-                    <Users className="w-4 h-4 text-gray-500" />
-                    Manager roles
-                  </label>
-                  <p className="text-xs text-text-secondary mb-3">
-                    Only users with selected roles can see this template and assign it to employees. Users without these roles will not see this template in their Documents page.
-                  </p>
-                  <MultiSelectDropdown
-                    options={roles.map((r) => ({ id: r.id, label: r.name }))}
-                    selected={selectedPermRoles}
-                    onChange={(values) => { setSelectedPermRoles(values); setSettingsDirty(true) }}
-                    placeholder="Select roles…"
-                    allLabel="All"
-                  />
-                  {selectedPermRoles.length === 0 ? (
-                    <p className="text-xs text-text-secondary mt-1.5">
-                      No restrictions — all managers can see and assign this template
-                    </p>
-                  ) : (
-                    <p className="text-xs text-primary-600 mt-1.5">
-                      Only {selectedPermRoles.map(id => roles.find(r => r.id === id)?.name).filter(Boolean).join(', ')} can see and assign this template
-                    </p>
-                  )}
-                </div>
-
-                {/* Summary info box */}
-                <div className="p-3 bg-purple-50 border border-purple-200 rounded-element space-y-1">
-                  <p className="text-xs font-semibold text-purple-800">Access summary</p>
-                  <p className="text-xs text-purple-800">
-                    <strong>Who can receive:</strong>{' '}
-                    {selectedPermLocations.length === 0
-                      ? 'Employees at any location.'
-                      : `Only employees at ${selectedPermLocations.map(id => locations.find(l => l.id === id)?.name).filter(Boolean).join(', ')}.`}
-                  </p>
-                  <p className="text-xs text-purple-800">
-                    <strong>Who can assign:</strong>{' '}
-                    {selectedPermRoles.length === 0
-                      ? 'All managers.'
-                      : `Only ${selectedPermRoles.map(id => roles.find(r => r.id === id)?.name).filter(Boolean).join(', ')}.`}
-                  </p>
-                </div>
-              </div>
-            )}
+            </div>
           </div>
 
-          {/* Save button */}
           {settingsDirty && (
             <div className="flex justify-end pt-2">
               <Button variant="primary" onClick={handleSaveSettings}>
@@ -1613,40 +1554,44 @@ function AssignmentCard({
       )}
 
       {/* Card Header */}
-      <div className="p-5">
+      <div className="p-5 cursor-pointer hover:bg-gray-50/50 transition-colors" onClick={onToggle}>
         <div className="flex items-start justify-between">
           <div className="flex items-start gap-2.5">
-            <button
-              onClick={onToggle}
-              className="mt-0.5 w-5 h-5 flex items-center justify-center flex-shrink-0"
-            >
+            <div className="mt-0.5 w-5 h-5 flex items-center justify-center flex-shrink-0">
               <ChevronDown
                 className={`w-4 h-4 text-gray-500 transition-transform ${
                   isExpanded ? '' : '-rotate-90'
                 }`}
               />
-            </button>
+            </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-base font-semibold text-text-primary">
+                <h3 className="text-sm font-semibold text-text-primary">
                   Assigned to {assignment.recipientCount} recipient
                   {assignment.recipientCount !== 1 ? 's' : ''}
                 </h3>
               </div>
-              <p className="text-sm text-text-secondary mt-1">
-                {assignment.completedCount} / {assignment.recipientCount} completed •{' '}
-                {assignment.cancelledCount} cancelled
+              <p className="text-xs text-text-secondary mt-0.5">
+                {assignment.assignedDate} by {assignment.assignedBy}
               </p>
+
+              {/* Progress bar */}
+              <div className="flex items-center gap-3 mt-2.5">
+                <div className="w-36 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-green-500 rounded-full transition-all"
+                    style={{ width: `${assignment.recipientCount > 0 ? (assignment.completedCount / assignment.recipientCount) * 100 : 0}%` }}
+                  />
+                </div>
+                <span className="text-xs text-text-secondary">
+                  {assignment.completedCount}/{assignment.recipientCount} completed
+                  {assignment.cancelledCount > 0 ? ` · ${assignment.cancelledCount} cancelled` : ''}
+                </span>
+              </div>
             </div>
           </div>
 
-          <div className="flex items-start gap-3">
-            <div className="text-right">
-              <p className="text-sm font-medium text-text-primary">
-                Assigned by {assignment.assignedBy}
-              </p>
-              <p className="text-sm text-text-secondary">{assignment.assignedDate}</p>
-            </div>
+          <div className="flex items-start gap-2" onClick={(e) => e.stopPropagation()}>
             <ContextMenu
               items={[
                 {
