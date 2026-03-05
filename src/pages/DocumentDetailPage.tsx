@@ -232,30 +232,33 @@ export default function DocumentDetailPage({ document, documentCategory, onBack,
         {/* Summary stats row */}
         <div className="flex items-center gap-6 mt-4 pt-4 border-t border-border-light">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-text-primary">{totalAssigned}</span>
-            <span className="text-sm text-text-secondary">assigned</span>
-          </div>
-          <div className="w-px h-4 bg-border-light" />
-          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-amber-500" />
             <span className="text-sm font-medium text-text-primary">{totalNeedsAttention}</span>
             <span className="text-sm text-text-secondary">needs attention</span>
           </div>
           <div className="w-px h-4 bg-border-light" />
           <div className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-green-500" />
             <span className="text-sm font-medium text-text-primary">{totalCompleted}</span>
             <span className="text-sm text-text-secondary">completed</span>
+          </div>
+          <div className="w-px h-4 bg-border-light" />
+          <div className="flex items-center gap-2">
+            <Users className="w-4 h-4 text-gray-400" />
+            <span className="text-sm font-medium text-text-primary">{totalAssigned}</span>
+            <span className="text-sm text-text-secondary">assigned</span>
           </div>
         </div>
       </div>
 
-      {/* Tabs and Search */}
+      {/* Tabs */}
       <div className="flex items-center justify-between mb-4">
         <SegmentedControl
           segments={tabs}
           activeSegment={activeTab}
           onChange={setActiveTab}
         />
-        {(activeTab === 'status' || activeTab === 'history') && (
+        {activeTab === 'history' && (
           <SearchBox
             value={searchQuery}
             onChange={setSearchQuery}
@@ -265,7 +268,7 @@ export default function DocumentDetailPage({ document, documentCategory, onBack,
         )}
       </div>
 
-      {/* Filters */}
+      {/* Filters + Search (status tab) */}
       {activeTab === 'status' && (
         <div className="flex items-center gap-2 mb-6 flex-wrap">
           <div className="flex items-center gap-1.5 text-text-secondary mr-1">
@@ -343,6 +346,15 @@ export default function DocumentDetailPage({ document, documentCategory, onBack,
               Clear {activeFilterCount > 1 ? `all (${activeFilterCount})` : ''}
             </button>
           )}
+
+          <div className="ml-auto">
+            <SearchBox
+              value={searchQuery}
+              onChange={setSearchQuery}
+              placeholder="Search"
+              className="w-56"
+            />
+          </div>
         </div>
       )}
 
