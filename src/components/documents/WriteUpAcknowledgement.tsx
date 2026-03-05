@@ -108,11 +108,11 @@ export default function WriteUpAcknowledgement({
             {config.icon}
           </div>
           <div className="flex-1">
-            <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${config.color} ${config.bgColor} border ${config.color.replace('text-', 'border-')}`}>
+            <span className={`inline-block px-2 py-1 rounded text-caption font-medium ${config.color} ${config.bgColor} border ${config.color.replace('text-', 'border-')}`}>
               {typeLabels[writeUp.type]}
             </span>
             <h1 className="text-xl font-bold text-text-primary mt-2">{writeUp.title}</h1>
-            <div className="flex items-center gap-4 mt-2 text-sm text-text-secondary">
+            <div className="flex items-center gap-4 mt-2 text-body text-text-secondary">
               <span className="flex items-center gap-1">
                 <Calendar className="w-4 h-4" />
                 {formatDate(writeUp.incidentDate)}
@@ -135,18 +135,18 @@ export default function WriteUpAcknowledgement({
               <User className="w-5 h-5 text-white" />
             </div>
             <div>
-              <p className="text-sm font-medium text-text-primary">{writeUp.employeeName}</p>
-              <p className="text-xs text-text-secondary">{writeUp.employeeRole} · {writeUp.employeeLocation}</p>
+              <p className="text-body font-medium text-text-primary">{writeUp.employeeName}</p>
+              <p className="text-caption text-text-secondary">{writeUp.employeeRole} · {writeUp.employeeLocation}</p>
             </div>
           </div>
         </div>
 
         {/* Description */}
         <div className="p-6">
-          <h3 className="text-sm font-semibold text-text-secondary uppercase tracking-wider mb-3">
+          <h3 className="text-headline text-text-secondary uppercase tracking-wider mb-3">
             {isPositive ? 'Recognition Details' : 'Incident Description'}
           </h3>
-          <p className="text-sm text-text-primary whitespace-pre-wrap leading-relaxed">
+          <p className="text-body text-text-primary whitespace-pre-wrap leading-relaxed">
             {writeUp.description}
           </p>
         </div>
@@ -154,10 +154,10 @@ export default function WriteUpAcknowledgement({
         {/* Manager Notes */}
         {writeUp.managerNotes && (
           <div className="p-6 border-t border-border-light bg-gray-50">
-            <h3 className="text-sm font-semibold text-text-secondary uppercase tracking-wider mb-3">
+            <h3 className="text-headline text-text-secondary uppercase tracking-wider mb-3">
               Manager Notes
             </h3>
-            <p className="text-sm text-text-primary whitespace-pre-wrap leading-relaxed">
+            <p className="text-body text-text-primary whitespace-pre-wrap leading-relaxed">
               {writeUp.managerNotes}
             </p>
           </div>
@@ -168,7 +168,7 @@ export default function WriteUpAcknowledgement({
           <div className="p-4 border-t border-border-light">
             <div className="flex items-center gap-3 p-3 bg-amber-50 border border-amber-200 rounded-element">
               <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0" />
-              <p className="text-sm text-amber-800">
+              <p className="text-body text-amber-800">
                 This write-up adds <strong>{writeUp.points} point{writeUp.points !== 1 ? 's' : ''}</strong> to your record.
               </p>
             </div>
@@ -179,12 +179,12 @@ export default function WriteUpAcknowledgement({
         <div className="p-4 border-t border-border-light">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs text-text-secondary uppercase tracking-wider">Issued By</p>
-              <p className="text-sm font-medium text-text-primary mt-1">{writeUp.managerSignature.signedBy}</p>
+              <p className="text-caption text-text-secondary uppercase tracking-wider">Issued By</p>
+              <p className="text-body font-medium text-text-primary mt-1">{writeUp.managerSignature.signedBy}</p>
             </div>
             <div className="flex items-center gap-2 text-green-600">
               <CheckCircle2 className="w-4 h-4" />
-              <span className="text-xs font-medium">Signed</span>
+              <span className="text-caption font-medium">Signed</span>
             </div>
           </div>
         </div>
@@ -205,7 +205,7 @@ export default function WriteUpAcknowledgement({
           }`}>
             {hasReadDocument && <CheckCircle2 className="w-3 h-3 text-white" />}
           </div>
-          <p className="text-sm text-text-primary">
+          <p className="text-body text-text-primary">
             I have read and understand the contents of this {isPositive ? 'recognition' : 'write-up'}.
           </p>
         </div>
@@ -214,14 +214,14 @@ export default function WriteUpAcknowledgement({
       {/* Action Buttons */}
       <div className="flex items-center justify-between pt-4 border-t border-border-light">
         {onClose && (
-          <Button variant="ghost" onClick={onClose}>
+          <Button variant="clear" onClick={onClose}>
             Close
           </Button>
         )}
         <div className="flex items-center gap-3">
           {!isPositive && (
             <Button 
-              variant="outline" 
+              variant="plain-gray" 
               onClick={() => setStep('decline')}
               disabled={!hasReadDocument}
             >
@@ -246,10 +246,10 @@ export default function WriteUpAcknowledgement({
         <div className={`w-16 h-16 rounded-full mx-auto flex items-center justify-center ${config.bgColor} ${config.color}`}>
           {config.icon}
         </div>
-        <h2 className="text-lg font-bold text-text-primary mt-4">
+        <h2 className="text-title-4 text-text-primary mt-4">
           {isPositive ? 'Acknowledge Recognition' : 'Acknowledge Write-up'}
         </h2>
-        <p className="text-sm text-text-secondary mt-1">
+        <p className="text-body text-text-secondary mt-1">
           {isPositive 
             ? 'Add a response or simply acknowledge this recognition.'
             : 'You may add a response before signing. Your signature confirms receipt, not necessarily agreement.'}
@@ -258,7 +258,7 @@ export default function WriteUpAcknowledgement({
 
       {/* Response Input */}
       <div>
-        <label className="block text-sm font-semibold text-text-primary mb-2">
+        <label className="block text-headline text-text-primary mb-2">
           Your Response (Optional)
         </label>
         <textarea
@@ -267,13 +267,13 @@ export default function WriteUpAcknowledgement({
           placeholder={isPositive 
             ? "Thank you for the recognition..." 
             : "Add any comments or context you'd like to include..."}
-          className="w-full h-32 px-3 py-2 rounded-element border border-border bg-white text-sm text-text-primary placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
+          className="w-full h-32 px-3 py-2 rounded-element border border-border bg-white text-body text-text-primary placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 resize-none"
         />
       </div>
 
       {/* Signature */}
       <div>
-        <label className="block text-sm font-semibold text-text-primary mb-2">
+        <label className="block text-headline text-text-primary mb-2">
           Your Signature
         </label>
         <div 
@@ -288,7 +288,7 @@ export default function WriteUpAcknowledgement({
             <div className="text-center">
               <CheckCircle2 className="w-8 h-8 text-green-600 mx-auto mb-2" />
               <p className="text-lg font-semibold text-green-800">{writeUp.employeeName}</p>
-              <p className="text-xs text-green-600 mt-1">
+              <p className="text-caption text-green-600 mt-1">
                 {new Date().toLocaleDateString('en-US', { 
                   year: 'numeric', 
                   month: 'long', 
@@ -297,13 +297,13 @@ export default function WriteUpAcknowledgement({
                   minute: '2-digit'
                 })}
               </p>
-              <p className="text-xs text-text-secondary mt-2">Click to remove signature</p>
+              <p className="text-caption text-text-secondary mt-2">Click to remove signature</p>
             </div>
           ) : (
             <div className="text-center">
               <User className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-              <p className="text-sm font-medium text-text-primary">Click to sign</p>
-              <p className="text-xs text-text-secondary mt-1">
+              <p className="text-body font-medium text-text-primary">Click to sign</p>
+              <p className="text-caption text-text-secondary mt-1">
                 Your electronic signature will be recorded
               </p>
             </div>
@@ -316,8 +316,8 @@ export default function WriteUpAcknowledgement({
         <div className="flex items-start gap-3 p-4 bg-blue-50 border border-blue-200 rounded-element">
           <Clock className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
           <div>
-            <p className="text-sm font-medium text-blue-800">What happens next?</p>
-            <p className="text-xs text-blue-700 mt-1">
+            <p className="text-body font-medium text-blue-800">What happens next?</p>
+            <p className="text-caption text-blue-700 mt-1">
               Your acknowledgement confirms you have received and read this write-up. 
               It does not necessarily mean you agree with its contents. 
               You may add your perspective in the response above.
@@ -328,7 +328,7 @@ export default function WriteUpAcknowledgement({
 
       {/* Action Buttons */}
       <div className="flex items-center justify-between pt-4 border-t border-border-light">
-        <Button variant="ghost" onClick={() => setStep('view')}>
+        <Button variant="clear" onClick={() => setStep('view')}>
           Back
         </Button>
         <Button onClick={handleAcknowledge} disabled={!signature}>
@@ -345,8 +345,8 @@ export default function WriteUpAcknowledgement({
         <div className="w-16 h-16 rounded-full mx-auto flex items-center justify-center bg-red-50">
           <XCircle className="w-8 h-8 text-red-600" />
         </div>
-        <h2 className="text-lg font-bold text-text-primary mt-4">Decline to Sign</h2>
-        <p className="text-sm text-text-secondary mt-1">
+        <h2 className="text-title-4 text-text-primary mt-4">Decline to Sign</h2>
+        <p className="text-body text-text-secondary mt-1">
           You may decline to sign this write-up. Please provide a reason below.
         </p>
       </div>
@@ -355,8 +355,8 @@ export default function WriteUpAcknowledgement({
       <div className="flex items-start gap-3 p-4 bg-amber-50 border border-amber-200 rounded-element">
         <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
         <div>
-          <p className="text-sm font-medium text-amber-800">Important</p>
-          <p className="text-xs text-amber-700 mt-1">
+          <p className="text-body font-medium text-amber-800">Important</p>
+          <p className="text-caption text-amber-700 mt-1">
             Declining to sign does not invalidate this write-up. It will be marked as 
             "Refused to Sign" in your employee file, along with your stated reason. 
             HR will be notified of your decision.
@@ -366,14 +366,14 @@ export default function WriteUpAcknowledgement({
 
       {/* Reason Input */}
       <div>
-        <label className="block text-sm font-semibold text-text-primary mb-2">
+        <label className="block text-headline text-text-primary mb-2">
           Reason for Declining <span className="text-red-500">*</span>
         </label>
         <textarea
           value={declineReason}
           onChange={(e) => setDeclineReason(e.target.value)}
           placeholder="Please explain why you are declining to sign this write-up..."
-          className="w-full h-32 px-3 py-2 rounded-element border border-border bg-white text-sm text-text-primary placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
+          className="w-full h-32 px-3 py-2 rounded-element border border-border bg-white text-body text-text-primary placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 resize-none"
         />
       </div>
 
@@ -392,7 +392,7 @@ export default function WriteUpAcknowledgement({
           }`}>
             {signature && <CheckCircle2 className="w-3 h-3 text-white" />}
           </div>
-          <p className="text-sm text-text-primary">
+          <p className="text-body text-text-primary">
             I understand that declining to sign does not invalidate this write-up and that 
             my decision will be recorded in my employee file.
           </p>
@@ -401,11 +401,11 @@ export default function WriteUpAcknowledgement({
 
       {/* Action Buttons */}
       <div className="flex items-center justify-between pt-4 border-t border-border-light">
-        <Button variant="ghost" onClick={() => setStep('view')}>
+        <Button variant="clear" onClick={() => setStep('view')}>
           Back
         </Button>
         <Button 
-          variant="outline"
+          variant="plain-gray"
           onClick={handleDecline} 
           disabled={!signature || !declineReason.trim()}
           className="border-red-500 text-red-600 hover:bg-red-50"

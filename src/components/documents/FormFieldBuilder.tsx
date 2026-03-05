@@ -122,7 +122,7 @@ export default function FormFieldBuilder({ fields, onChange, sectionLabel }: For
                 {typeInfo?.icon}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-text-primary truncate">
+                <p className="text-body font-medium text-text-primary truncate">
                   {field.label || `Untitled ${typeInfo?.label}`}
                 </p>
                 <p className="text-xs text-text-secondary">{typeInfo?.label}</p>
@@ -134,7 +134,7 @@ export default function FormFieldBuilder({ fields, onChange, sectionLabel }: For
                     moveField(index, 'up')
                   }}
                   disabled={index === 0}
-                  className="w-6 h-6 flex items-center justify-center rounded hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed"
+                  className="w-6 h-6 flex items-center justify-center rounded hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed"
                 >
                   <ChevronUp className="w-4 h-4 text-gray-500" />
                 </button>
@@ -144,7 +144,7 @@ export default function FormFieldBuilder({ fields, onChange, sectionLabel }: For
                     moveField(index, 'down')
                   }}
                   disabled={index === fields.length - 1}
-                  className="w-6 h-6 flex items-center justify-center rounded hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed"
+                  className="w-6 h-6 flex items-center justify-center rounded hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed"
                 >
                   <ChevronDown className="w-4 h-4 text-gray-500" />
                 </button>
@@ -153,7 +153,7 @@ export default function FormFieldBuilder({ fields, onChange, sectionLabel }: For
                     e.stopPropagation()
                     removeField(field.id)
                   }}
-                  className="w-6 h-6 flex items-center justify-center rounded hover:bg-gray-100 text-gray-400 hover:text-red-500"
+                  className="w-6 h-6 flex items-center justify-center rounded hover:bg-gray-50 text-gray-400 hover:text-red-500"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -166,7 +166,7 @@ export default function FormFieldBuilder({ fields, onChange, sectionLabel }: For
               <div className="border-t border-border-light p-4 bg-gray-50 space-y-4">
                 {/* Label */}
                 <div>
-                  <label className="block text-xs font-semibold text-text-secondary mb-1.5">
+                  <label className="block text-callout text-text-secondary mb-1.5">
                     Question
                   </label>
                   <input
@@ -174,14 +174,14 @@ export default function FormFieldBuilder({ fields, onChange, sectionLabel }: For
                     value={field.label}
                     onChange={(e) => updateField(field.id, { label: e.target.value })}
                     placeholder="Enter your question..."
-                    className="w-full h-9 px-3 rounded border border-border bg-white text-sm text-text-primary placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    className="w-full h-9 px-3 rounded border border-border bg-white text-body text-text-primary placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   />
                 </div>
 
                 {/* Options for single-select and multiple-choice */}
                 {(field.type === 'single-select' || field.type === 'multiple-choice') && field.options && (
                   <div>
-                    <label className="block text-xs font-semibold text-text-secondary mb-1.5">
+                    <label className="block text-callout text-text-secondary mb-1.5">
                       Options
                     </label>
                     <div className="space-y-2">
@@ -198,12 +198,12 @@ export default function FormFieldBuilder({ fields, onChange, sectionLabel }: For
                             type="text"
                             value={option}
                             onChange={(e) => updateOption(field.id, optionIndex, e.target.value)}
-                            className="flex-1 h-8 px-2 rounded border border-border bg-white text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                            className="flex-1 h-8 px-2 rounded border border-border bg-white text-body text-text-primary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                           />
                           {field.options && field.options.length > 1 && (
                             <button
                               onClick={() => removeOption(field.id, optionIndex)}
-                              className="w-6 h-6 flex items-center justify-center rounded hover:bg-gray-200 text-gray-400 hover:text-red-500"
+                              className="w-6 h-6 flex items-center justify-center rounded hover:bg-gray-50 text-gray-400 hover:text-red-500"
                             >
                               <X className="w-3 h-3" />
                             </button>
@@ -212,7 +212,7 @@ export default function FormFieldBuilder({ fields, onChange, sectionLabel }: For
                       ))}
                       <button
                         onClick={() => addOption(field.id)}
-                        className="flex items-center gap-1.5 text-sm text-primary-500 hover:text-primary-600 font-medium"
+                        className="flex items-center gap-1.5 text-body text-primary-500 hover:text-primary-600 font-medium"
                       >
                         <Plus className="w-4 h-4" />
                         Add option
@@ -224,7 +224,7 @@ export default function FormFieldBuilder({ fields, onChange, sectionLabel }: For
                 {/* Rating scale preview */}
                 {field.type === 'rating' && (
                   <div>
-                    <label className="block text-xs font-semibold text-text-secondary mb-1.5">
+                    <label className="block text-callout text-text-secondary mb-1.5">
                       Preview
                     </label>
                     <div className="flex items-center gap-1">
@@ -240,7 +240,7 @@ export default function FormFieldBuilder({ fields, onChange, sectionLabel }: For
 
                 {/* Required toggle */}
                 <div className="flex items-center justify-between pt-2 border-t border-border-light">
-                  <span className="text-sm text-text-primary">Required</span>
+                  <span className="text-body text-text-primary">Required</span>
                   <button
                     onClick={() => updateField(field.id, { required: !field.required })}
                     className={`relative w-10 h-6 rounded-full transition-colors ${
@@ -264,7 +264,7 @@ export default function FormFieldBuilder({ fields, onChange, sectionLabel }: For
       {!isAddingField ? (
         <button
           onClick={() => setIsAddingField(true)}
-          className="w-full flex items-center justify-center gap-2 p-3 border-2 border-dashed border-gray-300 rounded-element text-sm font-medium text-gray-500 hover:border-gray-400 hover:text-gray-600 transition-colors"
+          className="w-full flex items-center justify-center gap-2 p-3 border-2 border-dashed border-gray-300 rounded-element text-body font-medium text-gray-500 hover:border-gray-400 hover:text-gray-600 transition-colors"
         >
           <Plus className="w-4 h-4" />
           Add question to {sectionLabel}
@@ -272,10 +272,10 @@ export default function FormFieldBuilder({ fields, onChange, sectionLabel }: For
       ) : (
         <div className="border border-border-light rounded-element bg-white p-4">
           <div className="flex items-center justify-between mb-3">
-            <p className="text-sm font-semibold text-text-primary">Select question type</p>
+            <p className="text-headline text-text-primary">Select question type</p>
             <button
               onClick={() => setIsAddingField(false)}
-              className="w-6 h-6 flex items-center justify-center rounded hover:bg-gray-100"
+              className="w-6 h-6 flex items-center justify-center rounded hover:bg-gray-50"
             >
               <X className="w-4 h-4 text-gray-500" />
             </button>
@@ -291,7 +291,7 @@ export default function FormFieldBuilder({ fields, onChange, sectionLabel }: For
                   {ft.icon}
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-text-primary">{ft.label}</p>
+                  <p className="text-body font-medium text-text-primary">{ft.label}</p>
                   <p className="text-xs text-text-secondary">{ft.description}</p>
                 </div>
               </button>

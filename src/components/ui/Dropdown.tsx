@@ -44,39 +44,38 @@ export default function Dropdown({
     <div ref={dropdownRef} className={`relative ${className}`}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center justify-between w-full h-10 px-3 rounded-element border border-border bg-white text-sm text-text-primary hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500"
+        className="flex items-center justify-between w-full h-10 px-3 rounded-element border border-border bg-white text-body text-text-primary hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-colors"
       >
         <span className={selectedOption ? '' : 'text-text-placeholder'}>
           {selectedOption?.label || placeholder}
         </span>
         <ChevronDown
-          className={`w-4 h-4 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+          className={`w-[10px] h-[6px] text-text-secondary transition-transform ${isOpen ? 'rotate-180' : ''}`}
         />
       </button>
 
       {isOpen && (
-        <div className="absolute z-50 w-full mt-1 bg-white rounded-element border border-border shadow-dropdown max-h-60 overflow-auto">
-          {options.map((option) => (
-            <button
-              key={option.id}
-              onClick={() => {
-                onChange(option.id)
-                setIsOpen(false)
-              }}
-              className="flex items-center justify-between w-full px-3 py-2 text-sm text-text-primary hover:bg-gray-50 text-left"
-            >
-              {option.label}
-              {option.id === value && (
-                <Check className="w-4 h-4 text-primary-500" />
-              )}
-            </button>
-          ))}
+        <div className="absolute z-50 w-full mt-0.5 bg-white rounded-container border border-border-light shadow-dropdown py-0.5 overflow-hidden">
+          <div className="max-h-60 overflow-auto">
+            {options.map((option) => (
+              <button
+                key={option.id}
+                onClick={() => {
+                  onChange(option.id)
+                  setIsOpen(false)
+                }}
+                className="relative flex items-center justify-between w-full px-4 min-h-[44px] py-3 text-body text-text-primary text-left transition-colors group"
+              >
+                <span className="absolute inset-x-1 inset-y-0.5 rounded-element group-hover:bg-gray-50 transition-colors" />
+                <span className="relative">{option.label}</span>
+                {option.id === value && (
+                  <Check className="relative w-4 h-4 text-primary-500" />
+                )}
+              </button>
+            ))}
+          </div>
         </div>
       )}
     </div>
   )
 }
-
-
-
-

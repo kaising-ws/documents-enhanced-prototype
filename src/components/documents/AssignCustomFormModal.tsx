@@ -205,7 +205,7 @@ export default function AssignCustomFormModal({
     <div className="space-y-5">
       {/* Workflow step tabs */}
       <div>
-        <p className="text-sm font-semibold text-text-primary mb-3">
+        <p className="text-headline text-text-primary mb-3">
           Configure assignees for each step
         </p>
         <div className="flex gap-2 overflow-x-auto pb-1">
@@ -258,7 +258,7 @@ export default function AssignCustomFormModal({
           <div className="p-4 bg-gray-50 border-b border-border-light">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-semibold text-text-primary">
+                <p className="text-headline text-text-primary">
                   {activeStep.label} — {activeStep.questionCount} question{activeStep.questionCount !== 1 ? 's' : ''}
                 </p>
                 <p className="text-xs text-text-secondary mt-0.5">
@@ -272,7 +272,7 @@ export default function AssignCustomFormModal({
 
           {/* Assignee mode tabs */}
           <div className="p-4 border-b border-border-light">
-            <p className="text-xs font-semibold text-text-secondary mb-2">Assign by</p>
+            <p className="text-callout text-text-secondary mb-2">Assign by</p>
             <div className="flex gap-2">
               {([
                 { id: 'individual' as const, label: 'Individual', icon: <UserCheck className="w-3.5 h-3.5" /> },
@@ -308,7 +308,7 @@ export default function AssignCustomFormModal({
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search team members..."
-                    className="w-full h-9 pl-9 pr-3 rounded-element border border-border bg-white text-sm text-text-primary placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    className="w-full h-9 pl-9 pr-3 rounded-element border border-border bg-white text-sm text-text-primary placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   />
                   {searchQuery && (
                     <button
@@ -364,7 +364,7 @@ export default function AssignCustomFormModal({
                       className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
                         activeAssignment.selectedRoles.includes(role.id)
                           ? 'bg-primary-500 text-white'
-                          : 'bg-gray-100 text-text-primary hover:bg-gray-200'
+                          : 'bg-gray-100 text-text-primary hover:bg-gray-50'
                       }`}
                     >
                       {role.name}
@@ -389,7 +389,7 @@ export default function AssignCustomFormModal({
                       className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
                         activeAssignment.selectedLocations.includes(loc.id)
                           ? 'bg-primary-500 text-white'
-                          : 'bg-gray-100 text-text-primary hover:bg-gray-200'
+                          : 'bg-gray-100 text-text-primary hover:bg-gray-50'
                       }`}
                     >
                       {loc.name}
@@ -404,7 +404,7 @@ export default function AssignCustomFormModal({
 
       {/* Summary */}
       <div className="p-3 bg-gray-50 border border-border-light rounded-element">
-        <p className="text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2">Assignment Summary</p>
+        <p className="text-callout text-text-secondary uppercase tracking-wider mb-2">Assignment Summary</p>
         <div className="space-y-1.5">
           {workflowSteps.map((step, idx) => (
             <div key={step.id} className="flex items-center gap-2 text-xs">
@@ -431,7 +431,7 @@ export default function AssignCustomFormModal({
     <div className="space-y-6">
       {/* Send timing */}
       <div>
-        <p className="text-sm font-semibold text-text-primary mb-3">
+        <p className="text-headline text-text-primary mb-3">
           When should the form be sent?
         </p>
         <p className="text-xs text-text-secondary mb-4">
@@ -454,7 +454,7 @@ export default function AssignCustomFormModal({
               <ArrowRight className={`w-5 h-5 ${sendImmediately ? 'text-primary-600' : 'text-gray-500'}`} />
             </div>
             <div>
-              <p className="text-sm font-semibold text-text-primary">Send immediately</p>
+              <p className="text-headline text-text-primary">Send immediately</p>
               <p className="text-xs text-text-secondary">Form will be sent as soon as you assign</p>
             </div>
             {sendImmediately && (
@@ -477,7 +477,7 @@ export default function AssignCustomFormModal({
               <Calendar className={`w-5 h-5 ${!sendImmediately ? 'text-primary-600' : 'text-gray-500'}`} />
             </div>
             <div>
-              <p className="text-sm font-semibold text-text-primary">Schedule for later</p>
+              <p className="text-headline text-text-primary">Schedule for later</p>
               <p className="text-xs text-text-secondary">Choose a date and time to send the form</p>
             </div>
             {!sendImmediately && (
@@ -490,21 +490,21 @@ export default function AssignCustomFormModal({
           <div className="mt-4 p-4 bg-gray-50 border border-border-light rounded-element space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-semibold text-text-secondary mb-1.5">Date</label>
+                <label className="block text-callout text-text-secondary mb-1.5">Date</label>
                 <input
                   type="date"
                   value={scheduledDate}
                   onChange={(e) => setScheduledDate(e.target.value)}
-                  className="w-full h-10 px-3 rounded-element border border-border bg-white text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full h-10 px-3 rounded-element border border-border bg-white text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-text-secondary mb-1.5">Time</label>
+                <label className="block text-callout text-text-secondary mb-1.5">Time</label>
                 <input
                   type="time"
                   value={scheduledTime}
                   onChange={(e) => setScheduledTime(e.target.value)}
-                  className="w-full h-10 px-3 rounded-element border border-border bg-white text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full h-10 px-3 rounded-element border border-border bg-white text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 />
               </div>
             </div>
@@ -522,7 +522,7 @@ export default function AssignCustomFormModal({
 
       {/* Summary */}
       <div className="p-4 bg-gray-50 border border-border-light rounded-element">
-        <p className="text-xs font-semibold text-text-secondary uppercase tracking-wider mb-3">Final Summary</p>
+        <p className="text-callout text-text-secondary uppercase tracking-wider mb-3">Final Summary</p>
         <div className="space-y-2">
           {workflowSteps.map((step, idx) => (
             <div key={step.id} className="flex items-center gap-2 text-xs">
@@ -561,14 +561,14 @@ export default function AssignCustomFormModal({
           <div>
             {currentPage === 'schedule' ? (
               <Button
-                variant="ghost"
+                variant="clear"
                 leftIcon={<ArrowLeft className="w-4 h-4" />}
                 onClick={() => setCurrentPage('steps')}
               >
                 Back
               </Button>
             ) : (
-              <Button variant="ghost" onClick={handleClose}>
+              <Button variant="clear" onClick={handleClose}>
                 Cancel
               </Button>
             )}

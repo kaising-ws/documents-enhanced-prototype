@@ -127,15 +127,15 @@ export default function EscalationSettings({
         <button
           type="button"
           onClick={() => setIsExpanded(!isExpanded)}
-          className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+          className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-50 transition-colors"
         >
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center">
               <Clock className="w-4 h-4 text-amber-600" />
             </div>
             <div className="text-left">
-              <p className="text-sm font-semibold text-text-primary">Escalation Settings</p>
-              <p className="text-xs text-text-secondary">
+              <p className="text-headline text-text-primary">Escalation Settings</p>
+              <p className="text-caption text-text-secondary">
                 Auto-mark as refused after {escalationDays} days
               </p>
             </div>
@@ -167,15 +167,15 @@ export default function EscalationSettings({
               onChange={onAllowDeclineChange}
             />
             <div>
-              <p className="text-sm font-medium text-text-primary">Allow employee to decline signing</p>
-              <p className="text-xs text-text-secondary">Employee can refuse with a documented reason</p>
+              <p className="text-body font-medium text-text-primary">Allow employee to decline signing</p>
+              <p className="text-caption text-text-secondary">Employee can refuse with a documented reason</p>
             </div>
           </div>
         </div>
 
         {/* Auto-refuse Days */}
         <div>
-          <label className="block text-sm font-medium text-text-primary mb-2">
+          <label className="block text-body font-medium text-text-primary mb-2">
             Auto-mark as refused after
           </label>
           <div className="flex items-center gap-3">
@@ -185,22 +185,22 @@ export default function EscalationSettings({
               max="30"
               value={escalationDays}
               onChange={(e) => onEscalationDaysChange(parseInt(e.target.value) || 7)}
-              className="w-20 h-10 px-3 rounded-element border border-border bg-white text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-center"
+              className="w-20 h-10 px-3 rounded-element border border-border bg-white text-body text-text-primary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-center"
             />
-            <span className="text-sm text-text-secondary">days without response</span>
+            <span className="text-body text-text-secondary">days without response</span>
           </div>
         </div>
 
         {/* Escalation Timeline */}
         <div>
           <div className="flex items-center justify-between mb-3">
-            <label className="text-sm font-medium text-text-primary">
+            <label className="text-body font-medium text-text-primary">
               Escalation Timeline
             </label>
             <button
               type="button"
               onClick={handleAddRule}
-              className="flex items-center gap-1 text-xs font-medium text-primary-500 hover:text-primary-600"
+              className="flex items-center gap-1 text-caption font-medium text-primary-500 hover:text-primary-600"
             >
               <Plus className="w-3 h-3" />
               Add Step
@@ -221,7 +221,7 @@ export default function EscalationSettings({
                 >
                   {/* Timeline indicator */}
                   <div className="flex flex-col items-center">
-                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${
+                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-caption font-medium ${
                       rule.enabled ? actionConfig.color : 'bg-gray-200 text-gray-500'
                     }`}>
                       {index + 1}
@@ -233,7 +233,7 @@ export default function EscalationSettings({
 
                   {/* Days input */}
                   <div className="flex items-center gap-1">
-                    <span className="text-xs text-text-secondary">Day</span>
+                    <span className="text-caption text-text-secondary">Day</span>
                     <input
                       type="number"
                       min="1"
@@ -241,7 +241,7 @@ export default function EscalationSettings({
                       value={rule.daysAfterSend}
                       onChange={(e) => handleRuleDaysChange(rule.id, parseInt(e.target.value) || 1)}
                       disabled={!rule.enabled}
-                      className="w-12 h-8 px-2 rounded border border-border bg-white text-sm text-text-primary text-center focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:bg-gray-100"
+                      className="w-12 h-8 px-2 rounded-element border border-border bg-white text-body text-text-primary text-center focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:bg-gray-50 disabled:text-text-disabled transition-colors"
                     />
                   </div>
 
@@ -251,7 +251,7 @@ export default function EscalationSettings({
                       value={rule.action}
                       onChange={(e) => handleActionChange(rule.id, e.target.value as EscalationRule['action'])}
                       disabled={!rule.enabled}
-                      className="w-full h-8 px-2 rounded border border-border bg-white text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:bg-gray-100"
+                      className="w-full h-8 px-2 rounded-element border border-border bg-white text-body text-text-primary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:bg-gray-50 disabled:text-text-disabled transition-colors"
                     >
                       <option value="reminder">Send Reminder</option>
                       <option value="notify_manager">Notify Manager</option>
@@ -286,7 +286,7 @@ export default function EscalationSettings({
                       <button
                         type="button"
                         onClick={() => handleRemoveRule(rule.id)}
-                        className="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-100 transition-colors"
+                        className="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-50 transition-colors"
                       >
                         <Trash2 className="w-4 h-4 text-gray-400 hover:text-red-500" />
                       </button>
@@ -302,7 +302,7 @@ export default function EscalationSettings({
         <div className="flex items-start gap-2 p-3 bg-blue-50 border border-blue-200 rounded-element">
           <Info className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
           <div>
-            <p className="text-xs text-blue-800">
+            <p className="text-caption text-blue-800">
               <strong>How escalation works:</strong> The system will automatically perform each enabled action 
               on the specified day after the write-up is sent. All escalation steps are recorded in the audit log.
             </p>
@@ -320,7 +320,7 @@ export default function EscalationSettings({
         </div>
         <div>
           <h3 className="text-base font-semibold text-text-primary">Escalation Settings</h3>
-          <p className="text-sm text-text-secondary">Configure what happens when employees don't respond</p>
+          <p className="text-body text-text-secondary">Configure what happens when employees don't respond</p>
         </div>
       </div>
       
@@ -366,15 +366,15 @@ export function EscalationStatus({ writeUp }: EscalationStatusProps) {
     <div className={`flex items-center gap-3 p-3 rounded-element border ${getStatusColor()}`}>
       <Clock className="w-4 h-4 flex-shrink-0" />
       <div className="flex-1">
-        <p className="text-sm font-medium">{getStatusText()}</p>
-        <p className="text-xs opacity-80">
+        <p className="text-body font-medium">{getStatusText()}</p>
+        <p className="text-caption opacity-80">
           {writeUp.remindersSent > 0 
             ? `${writeUp.remindersSent} reminder${writeUp.remindersSent !== 1 ? 's' : ''} sent`
             : 'No reminders sent yet'}
         </p>
       </div>
       {daysRemaining > 0 && (
-        <Button size="sm" variant="outline">
+        <Button size="sm" variant="plain-gray">
           Send Reminder
         </Button>
       )}

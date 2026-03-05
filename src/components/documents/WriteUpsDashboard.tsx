@@ -21,6 +21,7 @@ import {
 import Button from '../ui/Button'
 import SearchBox from '../ui/SearchBox'
 import Checkbox from '../ui/Checkbox'
+import FilterChip from '../ui/FilterChip'
 import ContextMenu, { ContextMenuItem } from '../ui/ContextMenu'
 import { useToast } from '../ui/Toast'
 import { writeUps, WriteUp, WriteUpStatus, getWriteUpStats } from '../../data/mockData'
@@ -241,31 +242,20 @@ export default function WriteUpsDashboard({
     <div className="space-y-4">
       {/* ─── Status Filter Chips + Search ─── */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           {statusChips.map((chip) => {
             const count = chipCounts[chip.id]
             if (chip.id !== 'all' && count === 0) return null
-            const isActive = activeChip === chip.id
             return (
-              <button
+              <FilterChip
                 key={chip.id}
+                label={chip.label}
+                count={count}
+                isActive={activeChip === chip.id}
                 onClick={() => setActiveChip(chip.id)}
-                className={`
-                  inline-flex items-center gap-1.5 h-8 px-3 rounded-full text-xs font-medium transition-all
-                  ${isActive
-                    ? 'bg-text-primary text-white shadow-sm'
-                    : 'bg-white text-text-secondary border border-border-light hover:border-gray-300 hover:text-text-primary'
-                  }
-                `}
-              >
-                {chip.id !== 'all' && (
-                  <span className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-white/70' : chip.dotColor}`} />
-                )}
-                {chip.label}
-                <span className={`${isActive ? 'text-white/70' : 'text-text-secondary'}`}>
-                  {count}
-                </span>
-              </button>
+                dotColor={chip.dotColor}
+                showDot={chip.id !== 'all'}
+              />
             )
           })}
         </div>
@@ -281,12 +271,12 @@ export default function WriteUpsDashboard({
       {/* Floating bulk action bar */}
       {selectedRows.length > 0 && (
         <div className="sticky top-0 z-10 bg-gray-900 text-white rounded-container px-4 py-3 flex items-center justify-between shadow-lg">
-          <span className="text-sm font-medium">
+          <span className="text-headline">
             {selectedRows.length} write-up{selectedRows.length !== 1 ? 's' : ''} selected
           </span>
           <div className="flex items-center gap-2">
             <Button
-              variant="ghost"
+              variant="clear"
               size="sm"
               className="text-white hover:bg-white/20"
               onClick={() => {
@@ -297,7 +287,7 @@ export default function WriteUpsDashboard({
               Send Reminders
             </Button>
             <Button
-              variant="ghost"
+              variant="clear"
               size="sm"
               className="text-white hover:bg-white/20"
               onClick={() => {
@@ -308,7 +298,7 @@ export default function WriteUpsDashboard({
               Delete
             </Button>
             <Button
-              variant="ghost"
+              variant="clear"
               size="sm"
               className="text-white hover:bg-white/20"
               onClick={() => setSelectedRows([])}
@@ -330,7 +320,7 @@ export default function WriteUpsDashboard({
                   onChange={handleSelectAll}
                 />
               </th>
-              <th className="h-11 px-4 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider">
+              <th className="h-11 px-4 text-left text-callout text-text-secondary uppercase tracking-wider">
                 <button
                   onClick={() => handleSort('employee')}
                   className="flex items-center gap-1 hover:text-text-primary transition-colors"
@@ -338,7 +328,7 @@ export default function WriteUpsDashboard({
                   Employee {getSortIcon('employee')}
                 </button>
               </th>
-              <th className="h-11 px-4 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider">
+              <th className="h-11 px-4 text-left text-callout text-text-secondary uppercase tracking-wider">
                 <button
                   onClick={() => handleSort('type')}
                   className="flex items-center gap-1 hover:text-text-primary transition-colors"
@@ -346,10 +336,10 @@ export default function WriteUpsDashboard({
                   Type {getSortIcon('type')}
                 </button>
               </th>
-              <th className="h-11 px-4 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider">
+              <th className="h-11 px-4 text-left text-callout text-text-secondary uppercase tracking-wider">
                 Title
               </th>
-              <th className="h-11 px-4 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider">
+              <th className="h-11 px-4 text-left text-callout text-text-secondary uppercase tracking-wider">
                 <button
                   onClick={() => handleSort('status')}
                   className="flex items-center gap-1 hover:text-text-primary transition-colors"
@@ -357,7 +347,7 @@ export default function WriteUpsDashboard({
                   Status {getSortIcon('status')}
                 </button>
               </th>
-              <th className="h-11 px-4 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider">
+              <th className="h-11 px-4 text-left text-callout text-text-secondary uppercase tracking-wider">
                 <button
                   onClick={() => handleSort('date')}
                   className="flex items-center gap-1 hover:text-text-primary transition-colors"
@@ -365,7 +355,7 @@ export default function WriteUpsDashboard({
                   Date {getSortIcon('date')}
                 </button>
               </th>
-              <th className="h-11 px-4 text-right text-xs font-semibold text-text-secondary uppercase tracking-wider w-[100px]">
+              <th className="h-11 px-4 text-right text-callout text-text-secondary uppercase tracking-wider w-[100px]">
                 Actions
               </th>
             </tr>
@@ -392,45 +382,45 @@ export default function WriteUpsDashboard({
                   <td className="h-14 px-4">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center flex-shrink-0">
-                        <span className="text-xs font-semibold text-gray-600">
+                        <span className="text-callout text-gray-600">
                           {writeUp.employeeName.split(' ').map(n => n[0]).join('')}
                         </span>
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-text-primary">{writeUp.employeeName}</p>
-                        <p className="text-xs text-text-secondary">{writeUp.employeeRole}</p>
+                        <p className="text-headline text-text-primary">{writeUp.employeeName}</p>
+                        <p className="text-caption text-text-secondary">{writeUp.employeeRole}</p>
                       </div>
                     </div>
                   </td>
                   <td className="h-14 px-4">
-                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-medium bg-gray-100 text-gray-600">
+                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded text-caption font-medium bg-gray-100 text-gray-600">
                       {type.icon}
                       {type.label}
                     </span>
                   </td>
                   <td className="h-14 px-4">
-                    <p className="text-sm text-text-primary truncate max-w-xs">{writeUp.title}</p>
+                    <p className="text-body text-text-primary truncate max-w-xs">{writeUp.title}</p>
                   </td>
                   <td className="h-14 px-4">
-                    <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded text-xs font-medium ${status.bgColor} ${status.color}`}>
+                    <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded text-caption font-medium ${status.bgColor} ${status.color}`}>
                       {status.icon}
                       {status.label}
                     </span>
                   </td>
                   <td className="h-14 px-4">
                     <div>
-                      <p className="text-sm text-text-primary">{formatDate(writeUp.incidentDate)}</p>
-                      <p className="text-xs text-text-secondary">{writeUp.location}</p>
+                      <p className="text-body text-text-primary">{formatDate(writeUp.incidentDate)}</p>
+                      <p className="text-caption text-text-secondary">{writeUp.location}</p>
                     </div>
                   </td>
                   <td className="h-14 px-4" onClick={(e) => e.stopPropagation()}>
                     <div className="flex items-center justify-end gap-2">
                       {writeUp.status === 'sent' && (
                         <Button
-                          variant="ghost"
+                          variant="clear"
                           size="sm"
                           onClick={() => addToast(`Reminder sent to ${writeUp.employeeName}`, 'success')}
-                          className="text-gray-500 hover:bg-gray-100"
+                          className="text-gray-500 hover:bg-gray-50"
                         >
                           <Bell className="w-3.5 h-3.5" />
                         </Button>
@@ -447,15 +437,15 @@ export default function WriteUpsDashboard({
         {sortedWriteUps.length === 0 && (
           <div className="p-12 text-center">
             <FileText className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-sm font-medium text-text-primary mb-1">No write-ups found</h3>
-            <p className="text-sm text-text-secondary">
+            <h3 className="text-headline text-text-primary mb-1">No write-ups found</h3>
+            <p className="text-body text-text-secondary">
               {searchQuery || activeChip !== 'all'
                 ? 'Try adjusting your filters'
                 : 'Create your first write-up to get started'}
             </p>
             {!searchQuery && activeChip === 'all' && (
               <Button
-                variant="primary"
+                variant="accent-blue"
                 leftIcon={<Plus className="w-4 h-4" />}
                 className="mt-4"
                 onClick={onAssignWriteUp}
@@ -470,14 +460,14 @@ export default function WriteUpsDashboard({
       {/* Pagination */}
       {sortedWriteUps.length > 0 && (
         <div className="flex items-center justify-between">
-          <span className="text-sm text-text-secondary">
+          <span className="text-body text-text-secondary">
             Showing {sortedWriteUps.length} of {writeUps.length} write-ups
           </span>
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" disabled>
+            <Button variant="plain-gray" size="sm" disabled>
               Previous
             </Button>
-            <Button variant="outline" size="sm">
+            <Button variant="plain-gray" size="sm">
               Next
             </Button>
           </div>

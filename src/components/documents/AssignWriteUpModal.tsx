@@ -119,7 +119,7 @@ export default function AssignWriteUpModal({
     <div className="space-y-6">
       {/* Employee Selection */}
       <div>
-        <label className="block text-sm font-semibold text-text-primary mb-2">
+        <label className="block text-headline text-text-primary mb-2">
           Select Employee
         </label>
         <div className="relative">
@@ -127,13 +127,13 @@ export default function AssignWriteUpModal({
             <div className="flex items-center justify-between p-3 border border-primary-500 rounded-element bg-primary-50">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-primary-500 rounded-full flex items-center justify-center">
-                  <span className="text-sm font-semibold text-white">
+                  <span className="text-headline text-white">
                     {selectedEmployee.initials}
                   </span>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-text-primary">{selectedEmployee.name}</p>
-                  <p className="text-xs text-text-secondary">{selectedEmployee.role} · {selectedEmployee.location}</p>
+                  <p className="text-body font-medium text-text-primary">{selectedEmployee.name}</p>
+                  <p className="text-caption text-text-secondary">{selectedEmployee.role} · {selectedEmployee.location}</p>
                 </div>
               </div>
               <button
@@ -160,7 +160,7 @@ export default function AssignWriteUpModal({
                 }}
                 onFocus={() => setShowEmployeeDropdown(true)}
                 placeholder="Search by name, role, or location..."
-                className="w-full h-10 pl-10 pr-3 rounded-element border border-border bg-white text-sm text-text-primary placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="w-full h-10 pl-10 pr-3 rounded-element border border-border bg-white text-body text-text-primary placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
               />
               
               {showEmployeeDropdown && (
@@ -177,18 +177,18 @@ export default function AssignWriteUpModal({
                         className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 transition-colors text-left"
                       >
                         <div className="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center flex-shrink-0">
-                          <span className="text-xs font-semibold text-white">
+                          <span className="text-callout text-white">
                             {member.initials}
                           </span>
                         </div>
                         <div>
-                          <p className="text-sm font-medium text-text-primary">{member.name}</p>
-                          <p className="text-xs text-text-secondary">{member.role} · {member.location}</p>
+                          <p className="text-body font-medium text-text-primary">{member.name}</p>
+                          <p className="text-caption text-text-secondary">{member.role} · {member.location}</p>
                         </div>
                       </button>
                     ))
                   ) : (
-                    <div className="p-4 text-center text-sm text-text-secondary">
+                    <div className="p-4 text-center text-body text-text-secondary">
                       No employees found
                     </div>
                   )}
@@ -201,7 +201,7 @@ export default function AssignWriteUpModal({
 
       {/* Write-up Type */}
       <div>
-        <label className="block text-sm font-semibold text-text-primary mb-2">
+        <label className="block text-headline text-text-primary mb-2">
           Write-up Type
         </label>
         <div className="grid grid-cols-2 gap-2">
@@ -215,11 +215,11 @@ export default function AssignWriteUpModal({
                   : 'border-border-light hover:border-gray-300'
               }`}
             >
-              <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${type.color}`}>
+              <span className={`inline-block px-2 py-0.5 rounded text-caption font-medium ${type.color}`}>
                 {type.label}
               </span>
               {type.points !== 0 && (
-                <p className="text-xs text-text-secondary mt-1">
+                <p className="text-caption text-text-secondary mt-1">
                   {type.points > 0 ? `+${type.points} points` : `${type.points} points`}
                 </p>
               )}
@@ -230,7 +230,7 @@ export default function AssignWriteUpModal({
 
       {/* Incident Date */}
       <div>
-        <label className="block text-sm font-semibold text-text-primary mb-2">
+        <label className="block text-headline text-text-primary mb-2">
           Incident Date
         </label>
         <div className="relative">
@@ -239,7 +239,7 @@ export default function AssignWriteUpModal({
             value={incidentDate}
             onChange={(e) => setIncidentDate(e.target.value)}
             max={new Date().toISOString().split('T')[0]}
-            className="w-full h-10 px-3 pr-10 rounded-element border border-border bg-white text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            className="w-full h-10 px-3 pr-10 rounded-element border border-border bg-white text-body text-text-primary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
           />
           <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
         </div>
@@ -247,27 +247,27 @@ export default function AssignWriteUpModal({
 
       {/* Incident Description */}
       <div>
-        <label className="block text-sm font-semibold text-text-primary mb-2">
+        <label className="block text-headline text-text-primary mb-2">
           Incident Description <span className="text-red-500">*</span>
         </label>
         <textarea
           value={incidentDescription}
           onChange={(e) => setIncidentDescription(e.target.value)}
           placeholder="Describe what happened, when, and any relevant details..."
-          className="w-full h-28 px-3 py-2 rounded-element border border-border bg-white text-sm text-text-primary placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
+          className="w-full h-28 px-3 py-2 rounded-element border border-border bg-white text-body text-text-primary placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 resize-none"
         />
       </div>
 
       {/* Manager Notes */}
       <div>
-        <label className="block text-sm font-semibold text-text-primary mb-2">
+        <label className="block text-headline text-text-primary mb-2">
           Manager Notes (optional)
         </label>
         <textarea
           value={managerNotes}
           onChange={(e) => setManagerNotes(e.target.value)}
           placeholder="Additional context or action items..."
-          className="w-full h-20 px-3 py-2 rounded-element border border-border bg-white text-sm text-text-primary placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
+          className="w-full h-20 px-3 py-2 rounded-element border border-border bg-white text-body text-text-primary placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 resize-none"
         />
       </div>
 
@@ -275,7 +275,7 @@ export default function AssignWriteUpModal({
       {selectedType && selectedType.points !== 0 && (
         <div className="p-4 bg-gray-50 rounded-element">
           <div className="flex items-center justify-between mb-3">
-            <label className="text-sm font-semibold text-text-primary">
+            <label className="text-headline text-text-primary">
               Assign demerit points
             </label>
             <button
@@ -295,18 +295,18 @@ export default function AssignWriteUpModal({
           {usePoints && (
             <div className="flex items-center gap-4">
               <div className="flex-1">
-                <label className="block text-xs text-text-secondary mb-1">Points to assign</label>
+                <label className="block text-caption text-text-secondary mb-1">Points to assign</label>
                 <input
                   type="number"
                   min="0"
                   max="10"
                   value={customPoints !== null ? customPoints : selectedType.points}
                   onChange={(e) => setCustomPoints(parseInt(e.target.value) || 0)}
-                  className="w-24 h-10 px-3 rounded-element border border-border bg-white text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-24 h-10 px-3 rounded-element border border-border bg-white text-body text-text-primary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 />
               </div>
               <div className="flex-1">
-                <p className="text-xs text-text-secondary">
+                <p className="text-caption text-text-secondary">
                   {selectedEmployee?.name || 'Employee'} will have <strong>{pointsToAssign}</strong> points added to their record.
                 </p>
               </div>
@@ -317,7 +317,7 @@ export default function AssignWriteUpModal({
 
       {/* Send Options */}
       <div className="border-t border-border-light pt-6">
-        <label className="block text-sm font-semibold text-text-primary mb-3">
+        <label className="block text-headline text-text-primary mb-3">
           When to send
         </label>
         <div className="space-y-2">
@@ -335,8 +335,8 @@ export default function AssignWriteUpModal({
               {sendOption === 'now' && <div className="w-2 h-2 rounded-full bg-primary-500" />}
             </div>
             <div className="text-left">
-              <p className="text-sm font-medium text-text-primary">Send immediately</p>
-              <p className="text-xs text-text-secondary">Employee will be notified right away</p>
+              <p className="text-body font-medium text-text-primary">Send immediately</p>
+              <p className="text-caption text-text-secondary">Employee will be notified right away</p>
             </div>
           </button>
           
@@ -354,8 +354,8 @@ export default function AssignWriteUpModal({
               {sendOption === 'scheduled' && <div className="w-2 h-2 rounded-full bg-primary-500" />}
             </div>
             <div className="flex-1 text-left">
-              <p className="text-sm font-medium text-text-primary">Schedule for later</p>
-              <p className="text-xs text-text-secondary">Choose a date and time to send</p>
+              <p className="text-body font-medium text-text-primary">Schedule for later</p>
+              <p className="text-caption text-text-secondary">Choose a date and time to send</p>
             </div>
             <Clock className="w-4 h-4 text-gray-400" />
           </button>
@@ -367,7 +367,7 @@ export default function AssignWriteUpModal({
                 value={scheduledDate}
                 onChange={(e) => setScheduledDate(e.target.value)}
                 min={new Date().toISOString().slice(0, 16)}
-                className="w-full h-10 px-3 rounded-element border border-border bg-white text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="w-full h-10 px-3 rounded-element border border-border bg-white text-body text-text-primary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
               />
             </div>
           )}
@@ -386,8 +386,8 @@ export default function AssignWriteUpModal({
               {sendOption === 'draft' && <div className="w-2 h-2 rounded-full bg-primary-500" />}
             </div>
             <div className="text-left">
-              <p className="text-sm font-medium text-text-primary">Save as draft</p>
-              <p className="text-xs text-text-secondary">Save for later without sending</p>
+              <p className="text-body font-medium text-text-primary">Save as draft</p>
+              <p className="text-caption text-text-secondary">Save for later without sending</p>
             </div>
           </button>
         </div>
@@ -395,7 +395,7 @@ export default function AssignWriteUpModal({
 
       {/* Manager Signature */}
       <div className="border-t border-border-light pt-6">
-        <label className="block text-sm font-semibold text-text-primary mb-3">
+        <label className="block text-headline text-text-primary mb-3">
           Manager Signature
         </label>
         <div 
@@ -410,16 +410,16 @@ export default function AssignWriteUpModal({
             <div className="flex items-center gap-3">
               <CheckCircle2 className="w-5 h-5 text-green-600" />
               <div>
-                <p className="text-sm font-medium text-green-800">Signed by Manager</p>
-                <p className="text-xs text-green-600">Click to remove signature</p>
+                <p className="text-body font-medium text-green-800">Signed by Manager</p>
+                <p className="text-caption text-green-600">Click to remove signature</p>
               </div>
             </div>
           ) : (
             <div className="flex items-center gap-3">
               <User className="w-5 h-5 text-gray-400" />
               <div>
-                <p className="text-sm font-medium text-text-primary">Click to sign as manager</p>
-                <p className="text-xs text-text-secondary">Your signature is required before sending</p>
+                <p className="text-body font-medium text-text-primary">Click to sign as manager</p>
+                <p className="text-caption text-text-secondary">Your signature is required before sending</p>
               </div>
             </div>
           )}
@@ -434,44 +434,44 @@ export default function AssignWriteUpModal({
         {/* Header */}
         <div className="flex items-start justify-between mb-6 pb-6 border-b border-border-light">
           <div>
-            <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${selectedType?.color}`}>
+            <span className={`inline-block px-2 py-1 rounded text-caption font-medium ${selectedType?.color}`}>
               {selectedType?.label}
             </span>
-            <h3 className="text-lg font-bold text-text-primary mt-2">{templateName}</h3>
+            <h3 className="text-title-4 text-text-primary mt-2">{templateName}</h3>
           </div>
           <div className="text-right">
-            <p className="text-sm text-text-secondary">Incident Date</p>
-            <p className="text-sm font-medium text-text-primary">{incidentDate}</p>
+            <p className="text-body text-text-secondary">Incident Date</p>
+            <p className="text-body font-medium text-text-primary">{incidentDate}</p>
           </div>
         </div>
 
         {/* Employee */}
         <div className="mb-6">
-          <p className="text-xs text-text-secondary uppercase tracking-wider mb-2">Employee</p>
+          <p className="text-caption text-text-secondary uppercase tracking-wider mb-2">Employee</p>
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-primary-500 rounded-full flex items-center justify-center">
-              <span className="text-sm font-semibold text-white">
+              <span className="text-headline text-white">
                 {selectedEmployee?.initials}
               </span>
             </div>
             <div>
-              <p className="text-sm font-medium text-text-primary">{selectedEmployee?.name}</p>
-              <p className="text-xs text-text-secondary">{selectedEmployee?.role} · {selectedEmployee?.location}</p>
+              <p className="text-body font-medium text-text-primary">{selectedEmployee?.name}</p>
+              <p className="text-caption text-text-secondary">{selectedEmployee?.role} · {selectedEmployee?.location}</p>
             </div>
           </div>
         </div>
 
         {/* Incident Description */}
         <div className="mb-6">
-          <p className="text-xs text-text-secondary uppercase tracking-wider mb-2">Incident Description</p>
-          <p className="text-sm text-text-primary whitespace-pre-wrap">{incidentDescription}</p>
+          <p className="text-caption text-text-secondary uppercase tracking-wider mb-2">Incident Description</p>
+          <p className="text-body text-text-primary whitespace-pre-wrap">{incidentDescription}</p>
         </div>
 
         {/* Manager Notes */}
         {managerNotes && (
           <div className="mb-6">
-            <p className="text-xs text-text-secondary uppercase tracking-wider mb-2">Manager Notes</p>
-            <p className="text-sm text-text-primary whitespace-pre-wrap">{managerNotes}</p>
+            <p className="text-caption text-text-secondary uppercase tracking-wider mb-2">Manager Notes</p>
+            <p className="text-body text-text-primary whitespace-pre-wrap">{managerNotes}</p>
           </div>
         )}
 
@@ -480,7 +480,7 @@ export default function AssignWriteUpModal({
           <div className="mb-6 p-3 bg-amber-50 border border-amber-200 rounded-element">
             <div className="flex items-center gap-2">
               <AlertTriangle className="w-4 h-4 text-amber-600" />
-              <p className="text-sm text-amber-800">
+              <p className="text-body text-amber-800">
                 <strong>{pointsToAssign > 0 ? '+' : ''}{pointsToAssign} points</strong> will be added to {selectedEmployee?.name}'s record
               </p>
             </div>
@@ -489,8 +489,8 @@ export default function AssignWriteUpModal({
 
         {/* Send Option */}
         <div className="pt-4 border-t border-border-light">
-          <p className="text-xs text-text-secondary uppercase tracking-wider mb-2">Delivery</p>
-          <p className="text-sm text-text-primary">
+          <p className="text-caption text-text-secondary uppercase tracking-wider mb-2">Delivery</p>
+          <p className="text-body text-text-primary">
             {sendOption === 'now' && '📤 Send immediately after confirmation'}
             {sendOption === 'scheduled' && `📅 Scheduled for ${new Date(scheduledDate).toLocaleString()}`}
             {sendOption === 'draft' && '📝 Save as draft (will not be sent)'}
@@ -508,7 +508,7 @@ export default function AssignWriteUpModal({
       size="xl"
       footer={
         <div className="flex items-center justify-between w-full">
-          <Button variant="ghost" onClick={step === 'preview' ? () => setStep('details') : handleClose}>
+          <Button variant="clear" onClick={step === 'preview' ? () => setStep('details') : handleClose}>
             {step === 'preview' ? 'Back' : 'Cancel'}
           </Button>
           <div className="flex items-center gap-3">

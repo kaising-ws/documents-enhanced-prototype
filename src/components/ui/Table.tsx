@@ -27,7 +27,7 @@ export default function Table<T>({
               <th
                 key={column.id}
                 style={{ width: column.width }}
-                className="h-12 px-4 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider"
+                className="h-10 px-4 text-left text-callout text-text-secondary"
               >
                 {column.header}
               </th>
@@ -41,11 +41,11 @@ export default function Table<T>({
               onClick={() => onRowClick?.(item)}
               className={`
                 border-b border-border-light last:border-b-0
-                ${onRowClick ? 'cursor-pointer hover:bg-gray-50' : ''}
+                ${onRowClick ? 'cursor-pointer hover:bg-gray-50 transition-colors' : ''}
               `}
             >
               {columns.map((column) => (
-                <td key={column.id} className="h-14 px-4">
+                <td key={column.id} className="min-h-[44px] py-3 px-4 text-body text-text-primary">
                   {column.cell(item)}
                 </td>
               ))}
@@ -56,7 +56,3 @@ export default function Table<T>({
     </div>
   )
 }
-
-
-
-

@@ -407,12 +407,12 @@ export default function AssigneeTaskPage({
         <div className="max-w-[800px] mx-auto flex items-center justify-between">
           <button
             onClick={onBack}
-            className="flex items-center gap-2 text-sm text-text-secondary hover:text-text-primary transition-colors"
+            className="flex items-center gap-2 text-body text-text-secondary hover:text-text-primary transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to document
           </button>
-          <span className="inline-flex items-center gap-1.5 text-xs font-medium text-purple-600 bg-purple-50 px-2.5 py-1 rounded-full">
+          <span className="inline-flex items-center gap-1.5 text-caption font-medium text-purple-600 bg-purple-50 px-2.5 py-1 rounded-full">
             <Eye className="w-3 h-3" />
             Manager preview
           </span>
@@ -431,9 +431,9 @@ export default function AssigneeTaskPage({
             <div className="flex-1">
               <h1 className="text-xl font-bold text-text-primary mb-1">{documentName}</h1>
               {documentDescription && (
-                <p className="text-sm text-text-secondary mb-3">{documentDescription}</p>
+                <p className="text-body text-text-secondary mb-3">{documentDescription}</p>
               )}
-              <div className="flex items-center gap-4 text-sm text-text-secondary">
+              <div className="flex items-center gap-4 text-body text-text-secondary">
                 <span className="flex items-center gap-1.5">
                   <User className="w-3.5 h-3.5" />
                   {recipient.name}
@@ -460,7 +460,7 @@ export default function AssigneeTaskPage({
                   <div key={label} className="flex items-center gap-2 flex-1">
                     <div className="flex items-center gap-2.5 flex-1">
                       <div
-                        className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${
+                        className={`w-7 h-7 rounded-full flex items-center justify-center text-caption font-bold flex-shrink-0 ${
                           isComplete
                             ? 'bg-green-500 text-white'
                             : isCurrent
@@ -471,7 +471,7 @@ export default function AssigneeTaskPage({
                         {isComplete ? <Check className="w-3.5 h-3.5" /> : i + 1}
                       </div>
                       <span
-                        className={`text-sm font-medium whitespace-nowrap ${
+                        className={`text-body font-medium whitespace-nowrap ${
                           isCurrent
                             ? 'text-text-primary'
                             : isComplete
@@ -507,10 +507,10 @@ export default function AssigneeTaskPage({
                     <Lock className="w-4 h-4 text-blue-500" />
                   </div>
                   <div>
-                    <h2 className="text-sm font-semibold text-text-primary">
+                    <h2 className="text-callout text-text-primary">
                       Manager's Report
                     </h2>
-                    <p className="text-xs text-text-secondary">
+                    <p className="text-caption text-text-secondary">
                       Filled by your manager — read only
                     </p>
                   </div>
@@ -520,7 +520,7 @@ export default function AssigneeTaskPage({
               <div className="p-6 space-y-5">
                 {MOCK_MANAGER_ANSWERS.map((answer) => (
                   <div key={answer.fieldId}>
-                    <label className="flex items-center gap-2 text-sm font-medium text-text-secondary mb-1.5">
+                    <label className="flex items-center gap-2 text-headline text-text-secondary mb-1.5">
                       {answer.type === 'single-select' ? (
                         <CircleDot className="w-3.5 h-3.5 text-gray-400" />
                       ) : (
@@ -529,11 +529,11 @@ export default function AssigneeTaskPage({
                       {answer.label}
                     </label>
                     {answer.type === 'single-select' ? (
-                      <div className="h-10 px-3 flex items-center rounded-lg border border-border-light bg-gray-50 text-sm text-text-primary">
+                      <div className="h-10 px-3 flex items-center rounded-lg border border-border-light bg-gray-50 text-body text-text-primary">
                         {answer.value}
                       </div>
                     ) : (
-                      <div className="px-3 py-2.5 rounded-lg border border-border-light bg-gray-50 text-sm text-text-primary whitespace-pre-wrap min-h-[40px]">
+                      <div className="px-3 py-2.5 rounded-lg border border-border-light bg-gray-50 text-body text-text-primary whitespace-pre-wrap min-h-[40px]">
                         {answer.value}
                       </div>
                     )}
@@ -550,10 +550,10 @@ export default function AssigneeTaskPage({
                     <PenLine className="w-4 h-4 text-amber-600" />
                   </div>
                   <div>
-                    <h2 className="text-sm font-semibold text-text-primary">
+                    <h2 className="text-callout text-text-primary">
                       Employee Response
                     </h2>
-                    <p className="text-xs text-text-secondary">
+                    <p className="text-caption text-text-secondary">
                       Please review the above and answer the following questions
                     </p>
                   </div>
@@ -563,7 +563,7 @@ export default function AssigneeTaskPage({
               <div className="p-6 space-y-5">
                 {WORKER_QUESTIONS.map((question) => (
                   <div key={question.fieldId}>
-                    <label className="flex items-center gap-2 text-sm font-semibold text-text-primary mb-2">
+                    <label className="flex items-center gap-2 text-headline text-text-primary mb-2">
                       {question.type === 'single-select' ? (
                         <CircleDot className="w-3.5 h-3.5 text-gray-400" />
                       ) : (
@@ -571,7 +571,7 @@ export default function AssigneeTaskPage({
                       )}
                       {question.label}
                       {question.required && (
-                        <span className="text-red-500 text-xs">*</span>
+                        <span className="text-red-500 text-caption">*</span>
                       )}
                     </label>
 
@@ -582,7 +582,7 @@ export default function AssigneeTaskPage({
                             key={opt}
                             type="button"
                             onClick={() => setWorkerAnswer(question.fieldId, opt)}
-                            className={`flex-1 h-10 rounded-lg border text-sm font-medium transition-all ${
+                            className={`flex-1 h-10 rounded-lg border text-body font-medium transition-all ${
                               workerAnswers[question.fieldId] === opt
                                 ? 'border-primary-500 bg-primary-50 text-primary-700 ring-2 ring-primary-200'
                                 : 'border-border-light bg-white text-text-primary hover:border-gray-300 hover:bg-gray-50'
@@ -597,7 +597,7 @@ export default function AssigneeTaskPage({
                         value={workerAnswers[question.fieldId] || ''}
                         onChange={(e) => setWorkerAnswer(question.fieldId, e.target.value)}
                         placeholder="Type your response..."
-                        className="w-full px-3 py-2.5 rounded-lg border border-border bg-white text-sm text-text-primary placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none min-h-[80px]"
+                        className="w-full px-3 py-2 rounded-element border border-border bg-white text-body text-text-primary placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 resize-none min-h-[80px] transition-colors"
                       />
                     )}
                   </div>
@@ -608,7 +608,7 @@ export default function AssigneeTaskPage({
             {/* ─── Acknowledgement info ─── */}
             <div className="flex items-start gap-2.5 p-3 bg-blue-50 border border-blue-200 rounded-lg">
               <AlertTriangle className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
-              <p className="text-xs text-blue-800">
+              <p className="text-caption text-blue-800">
                 By submitting, you acknowledge that you have read the manager's report above and
                 provided your response. This will be recorded as part of your employee file.
               </p>
@@ -616,7 +616,7 @@ export default function AssigneeTaskPage({
 
             {/* ─── Submit ─── */}
             <div className="flex items-center justify-end gap-3">
-              <Button variant="outline" onClick={onBack}>
+              <Button variant="plain-gray" onClick={onBack}>
                 Cancel
               </Button>
               <Button
@@ -667,7 +667,7 @@ export default function AssigneeTaskPage({
                   }`}>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-caption font-bold ${
                           isCompleted
                             ? 'bg-green-500 text-white'
                             : isCurrent
@@ -678,14 +678,14 @@ export default function AssigneeTaskPage({
                         </div>
                         <div>
                           <div className="flex items-center gap-2">
-                            <h3 className="text-sm font-semibold text-text-primary">{step.label}</h3>
+                            <h3 className="text-callout text-text-primary">{step.label}</h3>
                             {step.managerOnly && (
-                              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-purple-100 text-purple-700 font-semibold">
+                              <span className="text-caption px-1.5 py-0.5 rounded-full bg-purple-100 text-purple-700 font-semibold">
                                 Managers only
                               </span>
                             )}
                           </div>
-                          <p className="text-xs text-text-secondary">
+                          <p className="text-caption text-text-secondary">
                             {isCompleted
                               ? `Completed by ${step.completedBy} · ${step.completedAt}`
                               : isCurrent
@@ -703,7 +703,7 @@ export default function AssigneeTaskPage({
                         </Button>
                       )}
                       {isCompleted && (
-                        <span className="inline-flex items-center gap-1.5 text-xs font-medium text-green-600 bg-green-100 px-2.5 py-1 rounded-full">
+                        <span className="inline-flex items-center gap-1.5 text-caption font-medium text-green-600 bg-green-100 px-2.5 py-1 rounded-full">
                           <CheckCircle2 className="w-3.5 h-3.5" />
                           Completed
                         </span>
@@ -716,7 +716,7 @@ export default function AssigneeTaskPage({
                     <div className="p-6 space-y-4">
                       {step.questions.map((q) => (
                         <div key={q.id}>
-                          <label className="flex items-center gap-2 text-sm font-medium text-text-secondary mb-1.5">
+                          <label className="flex items-center gap-2 text-headline text-text-secondary mb-1.5">
                             {q.type === 'rating' ? (
                               <span className="text-yellow-500">★</span>
                             ) : q.type === 'single-select' ? (
@@ -738,10 +738,10 @@ export default function AssigneeTaskPage({
                                   ★
                                 </span>
                               ))}
-                              <span className="text-xs text-text-secondary ml-2">{q.answer}/5</span>
+                              <span className="text-caption text-text-secondary ml-2">{q.answer}/5</span>
                             </div>
                           ) : (
-                            <div className="px-3 py-2.5 rounded-lg border border-border-light bg-gray-50 text-sm text-text-primary whitespace-pre-wrap min-h-[36px]">
+                            <div className="px-3 py-2.5 rounded-lg border border-border-light bg-gray-50 text-body text-text-primary whitespace-pre-wrap min-h-[36px]">
                               {q.answer}
                             </div>
                           )}
@@ -767,8 +767,8 @@ export default function AssigneeTaskPage({
                       <Check className="w-4 h-4" />
                     </div>
                     <div>
-                      <h3 className="text-sm font-semibold text-text-primary">{step.label}</h3>
-                      <p className="text-xs text-text-secondary">
+                      <h3 className="text-callout text-text-primary">{step.label}</h3>
+                      <p className="text-caption text-text-secondary">
                         Completed by {step.completedBy} · {step.completedAt}
                       </p>
                     </div>
@@ -777,7 +777,7 @@ export default function AssigneeTaskPage({
                 <div className="p-6 space-y-4">
                   {step.questions.map((q) => (
                     <div key={q.id}>
-                      <label className="flex items-center gap-2 text-sm font-medium text-text-secondary mb-1.5">
+                      <label className="flex items-center gap-2 text-headline text-text-secondary mb-1.5">
                         {q.type === 'rating' ? (
                           <span className="text-yellow-500">★</span>
                         ) : q.type === 'single-select' ? (
@@ -799,10 +799,10 @@ export default function AssigneeTaskPage({
                               ★
                             </span>
                           ))}
-                          <span className="text-xs text-text-secondary ml-2">{q.answer}/5</span>
+                          <span className="text-caption text-text-secondary ml-2">{q.answer}/5</span>
                         </div>
                       ) : (
-                        <div className="px-3 py-2.5 rounded-lg border border-border-light bg-gray-50 text-sm text-text-primary whitespace-pre-wrap min-h-[36px]">
+                        <div className="px-3 py-2.5 rounded-lg border border-border-light bg-gray-50 text-body text-text-primary whitespace-pre-wrap min-h-[36px]">
                           {q.answer}
                         </div>
                       )}
@@ -820,10 +820,10 @@ export default function AssigneeTaskPage({
                     <PenLine className="w-4 h-4 text-primary-600" />
                   </div>
                   <div>
-                    <h2 className="text-sm font-semibold text-text-primary">
+                    <h2 className="text-callout text-text-primary">
                       {currentWorkflowStep.label}
                     </h2>
-                    <p className="text-xs text-text-secondary">
+                    <p className="text-caption text-text-secondary">
                       Fill out the questions below
                     </p>
                   </div>
@@ -833,7 +833,7 @@ export default function AssigneeTaskPage({
               <div className="p-6 space-y-5">
                 {currentWorkflowStep.questions.map((question) => (
                   <div key={question.id}>
-                    <label className="flex items-center gap-2 text-sm font-semibold text-text-primary mb-2">
+                    <label className="flex items-center gap-2 text-headline text-text-primary mb-2">
                       {question.type === 'rating' ? (
                         <span className="text-yellow-500 text-base">★</span>
                       ) : question.type === 'single-select' ? (
@@ -842,7 +842,7 @@ export default function AssigneeTaskPage({
                         <AlignLeft className="w-3.5 h-3.5 text-gray-400" />
                       )}
                       {question.label}
-                      {question.required && <span className="text-red-500 text-xs">*</span>}
+                      {question.required && <span className="text-red-500 text-caption">*</span>}
                     </label>
 
                     {question.type === 'rating' ? (
@@ -864,7 +864,7 @@ export default function AssigneeTaskPage({
                           </button>
                         ))}
                         {customFormAnswers[question.id] && (
-                          <span className="text-xs text-text-secondary ml-2">{customFormAnswers[question.id]}/5</span>
+                          <span className="text-caption text-text-secondary ml-2">{customFormAnswers[question.id]}/5</span>
                         )}
                       </div>
                     ) : question.type === 'single-select' && question.options ? (
@@ -874,7 +874,7 @@ export default function AssigneeTaskPage({
                             key={opt}
                             type="button"
                             onClick={() => setCustomFormAnswer(question.id, opt)}
-                            className={`px-4 h-10 rounded-lg border text-sm font-medium transition-all ${
+                            className={`px-4 h-10 rounded-lg border text-body font-medium transition-all ${
                               customFormAnswers[question.id] === opt
                                 ? 'border-primary-500 bg-primary-50 text-primary-700 ring-2 ring-primary-200'
                                 : 'border-border-light bg-white text-text-primary hover:border-gray-300 hover:bg-gray-50'
@@ -889,7 +889,7 @@ export default function AssigneeTaskPage({
                         value={customFormAnswers[question.id] || ''}
                         onChange={(e) => setCustomFormAnswer(question.id, e.target.value)}
                         placeholder="Type your response..."
-                        className="w-full px-3 py-2.5 rounded-lg border border-border bg-white text-sm text-text-primary placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none min-h-[80px]"
+                        className="w-full px-3 py-2 rounded-element border border-border bg-white text-body text-text-primary placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 resize-none min-h-[80px] transition-colors"
                       />
                     )}
                   </div>
@@ -899,7 +899,7 @@ export default function AssigneeTaskPage({
 
             {/* Submit */}
             <div className="flex items-center justify-between">
-              <Button variant="outline" onClick={() => setCustomFormStep('overview')}>
+              <Button variant="plain-gray" onClick={() => setCustomFormStep('overview')}>
                 Back to Overview
               </Button>
               <Button
@@ -919,8 +919,8 @@ export default function AssigneeTaskPage({
             <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
               <CheckCircle2 className="w-8 h-8 text-green-500" />
             </div>
-            <h2 className="text-xl font-bold text-text-primary mb-2">Step Submitted!</h2>
-            <p className="text-sm text-text-secondary mb-6 max-w-md mx-auto">
+            <h2 className="text-title-4 text-text-primary mb-2">Step Submitted!</h2>
+            <p className="text-body text-text-secondary mb-6 max-w-md mx-auto">
               Your "{currentWorkflowStep?.label}" responses have been recorded.
               {MOCK_CUSTOM_FORM_STEPS.some(s => s.status === 'pending')
                 ? ' The next step will be sent to the assigned recipient.'
@@ -988,7 +988,7 @@ export default function AssigneeTaskPage({
         >
           <div className="relative max-w-4xl max-h-[90vh]">
             <button
-              className="absolute -top-3 -right-3 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-lg hover:bg-gray-100"
+              className="absolute -top-3 -right-3 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-lg hover:bg-gray-50"
               onClick={() => setIsImageExpanded(false)}
             >
               <X className="w-4 h-4" />
@@ -1026,16 +1026,16 @@ function WriteUpSubmittedView({
           <CheckCircle2 className="w-8 h-8 text-green-500" />
         </div>
         <h2 className="text-xl font-bold text-text-primary">Write-Up Acknowledged</h2>
-        <p className="text-sm text-text-secondary">
+        <p className="text-body text-text-secondary">
           Your response has been recorded. This write-up is now part of your employee file.
         </p>
 
         <div className="w-full mt-4 p-4 bg-gray-50 rounded-lg text-left space-y-3">
-          <div className="flex items-center justify-between text-sm">
+          <div className="flex items-center justify-between text-body">
             <span className="text-text-secondary">Document</span>
             <span className="font-medium text-text-primary">{documentName}</span>
           </div>
-          <div className="flex items-center justify-between text-sm">
+          <div className="flex items-center justify-between text-body">
             <span className="text-text-secondary">Employee</span>
             <span className="font-medium text-text-primary">{recipient.name}</span>
           </div>
@@ -1043,13 +1043,13 @@ function WriteUpSubmittedView({
             const val = workerAnswers[q.fieldId]
             if (!val) return null
             return (
-              <div key={q.fieldId} className="text-sm">
+              <div key={q.fieldId} className="text-body">
                 <span className="text-text-secondary block mb-0.5">{q.label}</span>
                 <span className="font-medium text-text-primary">{val}</span>
               </div>
             )
           })}
-          <div className="flex items-center justify-between text-sm pt-2 border-t border-border-light">
+          <div className="flex items-center justify-between text-body pt-2 border-t border-border-light">
             <span className="text-text-secondary">Status</span>
             <span className="inline-flex items-center gap-1.5 font-medium text-green-600">
               <CheckCircle2 className="w-3.5 h-3.5" />
@@ -1058,7 +1058,7 @@ function WriteUpSubmittedView({
           </div>
         </div>
 
-        <Button variant="outline" onClick={onBack} className="mt-4">
+        <Button variant="plain-gray" onClick={onBack} className="mt-4">
           Back to document
         </Button>
       </div>
@@ -1084,8 +1084,8 @@ function CertUploadStep({
 }) {
   return (
     <div className="bg-white rounded-xl border border-border-light p-6">
-      <h2 className="text-base font-semibold text-text-primary mb-1">Upload your certificate</h2>
-      <p className="text-sm text-text-secondary mb-6">
+      <h2 className="text-callout text-text-primary mb-1">Upload your certificate</h2>
+      <p className="text-body text-text-secondary mb-6">
         Take a photo or upload an image of your certificate. We'll automatically extract the key
         information from it.
       </p>
@@ -1105,10 +1105,10 @@ function CertUploadStep({
             <Upload className="w-8 h-8 text-blue-500" />
           </div>
           <div>
-            <p className="text-sm font-medium text-text-primary mb-1">
+            <p className="text-headline text-text-primary mb-1">
               Drag and drop your certificate here
             </p>
-            <p className="text-xs text-text-secondary">PNG, JPG, or PDF up to 10MB</p>
+            <p className="text-caption text-text-secondary">PNG, JPG, or PDF up to 10MB</p>
           </div>
           <div className="flex items-center gap-3">
             <label className="cursor-pointer">
@@ -1121,12 +1121,12 @@ function CertUploadStep({
                   if (file) onFileSelect(file)
                 }}
               />
-              <span className="inline-flex items-center gap-2 px-4 py-2.5 bg-primary-500 text-white rounded-lg text-sm font-medium hover:bg-primary-600 transition-colors">
+              <span className="inline-flex items-center gap-2 px-4 py-2.5 bg-primary-500 text-white rounded-lg text-body font-medium hover:bg-primary-600 transition-colors">
                 <Upload className="w-4 h-4" />
                 Browse files
               </span>
             </label>
-            <span className="text-xs text-text-secondary">or</span>
+            <span className="text-caption text-text-secondary">or</span>
             <button
               type="button"
               onClick={() => {
@@ -1135,7 +1135,7 @@ function CertUploadStep({
                 })
                 onFileSelect(mockFile)
               }}
-              className="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-border rounded-lg text-sm font-medium text-text-primary hover:bg-gray-50 transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-border rounded-lg text-body font-medium text-text-primary hover:bg-gray-50 transition-colors"
             >
               <Camera className="w-4 h-4" />
               Take photo
@@ -1146,8 +1146,8 @@ function CertUploadStep({
 
       <div className="mt-4 flex items-start gap-2.5 p-3 bg-blue-50 border border-blue-200 rounded-lg">
         <AlertTriangle className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
-        <div className="text-xs text-blue-800 space-y-0.5">
-          <p className="font-medium">Tips for best results:</p>
+        <div className="text-caption text-blue-800 space-y-0.5">
+          <p className="text-caption font-medium">Tips for best results:</p>
           <ul className="list-disc list-inside space-y-0.5 text-blue-700">
             <li>Make sure the entire document is visible and in focus</li>
             <li>Avoid glare and shadows on the document</li>
@@ -1173,10 +1173,10 @@ function ScanningOverlay() {
           <Loader2 className="absolute -top-1 -right-1 w-6 h-6 text-primary-500 animate-spin" />
         </div>
         <div>
-          <p className="text-base font-semibold text-text-primary mb-1">
+          <p className="text-headline text-text-primary mb-1">
             Scanning your document...
           </p>
-          <p className="text-sm text-text-secondary">
+          <p className="text-body text-text-secondary">
             Extracting certificate details and expiration date via OCR
           </p>
         </div>
@@ -1236,8 +1236,8 @@ function CertReviewStep({
       {/* Document preview */}
       <div className="bg-white rounded-xl border border-border-light p-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-base font-semibold text-text-primary">Uploaded Document</h2>
-          <Button variant="ghost" size="sm" onClick={onReUpload}>
+          <h2 className="text-callout text-text-primary">Uploaded Document</h2>
+          <Button variant="clear" size="sm" onClick={onReUpload}>
             Re-upload
           </Button>
         </div>
@@ -1261,15 +1261,15 @@ function CertReviewStep({
                 }`}
               >
                 <FileText className="w-12 h-12 text-gray-400 mb-2" />
-                <p className="text-sm font-medium text-gray-500">
+                <p className="text-headline text-gray-500">
                   {uploadedFile?.name || 'certificate.jpg'}
                 </p>
-                <p className="text-xs text-gray-400 mt-1">Click to expand</p>
+                <p className="text-caption text-gray-400 mt-1">Click to expand</p>
               </div>
             )}
           </div>
           {ocrResult && (
-            <div className="absolute top-3 right-3 flex items-center gap-1.5 bg-green-500 text-white text-xs font-medium px-2.5 py-1 rounded-full shadow-sm">
+            <div className="absolute top-3 right-3 flex items-center gap-1.5 bg-green-500 text-white text-caption font-medium px-2.5 py-1 rounded-full shadow-sm">
               <ScanLine className="w-3 h-3" />
               {ocrResult.confidence}% confidence
             </div>
@@ -1284,8 +1284,8 @@ function CertReviewStep({
             <CheckCircle2 className="w-4 h-4 text-green-600" />
           </div>
           <div>
-            <h2 className="text-base font-semibold text-text-primary">Extracted Information</h2>
-            <p className="text-xs text-text-secondary">
+            <h2 className="text-callout text-text-primary">Extracted Information</h2>
+            <p className="text-caption text-text-secondary">
               Please verify the information below is correct. Edit any fields if needed.
             </p>
           </div>
@@ -1334,7 +1334,7 @@ function CertReviewStep({
         </div>
         <div className="mt-4 flex items-start gap-2.5 p-3 bg-amber-50 border border-amber-200 rounded-lg">
           <AlertTriangle className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />
-          <p className="text-xs text-amber-800">
+          <p className="text-caption text-amber-800">
             These fields were auto-filled by scanning your document. Please double-check that all
             information is accurate before submitting. Your manager will verify the submission.
           </p>
@@ -1343,11 +1343,11 @@ function CertReviewStep({
 
       {/* Submit */}
       <div className="flex items-center justify-between bg-white rounded-xl border border-border-light p-6">
-        <p className="text-sm text-text-secondary">
+        <p className="text-body text-text-secondary">
           By submitting, you confirm that the above information is accurate.
         </p>
         <div className="flex items-center gap-3">
-          <Button variant="outline" onClick={onReUpload}>
+          <Button variant="plain-gray" onClick={onReUpload}>
             Start Over
           </Button>
           <Button
@@ -1385,29 +1385,29 @@ function CertSubmittedView({
         <div className="w-16 h-16 rounded-2xl bg-green-50 flex items-center justify-center">
           <CheckCircle2 className="w-8 h-8 text-green-500" />
         </div>
-        <h2 className="text-xl font-bold text-text-primary">Certificate Submitted!</h2>
-        <p className="text-sm text-text-secondary">
+        <h2 className="text-title-4 text-text-primary">Certificate Submitted!</h2>
+        <p className="text-body text-text-secondary">
           Your certificate has been submitted for manager verification. You'll be notified once it's
           been reviewed and approved.
         </p>
         <div className="w-full mt-4 p-4 bg-gray-50 rounded-lg text-left space-y-2">
-          <div className="flex items-center justify-between text-sm">
+          <div className="flex items-center justify-between text-body">
             <span className="text-text-secondary">Document</span>
             <span className="font-medium text-text-primary">{documentName}</span>
           </div>
-          <div className="flex items-center justify-between text-sm">
+          <div className="flex items-center justify-between text-body">
             <span className="text-text-secondary">Holder</span>
             <span className="font-medium text-text-primary">{certificateHolder}</span>
           </div>
-          <div className="flex items-center justify-between text-sm">
+          <div className="flex items-center justify-between text-body">
             <span className="text-text-secondary">Certificate #</span>
             <span className="font-medium text-text-primary">{certificateNumber}</span>
           </div>
-          <div className="flex items-center justify-between text-sm">
+          <div className="flex items-center justify-between text-body">
             <span className="text-text-secondary">Expiration</span>
             <span className="font-medium text-text-primary">{expirationDate}</span>
           </div>
-          <div className="flex items-center justify-between text-sm">
+          <div className="flex items-center justify-between text-body">
             <span className="text-text-secondary">Status</span>
             <span className="inline-flex items-center gap-1.5 font-medium text-purple-600">
               <Loader2 className="w-3 h-3" />
@@ -1415,7 +1415,7 @@ function CertSubmittedView({
             </span>
           </div>
         </div>
-        <Button variant="outline" onClick={onBack} className="mt-4">
+        <Button variant="plain-gray" onClick={onBack} className="mt-4">
           Back to document
         </Button>
       </div>
@@ -1445,7 +1445,7 @@ function FieldInput({
 }) {
   return (
     <div>
-      <label className="flex items-center gap-2 text-sm font-semibold text-text-primary mb-2">
+                    <label className="flex items-center gap-2 text-headline text-text-primary mb-2">
         {icon}
         {label}
         {ocrDetected && (
@@ -1458,7 +1458,7 @@ function FieldInput({
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className={`w-full h-10 px-3 rounded-lg border text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors ${
+        className={`w-full h-10 px-3 rounded-lg border text-body text-text-primary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors ${
           highlighted ? 'border-green-300 bg-green-50/50' : 'border-border bg-white'
         }`}
       />

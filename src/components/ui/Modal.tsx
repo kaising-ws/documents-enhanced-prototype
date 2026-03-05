@@ -45,33 +45,31 @@ export default function Modal({
   if (!isOpen) return null
 
   const sizes = {
-    sm: 'max-w-md',
-    md: 'max-w-lg',
-    lg: 'max-w-2xl',
+    sm: 'max-w-[640px]',
+    md: 'max-w-[800px]',
+    lg: 'max-w-[960px]',
     xl: 'max-w-4xl',
     full: 'max-w-[95vw]',
   }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/50"
+        className="absolute inset-0 bg-black/40"
         onClick={onClose}
       />
 
-      {/* Modal */}
       <div
         className={`relative bg-white rounded-container shadow-modal w-full ${sizes[size]} mx-4 max-h-[90vh] flex flex-col`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-border-light">
-          <h2 className="text-lg font-bold text-text-primary">{title}</h2>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border-light shrink-0">
+          <h2 className="text-title-4 text-text-primary">{title}</h2>
           <button
             onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
+            className="w-8 h-8 flex items-center justify-center rounded-element hover:bg-gray-50 transition-colors"
           >
-            <X className="w-5 h-5 text-gray-500" />
+            <X className="w-5 h-5 text-text-secondary" />
           </button>
         </div>
 
@@ -80,7 +78,7 @@ export default function Modal({
 
         {/* Footer */}
         {footer && (
-          <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-border-light">
+          <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-border-light shrink-0">
             {footer}
           </div>
         )}
@@ -88,4 +86,3 @@ export default function Modal({
     </div>
   )
 }
-

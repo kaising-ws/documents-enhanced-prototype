@@ -115,12 +115,12 @@ export default function WriteUpHistorySection({
     return (
       <div className="bg-white rounded-container border border-border-light p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-semibold text-text-primary">Write-up History</h3>
+          <h3 className="text-headline text-text-primary">Write-up History</h3>
         </div>
         <div className="text-center py-8">
           <FileText className="w-10 h-10 text-gray-300 mx-auto mb-3" />
-          <p className="text-sm text-text-secondary">No write-ups on record</p>
-          <p className="text-xs text-text-placeholder mt-1">
+          <p className="text-body text-text-secondary">No write-ups on record</p>
+          <p className="text-caption text-text-placeholder mt-1">
             {employeeName.split(' ')[0]} has a clean record
           </p>
         </div>
@@ -140,8 +140,8 @@ export default function WriteUpHistorySection({
             <FileText className="w-5 h-5 text-amber-600" />
           </div>
           <div className="text-left">
-            <h3 className="text-sm font-semibold text-text-primary">Write-up History</h3>
-            <p className="text-xs text-text-secondary">
+            <h3 className="text-headline text-text-primary">Write-up History</h3>
+            <p className="text-caption text-text-secondary">
               {stats.total} record{stats.total !== 1 ? 's' : ''} · {stats.warnings} warning{stats.warnings !== 1 ? 's' : ''} · {stats.recognitions} recognition{stats.recognitions !== 1 ? 's' : ''}
             </p>
           </div>
@@ -149,7 +149,7 @@ export default function WriteUpHistorySection({
         <div className="flex items-center gap-3">
           {/* Point Balance Badge */}
           {pointBalance !== 0 && (
-            <div className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-semibold ${
+            <div className={`flex items-center gap-1 px-2 py-1 rounded text-callout ${
               pointBalance > 0 
                 ? 'bg-red-100 text-red-700' 
                 : 'bg-green-100 text-green-700'
@@ -163,7 +163,7 @@ export default function WriteUpHistorySection({
             </div>
           )}
           {stats.pending > 0 && (
-            <span className="px-2 py-1 bg-amber-100 text-amber-700 rounded text-xs font-medium">
+            <span className="px-2 py-1 bg-amber-100 text-amber-700 rounded text-caption font-medium">
               {stats.pending} pending
             </span>
           )}
@@ -201,17 +201,17 @@ export default function WriteUpHistorySection({
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2">
                         <div>
-                          <p className="text-sm font-medium text-text-primary">{writeUp.title}</p>
+                          <p className="text-body font-medium text-text-primary">{writeUp.title}</p>
                           <div className="flex items-center gap-2 mt-1">
-                            <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-xs font-medium ${status.bgColor} ${status.color}`}>
+                            <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-caption font-medium ${status.bgColor} ${status.color}`}>
                               {status.icon}
                               {status.label}
                             </span>
-                            <span className="text-xs text-text-secondary">
+                            <span className="text-caption text-text-secondary">
                               {formatDate(writeUp.incidentDate)}
                             </span>
                             {writeUp.points && writeUp.points > 0 && (
-                              <span className="text-xs text-red-600 font-medium">
+                              <span className="text-caption text-red-600 font-medium">
                                 +{writeUp.points} pts
                               </span>
                             )}
@@ -246,18 +246,18 @@ export default function WriteUpHistorySection({
                       </div>
                       
                       {/* Description Preview */}
-                      <p className="text-xs text-text-secondary mt-2 line-clamp-2">
+                      <p className="text-caption text-text-secondary mt-2 line-clamp-2">
                         {writeUp.description}
                       </p>
                       
                       {/* Signatures */}
                       <div className="flex items-center gap-4 mt-2 pt-2 border-t border-current border-opacity-10">
-                        <div className="flex items-center gap-1 text-xs text-text-secondary">
+                        <div className="flex items-center gap-1 text-caption text-text-secondary">
                           <CheckCircle2 className="w-3 h-3 text-green-500" />
                           <span>Issued by {writeUp.managerSignature.signedBy}</span>
                         </div>
                         {writeUp.employeeSignature ? (
-                          <div className="flex items-center gap-1 text-xs">
+                          <div className="flex items-center gap-1 text-caption">
                             {writeUp.employeeSignature.declined ? (
                               <>
                                 <XCircle className="w-3 h-3 text-red-500" />
@@ -271,7 +271,7 @@ export default function WriteUpHistorySection({
                             )}
                           </div>
                         ) : writeUp.status === 'sent' ? (
-                          <div className="flex items-center gap-1 text-xs text-amber-600">
+                          <div className="flex items-center gap-1 text-caption text-amber-600">
                             <Clock className="w-3 h-3" />
                             <span>Awaiting acknowledgement</span>
                           </div>
@@ -288,7 +288,7 @@ export default function WriteUpHistorySection({
           {sortedWriteUps.length > 3 && (
             <div className="px-4 pb-4">
               <Button
-                variant="ghost"
+                variant="clear"
                 size="sm"
                 onClick={() => setShowAll(!showAll)}
                 className="w-full"

@@ -139,7 +139,7 @@ export default function AssignDocumentModal({
     <div className="space-y-5">
       {/* Quick select by location */}
       <div>
-        <label className="block text-sm font-semibold text-text-primary mb-2">
+        <label className="block text-headline text-text-primary mb-2">
           <MapPin className="w-4 h-4 inline mr-1" />
           Select by Location
         </label>
@@ -151,10 +151,10 @@ export default function AssignDocumentModal({
               <button
                 key={loc.id}
                 onClick={() => handleSelectByLocation(loc.name)}
-                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                className={`px-3 py-1.5 rounded-full text-caption font-medium transition-colors ${
                   allSelected
                     ? 'bg-primary-500 text-white'
-                    : 'bg-gray-100 text-text-primary hover:bg-gray-200'
+                    : 'bg-gray-100 text-text-primary hover:bg-gray-50'
                 }`}
               >
                 {loc.name} ({membersAtLoc.length})
@@ -166,7 +166,7 @@ export default function AssignDocumentModal({
 
       {/* Quick select by role */}
       <div>
-        <label className="block text-sm font-semibold text-text-primary mb-2">
+        <label className="block text-headline text-text-primary mb-2">
           <Users className="w-4 h-4 inline mr-1" />
           Select by Role
         </label>
@@ -179,10 +179,10 @@ export default function AssignDocumentModal({
               <button
                 key={role}
                 onClick={() => handleSelectByRole(role)}
-                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                className={`px-3 py-1.5 rounded-full text-caption font-medium transition-colors ${
                   allSelected
                     ? 'bg-primary-500 text-white'
-                    : 'bg-gray-100 text-text-primary hover:bg-gray-200'
+                    : 'bg-gray-100 text-text-primary hover:bg-gray-50'
                 }`}
               >
                 {role} ({membersWithRole.length})
@@ -195,10 +195,10 @@ export default function AssignDocumentModal({
       {/* Search & member list */}
       <div>
         <div className="flex items-center justify-between mb-2">
-          <label className="block text-sm font-semibold text-text-primary">
+          <label className="block text-headline text-text-primary">
             Select Recipients
           </label>
-          <button onClick={handleSelectAll} className="text-xs text-primary-500 hover:underline font-medium">
+          <button onClick={handleSelectAll} className="text-caption text-primary-500 hover:underline font-medium">
             {selectedMembers.length === filteredMembers.length ? 'Deselect All' : 'Select All'}
           </button>
         </div>
@@ -211,7 +211,7 @@ export default function AssignDocumentModal({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search by name, role, or location..."
-            className="w-full h-10 pl-10 pr-3 rounded-element border border-border bg-white text-sm text-text-primary placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            className="w-full h-10 pl-10 pr-3 rounded-element border border-border bg-white text-body text-text-primary placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
           />
         </div>
 
@@ -226,18 +226,18 @@ export default function AssignDocumentModal({
                 onChange={() => handleToggleMember(member.id)}
               />
               <div className="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center flex-shrink-0">
-                <span className="text-xs font-semibold text-white">{member.initials}</span>
+                <span className="text-callout text-white">{member.initials}</span>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-text-primary">{member.name}</p>
-                <p className="text-xs text-text-secondary">
+                <p className="text-body font-medium text-text-primary">{member.name}</p>
+                <p className="text-caption text-text-secondary">
                   {member.role} · {member.location}
                 </p>
               </div>
             </label>
           ))}
           {filteredMembers.length === 0 && (
-            <div className="p-4 text-center text-sm text-text-secondary">No employees found</div>
+            <div className="p-4 text-center text-body text-text-secondary">No employees found</div>
           )}
         </div>
       </div>
@@ -245,11 +245,11 @@ export default function AssignDocumentModal({
       {/* Selection summary */}
       {selectedMembers.length > 0 && (
         <div className="bg-primary-50 border border-primary-200 rounded-element p-3">
-          <p className="text-sm text-primary-800 font-medium">
+          <p className="text-body text-primary-800 font-medium">
             {selectedMembers.length} recipient{selectedMembers.length !== 1 ? 's' : ''} selected
           </p>
           {getLocationSummary() && (
-            <p className="text-xs text-primary-600 mt-1">{getLocationSummary()}</p>
+            <p className="text-caption text-primary-600 mt-1">{getLocationSummary()}</p>
           )}
         </div>
       )}
@@ -263,25 +263,25 @@ export default function AssignDocumentModal({
       <div className="space-y-5">
         {/* Document info */}
         <div className="bg-gray-50 rounded-element p-4">
-          <p className="text-xs text-text-secondary uppercase tracking-wider mb-1">Document</p>
-          <p className="text-sm font-semibold text-text-primary">{document?.name}</p>
-          <p className="text-xs text-text-secondary mt-0.5">{document?.type}</p>
+          <p className="text-caption text-text-secondary uppercase tracking-wider mb-1">Document</p>
+          <p className="text-headline text-text-primary">{document?.name}</p>
+          <p className="text-caption text-text-secondary mt-0.5">{document?.type}</p>
         </div>
 
         {/* Recipients */}
         <div>
-          <p className="text-sm font-semibold text-text-primary mb-2">
+          <p className="text-headline text-text-primary mb-2">
             Recipients ({selectedMemberDetails.length})
           </p>
           <div className="border border-border-light rounded-element max-h-[200px] overflow-y-auto divide-y divide-border-light">
             {selectedMemberDetails.map((member) => (
               <div key={member.id} className="flex items-center gap-3 p-3">
                 <div className="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center flex-shrink-0">
-                  <span className="text-xs font-semibold text-white">{member.initials}</span>
+                  <span className="text-callout text-white">{member.initials}</span>
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-text-primary">{member.name}</p>
-                  <p className="text-xs text-text-secondary">
+                  <p className="text-body font-medium text-text-primary">{member.name}</p>
+                  <p className="text-caption text-text-secondary">
                     {member.role} · {member.location}
                   </p>
                 </div>
@@ -292,7 +292,7 @@ export default function AssignDocumentModal({
 
         {/* Due date */}
         <div>
-          <label className="block text-sm font-semibold text-text-primary mb-2">
+          <label className="block text-headline text-text-primary mb-2">
             Due Date (optional)
           </label>
           <input
@@ -300,28 +300,28 @@ export default function AssignDocumentModal({
             value={dueDate}
             onChange={(e) => setDueDate(e.target.value)}
             min={new Date().toISOString().split('T')[0]}
-            className="w-full h-10 px-3 rounded-element border border-border bg-white text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            className="w-full h-10 px-3 rounded-element border border-border bg-white text-body text-text-primary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
           />
         </div>
 
         {/* Custom message */}
         <div>
-          <label className="block text-sm font-semibold text-text-primary mb-2">
+          <label className="block text-headline text-text-primary mb-2">
             Message (optional)
           </label>
           <textarea
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             placeholder="Add a note to recipients..."
-            className="w-full h-20 px-3 py-2 rounded-element border border-border bg-white text-sm text-text-primary placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
+            className="w-full h-20 px-3 py-2 rounded-element border border-border bg-white text-body text-text-primary placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 resize-none"
           />
         </div>
 
         {/* Notification toggle */}
         <div className="flex items-center justify-between p-3 bg-gray-50 rounded-element">
           <div>
-            <p className="text-sm font-medium text-text-primary">Send notification</p>
-            <p className="text-xs text-text-secondary">
+            <p className="text-body font-medium text-text-primary">Send notification</p>
+            <p className="text-caption text-text-secondary">
               Recipients will be notified via email and push notification
             </p>
           </div>
@@ -344,7 +344,7 @@ export default function AssignDocumentModal({
         <div className="bg-blue-50 border border-blue-200 rounded-element p-4">
           <div className="flex items-start gap-2">
             <AlertTriangle className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
-            <p className="text-sm text-blue-800">
+            <p className="text-body text-blue-800">
               This will send <strong>{document?.name}</strong> to{' '}
               <strong>
                 {selectedMemberDetails.length} employee{selectedMemberDetails.length !== 1 ? 's' : ''}
@@ -366,7 +366,7 @@ export default function AssignDocumentModal({
       size="xl"
       footer={
         <div className="flex items-center justify-between w-full">
-          <Button variant="ghost" onClick={step === 'review' ? () => setStep('select') : handleClose}>
+          <Button variant="clear" onClick={step === 'review' ? () => setStep('select') : handleClose}>
             {step === 'review' ? 'Back' : 'Cancel'}
           </Button>
           <div className="flex items-center gap-3">

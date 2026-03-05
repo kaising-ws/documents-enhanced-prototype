@@ -77,7 +77,7 @@ export default function DocumentTypeSelector({
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="" size="xl">
       <div className="pb-2">
-        <h2 className="text-xl font-bold text-text-primary mb-8">
+        <h2 className="text-title-4 text-text-primary mb-8">
           What would you like to create?
         </h2>
 
@@ -101,7 +101,7 @@ export default function DocumentTypeSelector({
               </h3>
 
               {/* Description */}
-              <p className="text-sm text-text-secondary leading-relaxed">
+              <p className="text-body text-text-secondary leading-relaxed">
                 {option.description}
               </p>
 

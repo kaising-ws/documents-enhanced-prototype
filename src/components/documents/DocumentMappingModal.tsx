@@ -94,10 +94,10 @@ export default function DocumentMappingModal({
           {/* Header */}
           <div className="p-4 border-b border-border-light bg-white">
             <div className="flex items-center justify-between mb-1">
-              <h2 className="text-lg font-bold text-text-primary">Map Document</h2>
+              <h2 className="text-title-4 text-text-primary">Map Document</h2>
               <button
                 onClick={onClose}
-                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
+                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-50 transition-colors"
               >
                 <X className="w-5 h-5 text-gray-500" />
               </button>
@@ -107,7 +107,7 @@ export default function DocumentMappingModal({
 
           {/* Signer Selection */}
           <div className="p-4 border-b border-border-light">
-            <label className="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-3">
+            <label className="block text-callout text-text-secondary uppercase tracking-wider mb-3">
               Adding fields for
             </label>
             <div className="space-y-2">
@@ -126,7 +126,7 @@ export default function DocumentMappingModal({
                 </div>
                 <div className="text-left">
                   <p className="text-sm font-medium text-text-primary">Team Member</p>
-                  <p className="text-xs text-text-secondary">Employee signer</p>
+                  <p className="text-caption text-text-secondary">Employee signer</p>
                 </div>
               </button>
               <button
@@ -144,7 +144,7 @@ export default function DocumentMappingModal({
                 </div>
                 <div className="text-left">
                   <p className="text-sm font-medium text-text-primary">Company</p>
-                  <p className="text-xs text-text-secondary">Manager/Admin signer</p>
+                  <p className="text-caption text-text-secondary">Manager/Admin signer</p>
                 </div>
               </button>
             </div>
@@ -152,7 +152,7 @@ export default function DocumentMappingModal({
 
           {/* Field Types */}
           <div className="p-4 flex-1 overflow-auto">
-            <label className="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-3">
+            <label className="block text-callout text-text-secondary uppercase tracking-wider mb-3">
               Drag fields to document
             </label>
             <div className="space-y-2">
@@ -174,7 +174,7 @@ export default function DocumentMappingModal({
           {/* Added Fields List */}
           {fields.length > 0 && (
             <div className="p-4 border-t border-border-light">
-              <label className="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-3">
+              <label className="block text-callout text-text-secondary uppercase tracking-wider mb-3">
                 Added Fields ({fields.length})
               </label>
               <div className="space-y-2 max-h-40 overflow-auto">
@@ -189,11 +189,11 @@ export default function DocumentMappingModal({
                       }`}>
                         {field.icon}
                       </div>
-                      <span className="text-xs font-medium text-text-primary">{field.label}</span>
+                      <span className="text-caption font-medium text-text-primary">{field.label}</span>
                     </div>
                     <button
                       onClick={() => handleRemoveField(field.id)}
-                      className="w-6 h-6 flex items-center justify-center rounded hover:bg-gray-100 transition-colors"
+                      className="w-6 h-6 flex items-center justify-center rounded hover:bg-gray-50 transition-colors"
                     >
                       <Trash2 className="w-3 h-3 text-gray-400" />
                     </button>
@@ -206,7 +206,7 @@ export default function DocumentMappingModal({
           {/* Footer */}
           <div className="p-4 border-t border-border-light bg-white">
             <div className="flex gap-3">
-              <Button variant="outline" onClick={onClose} className="flex-1">
+              <Button variant="plain-gray" onClick={onClose} className="flex-1">
                 Cancel
               </Button>
               <Button onClick={handleSave} className="flex-1">
@@ -257,17 +257,17 @@ export default function DocumentMappingModal({
 
                   {/* Signature area hint */}
                   <div className="pt-12 mt-12 border-t border-dashed border-gray-300">
-                    <p className="text-xs text-gray-400 text-center mb-8">
+                    <p className="text-caption text-gray-400 text-center mb-8">
                       Click on the document to place fields, or drag them from the sidebar
                     </p>
                     <div className="flex justify-between">
                       <div className="text-center">
                         <div className="w-48 border-b border-gray-300 mb-2" />
-                        <p className="text-xs text-gray-500">Team Member Signature</p>
+                        <p className="text-caption text-gray-500">Team Member Signature</p>
                       </div>
                       <div className="text-center">
                         <div className="w-48 border-b border-gray-300 mb-2" />
-                        <p className="text-xs text-gray-500">Date</p>
+                        <p className="text-caption text-gray-500">Date</p>
                       </div>
                     </div>
                   </div>
@@ -293,7 +293,7 @@ export default function DocumentMappingModal({
                   }`}>
                     <GripVertical className="w-3 h-3 opacity-50" />
                     {field.icon}
-                    <span className="text-xs font-medium">{field.label}</span>
+                    <span className="text-caption font-medium">{field.label}</span>
                     <button
                       onClick={(e) => {
                         e.stopPropagation()

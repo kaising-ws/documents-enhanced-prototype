@@ -183,7 +183,7 @@ export const documentTemplates: DocumentTemplate[] = [
   // ─── Signing ───
   {
     id: '1',
-    name: 'PIPL_consent_form.pdf',
+    name: 'PIPL Consent Form',
     category: 'signing',
     type: 'Payroll',
     trackingMode: 'progress',
@@ -193,7 +193,7 @@ export const documentTemplates: DocumentTemplate[] = [
   },
   {
     id: '2',
-    name: 'Contract.pdf',
+    name: 'Employment Contract',
     category: 'signing',
     type: 'Onboarding',
     trackingMode: 'progress',
@@ -203,7 +203,7 @@ export const documentTemplates: DocumentTemplate[] = [
   },
   {
     id: '3',
-    name: 'VFS_consent_form.pdf',
+    name: 'VFS Consent Form',
     category: 'signing',
     type: 'Onboarding',
     trackingMode: 'progress',
@@ -213,7 +213,7 @@ export const documentTemplates: DocumentTemplate[] = [
   },
   {
     id: '5',
-    name: 'Employee_Handbook_2024.pdf',
+    name: 'Employee Handbook 2024',
     category: 'signing',
     type: 'Onboarding',
     trackingMode: 'progress',

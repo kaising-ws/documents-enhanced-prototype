@@ -60,7 +60,7 @@ export default function MultiSelectDropdown({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center justify-between w-full h-10 px-3 rounded-element border border-border bg-white text-sm text-text-primary hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500"
+        className="flex items-center justify-between w-full h-10 px-3 rounded-element border border-border bg-white text-body text-text-primary hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-colors"
       >
         <span className={selected.length === 0 ? 'text-text-placeholder' : ''}>
           {selected.length === 0
@@ -68,88 +68,94 @@ export default function MultiSelectDropdown({
             : `${selected.length} selected`}
         </span>
         <ChevronDown
-          className={`w-4 h-4 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+          className={`w-[10px] h-[6px] text-text-secondary transition-transform ${isOpen ? 'rotate-180' : ''}`}
         />
       </button>
 
       {isOpen && (
-        <div className="absolute z-50 w-full mt-1 bg-white rounded-element border border-border shadow-dropdown max-h-64 overflow-auto">
-          {/* All toggle */}
-          <button
-            type="button"
-            onClick={toggleAll}
-            className="flex items-center gap-3 w-full px-3 py-2.5 text-sm text-text-primary hover:bg-gray-50 text-left border-b border-border-light"
-          >
-            <span
-              className={`w-5 h-5 rounded flex items-center justify-center border-2 transition-all flex-shrink-0 ${
-                allSelected
-                  ? 'bg-primary-500 border-primary-500'
-                  : someSelected
-                    ? 'bg-primary-500 border-primary-500'
-                    : 'bg-white border-gray-300'
-              }`}
-            >
-              {allSelected && <Check className="w-3 h-3 text-white stroke-[3]" />}
-              {someSelected && !allSelected && <Minus className="w-3 h-3 text-white stroke-[3]" />}
-            </span>
-            {allLabel}
-          </button>
-
-          {/* Options */}
-          {options.map((option) => {
-            const checked = selected.includes(option.id)
-            return (
-              <button
-                key={option.id}
-                type="button"
-                onClick={() => toggleOption(option.id)}
-                className="flex items-center gap-3 w-full px-3 py-2.5 text-sm text-text-primary hover:bg-gray-50 text-left"
-              >
-                <span
-                  className={`w-5 h-5 rounded flex items-center justify-center border-2 transition-all flex-shrink-0 ${
-                    checked
-                      ? 'bg-primary-500 border-primary-500'
-                      : 'bg-white border-gray-300'
-                  }`}
-                >
-                  {checked && <Check className="w-3 h-3 text-white stroke-[3]" />}
-                </span>
-                {option.label}
-              </button>
-            )
-          })}
-
-          {/* Clear */}
-          {selected.length > 0 && (
+        <div className="absolute z-50 w-full mt-0.5 bg-white rounded-container border border-border-light shadow-dropdown py-0.5 overflow-hidden">
+          <div className="max-h-64 overflow-auto">
+            {/* All toggle */}
             <button
               type="button"
-              onClick={() => {
-                onChange([])
-              }}
-              className="w-full px-3 py-2.5 text-sm font-medium text-primary-500 hover:bg-gray-50 text-left border-t border-border-light"
+              onClick={toggleAll}
+              className="relative flex items-center gap-3 w-full px-4 min-h-[44px] py-3 text-body text-text-primary text-left group"
             >
-              Clear
+              <span className="absolute inset-x-1 inset-y-0.5 rounded-element group-hover:bg-gray-50 transition-colors" />
+              <span
+                className={`relative w-[18px] h-[18px] rounded flex items-center justify-center border transition-all flex-shrink-0 ${
+                  allSelected || someSelected
+                    ? 'bg-primary-500 border-primary-500'
+                    : 'bg-white border-border-medium'
+                }`}
+              >
+                {allSelected && <Check className="w-3 h-3 text-white stroke-[3]" />}
+                {someSelected && !allSelected && <Minus className="w-3 h-3 text-white stroke-[3]" />}
+              </span>
+              <span className="relative font-bold">{allLabel}</span>
             </button>
-          )}
+
+            <div className="mx-4 h-px bg-border-light" />
+
+            {/* Options */}
+            {options.map((option) => {
+              const checked = selected.includes(option.id)
+              return (
+                <button
+                  key={option.id}
+                  type="button"
+                  onClick={() => toggleOption(option.id)}
+                  className="relative flex items-center gap-3 w-full px-4 min-h-[44px] py-3 text-body text-text-primary text-left group"
+                >
+                  <span className="absolute inset-x-1 inset-y-0.5 rounded-element group-hover:bg-gray-50 transition-colors" />
+                  <span
+                    className={`relative w-[18px] h-[18px] rounded flex items-center justify-center border transition-all flex-shrink-0 ${
+                      checked
+                        ? 'bg-primary-500 border-primary-500'
+                        : 'bg-white border-border-medium'
+                    }`}
+                  >
+                    {checked && <Check className="w-3 h-3 text-white stroke-[3]" />}
+                  </span>
+                  <span className="relative">{option.label}</span>
+                </button>
+              )
+            })}
+
+            {/* Clear */}
+            {selected.length > 0 && (
+              <>
+                <div className="mx-4 h-px bg-border-light" />
+                <button
+                  type="button"
+                  onClick={() => onChange([])}
+                  className="relative w-full px-4 min-h-[44px] py-3 text-body font-semibold text-primary-500 text-left group"
+                >
+                  <span className="absolute inset-x-1 inset-y-0.5 rounded-element group-hover:bg-gray-50 transition-colors" />
+                  <span className="relative">Clear</span>
+                </button>
+              </>
+            )}
+          </div>
         </div>
       )}
 
       {/* Chips */}
       {selected.length > 0 && (
-        <div className="flex flex-wrap gap-2 mt-2">
+        <div className="flex flex-wrap gap-1.5 mt-2">
           {selected.map((id) => {
             const option = options.find((o) => o.id === id)
             if (!option) return null
             return (
               <span
                 key={id}
-                className="inline-flex items-center gap-1.5 px-3 py-1 bg-primary-500 text-white text-xs font-medium rounded-full"
+                className="inline-flex items-center gap-1 px-2.5 py-1 bg-primary-500 text-white text-caption rounded-full"
               >
                 {option.label}
                 <button
                   type="button"
                   onClick={() => removeChip(id)}
-                  className="hover:bg-primary-600 rounded-full p-0.5 transition-colors"
+                  className="hover:bg-white/20 rounded-full p-0.5 transition-colors"
                 >
                   <X className="w-3 h-3" />
                 </button>

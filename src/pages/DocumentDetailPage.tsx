@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useRef, useEffect } from 'react'
 import {
   ArrowLeft,
   FileText,
@@ -35,6 +35,7 @@ import SearchBox from '../components/ui/SearchBox'
 import Button from '../components/ui/Button'
 import Checkbox from '../components/ui/Checkbox'
 import MultiSelectDropdown from '../components/ui/MultiSelectDropdown'
+import FilterSelect from '../components/ui/FilterSelect'
 import ContextMenu, { ContextMenuItem } from '../components/ui/ContextMenu'
 import { useToast } from '../components/ui/Toast'
 import { DocumentDetail, AssignmentInstance, DocumentRecipient, TemplateCategory, locations, roles } from '../data/mockData'
@@ -65,6 +66,7 @@ export default function DocumentDetailPage({ document, documentCategory, onBack,
   const [filterLocation, setFilterLocation] = useState<string>('all')
   const [filterRole, setFilterRole] = useState<string>('all')
   const [filterStatus, setFilterStatus] = useState<string>('all')
+  const [quickFilter, setQuickFilter] = useState<'all' | 'attention' | 'completed'>('all')
   const [expandedGroups, setExpandedGroups] = useState<string[]>(
     document.assignmentHistory?.length > 0 ? [document.assignmentHistory[0].id] : []
   )
@@ -130,12 +132,14 @@ export default function DocumentDetailPage({ document, documentCategory, onBack,
   const activeFilterCount =
     (filterLocation !== 'all' ? 1 : 0) +
     (filterRole !== 'all' ? 1 : 0) +
-    (filterStatus !== 'all' ? 1 : 0)
+    (filterStatus !== 'all' ? 1 : 0) +
+    (quickFilter !== 'all' ? 1 : 0)
 
   const clearAllFilters = () => {
     setFilterLocation('all')
     setFilterRole('all')
     setFilterStatus('all')
+    setQuickFilter('all')
   }
 
   const toggleGroup = (groupId: string) => {
@@ -145,6 +149,9 @@ export default function DocumentDetailPage({ document, documentCategory, onBack,
         : [...prev, groupId]
     )
   }
+
+  const isTerminalTop = (r: DocumentRecipient) =>
+    (r.status === 'completed' || r.status === 'refused') && !r.expiryDate
 
   // Filter and split recipients
   const filterRecipients = (recipients: DocumentRecipient[]) => {
@@ -157,7 +164,11 @@ export default function DocumentDetailPage({ document, documentCategory, onBack,
       const matchesLocation = filterLocation === 'all' || r.location === filterLocation
       const matchesRole = filterRole === 'all' || r.role === filterRole
       const matchesStatus = filterStatus === 'all' || r.status === filterStatus
-      return matchesSearch && matchesLocation && matchesRole && matchesStatus
+      const matchesQuickFilter =
+        quickFilter === 'all' ||
+        (quickFilter === 'attention' && !isTerminalTop(r)) ||
+        (quickFilter === 'completed' && isTerminalTop(r))
+      return matchesSearch && matchesLocation && matchesRole && matchesStatus && matchesQuickFilter
     })
   }
 
@@ -179,7 +190,7 @@ export default function DocumentDetailPage({ document, documentCategory, onBack,
       {/* Back button */}
       <button
         onClick={onBack}
-        className="flex items-center gap-2 text-sm text-text-secondary hover:text-text-primary mb-4 -ml-1"
+        className="flex items-center gap-2 text-body text-text-secondary hover:text-text-primary mb-4 -ml-1"
       >
         <ArrowLeft className="w-4 h-4" />
         Back to Documents
@@ -193,21 +204,21 @@ export default function DocumentDetailPage({ document, documentCategory, onBack,
               <FileText className="w-6 h-6 text-gray-500" />
             </div>
             <div>
-              <h1 className="text-lg font-bold text-text-primary">{document.name}</h1>
-              <p className="text-sm text-text-secondary">
+              <h1 className="text-title-4 text-text-primary">{document.name}</h1>
+              <p className="text-body text-text-secondary">
                 Created: {document.createdAt}
               </p>
             </div>
           </div>
           <div className="flex items-center gap-3">
             <Button
-              variant="primary"
+              variant="accent-blue"
               leftIcon={<Send className="w-4 h-4" />}
               onClick={() => addToast('Opening assign dialog...', 'info')}
             >
               Assign
             </Button>
-            <Button variant="outline" leftIcon={<Eye className="w-4 h-4" />}>
+            <Button variant="plain-gray" leftIcon={<Eye className="w-4 h-4" />}>
               Preview
             </Button>
             <ContextMenu
@@ -222,33 +233,13 @@ export default function DocumentDetailPage({ document, documentCategory, onBack,
                   id: 'download',
                   label: 'Download All',
                   icon: <Download className="w-4 h-4" />,
-                  onClick: () => addToast('Downloading all documents...', 'info'),
+                  onClick: () => addToast('A download link will be sent to your email shortly.', 'info'),
                 },
               ]}
             />
           </div>
         </div>
 
-        {/* Summary stats row */}
-        <div className="flex items-center gap-6 mt-4 pt-4 border-t border-border-light">
-          <div className="flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 text-amber-500" />
-            <span className="text-sm font-medium text-text-primary">{totalNeedsAttention}</span>
-            <span className="text-sm text-text-secondary">needs attention</span>
-          </div>
-          <div className="w-px h-4 bg-border-light" />
-          <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-green-500" />
-            <span className="text-sm font-medium text-text-primary">{totalCompleted}</span>
-            <span className="text-sm text-text-secondary">completed</span>
-          </div>
-          <div className="w-px h-4 bg-border-light" />
-          <div className="flex items-center gap-2">
-            <Users className="w-4 h-4 text-gray-400" />
-            <span className="text-sm font-medium text-text-primary">{totalAssigned}</span>
-            <span className="text-sm text-text-secondary">assigned</span>
-          </div>
-        </div>
       </div>
 
       {/* Tabs */}
@@ -258,14 +249,6 @@ export default function DocumentDetailPage({ document, documentCategory, onBack,
           activeSegment={activeTab}
           onChange={setActiveTab}
         />
-        {activeTab === 'history' && (
-          <SearchBox
-            value={searchQuery}
-            onChange={setSearchQuery}
-            placeholder="Search"
-            className="w-60"
-          />
-        )}
       </div>
 
       {/* Filters + Search (status tab) */}
@@ -273,77 +256,40 @@ export default function DocumentDetailPage({ document, documentCategory, onBack,
         <div className="flex items-center gap-2 mb-6 flex-wrap">
           <div className="flex items-center gap-1.5 text-text-secondary mr-1">
             <Filter className="w-3.5 h-3.5" />
-            <span className="text-xs font-medium">Filters</span>
+            <span className="text-callout text-text-secondary">Filters</span>
           </div>
 
-          {/* Location filter */}
-          <div className="relative">
-            <select
-              value={filterLocation}
-              onChange={(e) => setFilterLocation(e.target.value)}
-              className={`appearance-none h-8 pl-7 pr-7 rounded-full border text-xs font-medium cursor-pointer transition-colors ${
-                filterLocation !== 'all'
-                  ? 'bg-primary-50 border-primary-300 text-primary-700'
-                  : 'bg-white border-border text-text-secondary hover:border-gray-400'
-              }`}
-            >
-              <option value="all">All locations</option>
-              {uniqueLocations.map((loc) => (
-                <option key={loc} value={loc}>{loc}</option>
-              ))}
-            </select>
-            <MapPin className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 pointer-events-none text-text-secondary" />
-            <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 pointer-events-none text-text-secondary" />
-          </div>
+          <FilterSelect
+            options={uniqueLocations.map((loc) => ({ id: loc, label: loc }))}
+            value={filterLocation}
+            onChange={setFilterLocation}
+            allLabel="All locations"
+            icon={<MapPin className="w-3.5 h-3.5" />}
+          />
 
-          {/* Role filter */}
-          <div className="relative">
-            <select
-              value={filterRole}
-              onChange={(e) => setFilterRole(e.target.value)}
-              className={`appearance-none h-8 pl-7 pr-7 rounded-full border text-xs font-medium cursor-pointer transition-colors ${
-                filterRole !== 'all'
-                  ? 'bg-primary-50 border-primary-300 text-primary-700'
-                  : 'bg-white border-border text-text-secondary hover:border-gray-400'
-              }`}
-            >
-              <option value="all">All roles</option>
-              {uniqueRoles.map((role) => (
-                <option key={role} value={role}>{role}</option>
-              ))}
-            </select>
-            <Briefcase className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 pointer-events-none text-text-secondary" />
-            <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 pointer-events-none text-text-secondary" />
-          </div>
+          <FilterSelect
+            options={uniqueRoles.map((role) => ({ id: role, label: role }))}
+            value={filterRole}
+            onChange={setFilterRole}
+            allLabel="All roles"
+            icon={<Briefcase className="w-3.5 h-3.5" />}
+          />
 
-          {/* Status filter */}
-          <div className="relative">
-            <select
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value)}
-              className={`appearance-none h-8 pl-7 pr-7 rounded-full border text-xs font-medium cursor-pointer transition-colors ${
-                filterStatus !== 'all'
-                  ? 'bg-primary-50 border-primary-300 text-primary-700'
-                  : 'bg-white border-border text-text-secondary hover:border-gray-400'
-              }`}
-            >
-              <option value="all">All statuses</option>
-              {uniqueStatuses.map((s) => (
-                <option key={s} value={s}>{statusLabel(s)}</option>
-              ))}
-            </select>
-            <CircleDot className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 pointer-events-none text-text-secondary" />
-            <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 pointer-events-none text-text-secondary" />
-          </div>
+          <FilterSelect
+            options={uniqueStatuses.map((s) => ({ id: s, label: statusLabel(s) }))}
+            value={filterStatus}
+            onChange={setFilterStatus}
+            allLabel="All statuses"
+            icon={<CircleDot className="w-3.5 h-3.5" />}
+          />
 
-          {/* Clear all */}
           {activeFilterCount > 0 && (
             <button
               onClick={clearAllFilters}
-              className="flex items-center gap-1 h-8 px-3 rounded-full text-xs font-medium text-red-600 hover:bg-red-50 transition-colors"
+              className="flex items-center gap-1 h-8 px-3 rounded-element text-caption font-medium text-accent-red-500 hover:bg-red-50 transition-colors"
             >
               <X className="w-3 h-3" />
-              Clear {activeFilterCount > 1 ? `all (${activeFilterCount})` : ''}
+              Clear{activeFilterCount > 1 ? ` all (${activeFilterCount})` : ''}
             </button>
           )}
 
@@ -371,7 +317,7 @@ export default function DocumentDetailPage({ document, documentCategory, onBack,
             />
           ) : (
             <div className="bg-white rounded-container border border-border-light p-12 text-center">
-              <p className="text-sm text-text-secondary">No team members found</p>
+              <p className="text-body text-text-secondary">No team members found</p>
             </div>
           )}
         </div>
@@ -380,6 +326,18 @@ export default function DocumentDetailPage({ document, documentCategory, onBack,
       {/* History Tab */}
       {activeTab === 'history' && (
         <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-base font-semibold text-text-primary">Assignment History</h2>
+              <p className="text-sm text-text-secondary mt-0.5">Audit trail of all assignments of this document template.</p>
+            </div>
+            <SearchBox
+              value={searchQuery}
+              onChange={setSearchQuery}
+              placeholder="Search"
+              className="w-60"
+            />
+          </div>
           {document.assignmentHistory?.map((assignment) => (
             <AssignmentCard
               key={assignment.id}
@@ -392,7 +350,7 @@ export default function DocumentDetailPage({ document, documentCategory, onBack,
           ))}
           {(!document.assignmentHistory || document.assignmentHistory.length === 0) && (
             <div className="bg-white rounded-container border border-border-light p-8 text-center">
-              <p className="text-sm text-text-secondary">No assignment history</p>
+              <p className="text-body text-text-secondary">No assignment history</p>
             </div>
           )}
         </div>
@@ -405,11 +363,11 @@ export default function DocumentDetailPage({ document, documentCategory, onBack,
             <div className="p-5 space-y-5">
               {/* Location restrictions */}
               <div>
-                <label className="flex items-center gap-2 text-sm font-medium text-text-primary mb-1">
+                <label className="flex items-center gap-2 text-headline text-text-primary mb-1">
                   <MapPin className="w-4 h-4 text-gray-500" />
                   Recipient locations
                 </label>
-                <p className="text-xs text-text-secondary mb-3">
+                <p className="text-caption text-text-secondary mb-3">
                   Only employees at selected locations can receive this document. When assigning, only employees at these locations will appear in the recipient list.
                 </p>
                 <MultiSelectDropdown
@@ -420,11 +378,11 @@ export default function DocumentDetailPage({ document, documentCategory, onBack,
                   allLabel="All"
                 />
                 {selectedPermLocations.length === 0 ? (
-                  <p className="text-xs text-text-secondary mt-1.5">
+                  <p className="text-caption text-text-secondary mt-1.5">
                     No restrictions — employees at any location can receive this document
                   </p>
                 ) : (
-                  <p className="text-xs text-primary-600 mt-1.5">
+                  <p className="text-caption text-primary-600 mt-1.5">
                     Only employees at {selectedPermLocations.map(id => locations.find(l => l.id === id)?.name).filter(Boolean).join(', ')} can receive this document
                   </p>
                 )}
@@ -432,11 +390,11 @@ export default function DocumentDetailPage({ document, documentCategory, onBack,
 
               {/* Role permissions */}
               <div>
-                <label className="flex items-center gap-2 text-sm font-medium text-text-primary mb-1">
+                <label className="flex items-center gap-2 text-headline text-text-primary mb-1">
                   <Users className="w-4 h-4 text-gray-500" />
                   Manager roles
                 </label>
-                <p className="text-xs text-text-secondary mb-3">
+                <p className="text-caption text-text-secondary mb-3">
                   Only users with selected roles can see this template and assign it to employees. Users without these roles will not see this template in their Documents page.
                 </p>
                 <MultiSelectDropdown
@@ -447,11 +405,11 @@ export default function DocumentDetailPage({ document, documentCategory, onBack,
                   allLabel="All"
                 />
                 {selectedPermRoles.length === 0 ? (
-                  <p className="text-xs text-text-secondary mt-1.5">
+                  <p className="text-caption text-text-secondary mt-1.5">
                     No restrictions — all managers can see and assign this template
                   </p>
                 ) : (
-                  <p className="text-xs text-primary-600 mt-1.5">
+                  <p className="text-caption text-primary-600 mt-1.5">
                     Only {selectedPermRoles.map(id => roles.find(r => r.id === id)?.name).filter(Boolean).join(', ')} can see and assign this template
                   </p>
                 )}
@@ -459,14 +417,14 @@ export default function DocumentDetailPage({ document, documentCategory, onBack,
 
               {/* Summary info box */}
               <div className="p-3 bg-purple-50 border border-purple-200 rounded-element space-y-1">
-                <p className="text-xs font-semibold text-purple-800">Access summary</p>
-                <p className="text-xs text-purple-800">
+                <p className="text-callout text-purple-800">Access summary</p>
+                <p className="text-caption text-purple-800">
                   <strong>Who can receive:</strong>{' '}
                   {selectedPermLocations.length === 0
                     ? 'Employees at any location.'
                     : `Only employees at ${selectedPermLocations.map(id => locations.find(l => l.id === id)?.name).filter(Boolean).join(', ')}.`}
                 </p>
-                <p className="text-xs text-purple-800">
+                <p className="text-caption text-purple-800">
                   <strong>Who can assign:</strong>{' '}
                   {selectedPermRoles.length === 0
                     ? 'All managers.'
@@ -478,7 +436,7 @@ export default function DocumentDetailPage({ document, documentCategory, onBack,
 
           {settingsDirty && (
             <div className="flex justify-end pt-2">
-              <Button variant="primary" onClick={handleSaveSettings}>
+              <Button variant="accent-blue" onClick={handleSaveSettings}>
                 Save Settings
               </Button>
             </div>
@@ -494,8 +452,8 @@ export default function DocumentDetailPage({ document, documentCategory, onBack,
               {/* Enable toggle */}
               <div className="flex items-center justify-between">
                 <div>
-                  <label className="text-sm font-medium text-text-primary">Enable auto-assignment</label>
-                  <p className="text-xs text-text-secondary mt-0.5">
+                  <label className="text-headline text-text-primary">Enable auto-assignment</label>
+                  <p className="text-caption text-text-secondary mt-0.5">
                     Automatically assign this document when conditions are met
                   </p>
                 </div>
@@ -519,14 +477,14 @@ export default function DocumentDetailPage({ document, documentCategory, onBack,
                   {/* How it works */}
                   <div className="flex items-start gap-3 p-3 bg-blue-50 border border-blue-200 rounded-element">
                     <Info className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
-                    <p className="text-xs text-blue-800">
+                    <p className="text-caption text-blue-800">
                       This document will be automatically assigned when a <strong>new employee is hired</strong> or an <strong>existing employee's job title changes</strong> to one of the selected job titles below.
                     </p>
                   </div>
 
                   {/* Job titles */}
                   <div>
-                    <label className="block text-sm font-medium text-text-primary mb-2">
+                    <label className="block text-headline text-text-primary mb-2">
                       For employees with job title
                     </label>
                     <MultiSelectDropdown
@@ -537,7 +495,7 @@ export default function DocumentDetailPage({ document, documentCategory, onBack,
                       allLabel="All"
                     />
                     {autoAssignJobTitles.length === 0 && (
-                      <p className="text-xs text-amber-600 mt-2 flex items-center gap-1">
+                      <p className="text-caption text-amber-600 mt-2 flex items-center gap-1">
                         <Info className="w-3 h-3" />
                         No job titles selected — will apply to all employees
                       </p>
@@ -546,10 +504,10 @@ export default function DocumentDetailPage({ document, documentCategory, onBack,
 
                   {/* Locations for auto-assign */}
                   <div>
-                    <label className="block text-sm font-medium text-text-primary mb-2">
+                    <label className="block text-headline text-text-primary mb-2">
                       At locations
                     </label>
-                    <p className="text-xs text-text-secondary mb-3">
+                    <p className="text-caption text-text-secondary mb-3">
                       Only employees at selected locations will be auto-assigned this document
                     </p>
                     <MultiSelectDropdown
@@ -560,7 +518,7 @@ export default function DocumentDetailPage({ document, documentCategory, onBack,
                       allLabel="All"
                     />
                     {autoAssignLocations.length === 0 && (
-                      <p className="text-xs text-text-secondary mt-1.5">
+                      <p className="text-caption text-text-secondary mt-1.5">
                         No locations selected — will apply at all locations
                       </p>
                     )}
@@ -568,13 +526,13 @@ export default function DocumentDetailPage({ document, documentCategory, onBack,
 
                   {/* Timing */}
                   <div className="p-4 bg-gray-50 border border-border-light rounded-element space-y-4">
-                    <p className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Timing</p>
+                    <p className="text-callout text-text-secondary uppercase tracking-wider">Timing</p>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-text-primary mb-1.5">
+                        <label className="block text-headline text-text-primary mb-1.5">
                           Assign date
                         </label>
-                        <p className="text-xs text-text-secondary mb-2">
+                        <p className="text-caption text-text-secondary mb-2">
                           Delay before the document is sent to the employee
                         </p>
                         <div className="flex items-center gap-2">
@@ -583,18 +541,18 @@ export default function DocumentDetailPage({ document, documentCategory, onBack,
                             min={0}
                             value={autoAssignDelayDays}
                             onChange={(e) => { setAutoAssignDelayDays(Math.max(0, parseInt(e.target.value) || 0)); setSettingsDirty(true) }}
-                            className="w-20 h-9 px-3 rounded-element border border-border bg-white text-sm text-text-primary text-center focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                            className="w-20 h-9 px-3 rounded-element border border-border bg-white text-body text-text-primary text-center focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                           />
-                          <span className="text-sm text-text-secondary">
+                          <span className="text-body text-text-secondary">
                             day{autoAssignDelayDays !== 1 ? 's' : ''} after trigger
                           </span>
                         </div>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-text-primary mb-1.5">
+                        <label className="block text-headline text-text-primary mb-1.5">
                           Due date
                         </label>
-                        <p className="text-xs text-text-secondary mb-2">
+                        <p className="text-caption text-text-secondary mb-2">
                           Deadline for the employee to complete the document
                         </p>
                         <div className="flex items-center gap-2">
@@ -603,16 +561,16 @@ export default function DocumentDetailPage({ document, documentCategory, onBack,
                             min={1}
                             value={autoAssignDueDays}
                             onChange={(e) => { setAutoAssignDueDays(Math.max(1, parseInt(e.target.value) || 1)); setSettingsDirty(true) }}
-                            className="w-20 h-9 px-3 rounded-element border border-border bg-white text-sm text-text-primary text-center focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                            className="w-20 h-9 px-3 rounded-element border border-border bg-white text-body text-text-primary text-center focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                           />
-                          <span className="text-sm text-text-secondary">
+                          <span className="text-body text-text-secondary">
                             day{autoAssignDueDays !== 1 ? 's' : ''} after trigger
                           </span>
                         </div>
                       </div>
                     </div>
                     {autoAssignDelayDays >= autoAssignDueDays && (
-                      <div className="flex items-center gap-2 text-xs text-amber-600">
+                      <div className="flex items-center gap-2 text-caption text-amber-600">
                         <Info className="w-3 h-3 flex-shrink-0" />
                         The due date should be after the assign date. The document would be sent on day {autoAssignDelayDays} but due on day {autoAssignDueDays}.
                       </div>
@@ -621,7 +579,7 @@ export default function DocumentDetailPage({ document, documentCategory, onBack,
 
                   {/* Rule preview */}
                   <div className="p-3 bg-blue-50 border border-blue-200 rounded-element">
-                    <p className="text-xs text-blue-800">
+                    <p className="text-caption text-blue-800">
                       <strong>Rule preview:</strong> When a new employee is hired or an existing employee acquires a job title
                       {autoAssignJobTitles.length > 0
                         ? ` matching ${autoAssignJobTitles.join(', ')}`
@@ -643,11 +601,76 @@ export default function DocumentDetailPage({ document, documentCategory, onBack,
 
           {settingsDirty && (
             <div className="flex justify-end pt-2">
-              <Button variant="primary" onClick={handleSaveSettings}>
+              <Button variant="accent-blue" onClick={handleSaveSettings}>
                 Save Settings
               </Button>
             </div>
           )}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// Bulk Actions Dropdown for multi-select bar
+function BulkActionsDropdown({
+  onSendReminder,
+  onCancelAssignment,
+  onDownloadCompleted,
+}: {
+  onSendReminder: () => void
+  onCancelAssignment: () => void
+  onDownloadCompleted: () => void
+}) {
+  const [isOpen, setIsOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (ref.current && !ref.current.contains(event.target as Node)) {
+        setIsOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  const actions = [
+    { id: 'remind', label: 'Send Reminder', icon: <Bell className="w-4 h-4" />, onClick: onSendReminder },
+    { id: 'cancel', label: 'Cancel Assignment', icon: <UserX className="w-4 h-4" />, onClick: onCancelAssignment, variant: 'danger' as const },
+    { id: 'download', label: 'Download completed documents', icon: <Download className="w-4 h-4" />, onClick: onDownloadCompleted },
+  ]
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center gap-2 h-8 px-3 rounded-element bg-white/20 hover:bg-white/30 text-white text-caption font-medium transition-colors cursor-pointer"
+      >
+        Bulk Actions
+        <ChevronDown className={`w-3 h-3 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+      </button>
+
+      {isOpen && (
+        <div className="absolute left-0 top-full mt-1 min-w-[260px] bg-white rounded-container border border-border-light shadow-dropdown py-0.5 z-50">
+          {actions.map((action) => (
+            <button
+              key={action.id}
+              onClick={() => {
+                action.onClick()
+                setIsOpen(false)
+              }}
+              className="relative flex items-center gap-3 w-full px-4 min-h-[44px] py-3 text-body text-left transition-colors group"
+            >
+              <span className="absolute inset-x-1 inset-y-0.5 rounded-element group-hover:bg-gray-50 transition-colors" />
+              <span className={`relative ${action.variant === 'danger' ? 'text-red-500' : 'text-text-secondary'}`}>
+                {action.icon}
+              </span>
+              <span className={`relative ${action.variant === 'danger' ? 'text-red-600' : 'text-text-primary'}`}>
+                {action.label}
+              </span>
+            </button>
+          ))}
         </div>
       )}
     </div>
@@ -774,9 +797,9 @@ function StatusTable({
     if (isTerminal(recipient)) {
       items.push({
         id: 'download',
-        label: 'Export PDF',
+        label: 'Download completed documents',
         icon: <Download className="w-4 h-4" />,
-        onClick: () => addToast(`Exporting PDF for ${recipient.name}`, 'info'),
+        onClick: () => addToast(`A download link for ${recipient.name}'s documents will be sent to your email.`, 'info'),
       })
     } else {
       items.push({
@@ -808,31 +831,31 @@ function StatusTable({
         </td>
         <td className="h-14 px-5">
           <div>
-            <p className="text-sm font-medium text-text-primary">{recipient.name}</p>
-            <p className="text-xs text-text-secondary">{recipient.role}</p>
+            <p className="text-headline text-text-primary">{recipient.name}</p>
+            <p className="text-caption text-text-secondary">{recipient.role}</p>
           </div>
         </td>
         <td className="h-14 px-5">
-          <span className="text-sm text-text-primary">{recipient.location}</span>
+          <span className="text-body text-text-primary">{recipient.location}</span>
         </td>
         <td className="h-14 px-5">
           <span
-            className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${status.className}`}
+            className={`inline-flex items-center px-2 py-1 rounded text-caption font-medium ${status.className}`}
           >
             {status.text}
           </span>
         </td>
         <td className="h-14 px-5">
           <div>
-            <p className="text-sm text-text-primary">{date.value}</p>
-            <p className="text-xs text-text-secondary">{date.label}</p>
+            <p className="text-body text-text-primary">{date.value}</p>
+            <p className="text-caption text-text-secondary">{date.label}</p>
           </div>
         </td>
         <td className="h-14 px-5">
           <div className="flex items-center justify-end gap-2">
             {isPendingVerification ? (
               <Button
-                variant="outline"
+                variant="plain-gray"
                 size="sm"
                 leftIcon={<Eye className="w-3.5 h-3.5" />}
                 onClick={() => setReviewingRecipient(recipient)}
@@ -842,7 +865,7 @@ function StatusTable({
               </Button>
             ) : !terminal ? (
               <Button
-                variant="ghost"
+                variant="clear"
                 size="sm"
                 leftIcon={<Bell className="w-3.5 h-3.5" />}
                 onClick={() => setSharingRecipient(recipient)}
@@ -918,45 +941,22 @@ function StatusTable({
       )}
 
       {selected.length > 0 && (
-        <div className="sticky top-0 z-10 bg-primary-500 text-white rounded-container px-4 py-3 mb-3 flex items-center justify-between shadow-lg">
-          <span className="text-sm font-medium">{selected.length} selected</span>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-white hover:bg-white/20"
-              onClick={() => setShowBulkReminder(true)}
-            >
-              Send Reminder
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-white hover:bg-white/20"
-              onClick={() => setShowBulkCancel(true)}
-            >
-              Cancel Assignment
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-white hover:bg-white/20"
-              onClick={() => {
-                addToast(`Exporting ${selected.length} PDF(s)`, 'info')
-                setSelected([])
-              }}
-            >
-              Export PDF
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-white hover:bg-white/20"
-              onClick={() => setSelected([])}
-            >
-              Deselect
-            </Button>
-          </div>
+        <div className="sticky top-0 z-10 bg-primary-500 text-white rounded-container px-4 py-3 mb-3 flex items-center gap-3 shadow-lg">
+          <button
+            onClick={() => setSelected([])}
+            className="text-white/80 hover:text-white transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </button>
+          <span className="text-body font-medium">{selected.length} items selected</span>
+          <BulkActionsDropdown
+            onSendReminder={() => setShowBulkReminder(true)}
+            onCancelAssignment={() => setShowBulkCancel(true)}
+            onDownloadCompleted={() => {
+              addToast(`A download link for ${selected.length} completed document(s) will be sent to your email.`, 'info')
+              setSelected([])
+            }}
+          />
         </div>
       )}
       <div className="bg-white rounded-container border border-border-light overflow-hidden">
@@ -967,19 +967,19 @@ function StatusTable({
                 <th className="h-11 px-4 w-12">
                   <Checkbox checked={selected.length === allRecipients.length && allRecipients.length > 0} onChange={toggleAll} />
                 </th>
-                <th className="h-11 px-5 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider w-[25%]">
+                <th className="h-11 px-5 text-left text-callout text-text-secondary uppercase tracking-wider w-[25%]">
                   Name
                 </th>
-                <th className="h-11 px-5 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider w-[18%]">
+                <th className="h-11 px-5 text-left text-callout text-text-secondary uppercase tracking-wider w-[18%]">
                   Location
                 </th>
-                <th className="h-11 px-5 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider w-[18%]">
+                <th className="h-11 px-5 text-left text-callout text-text-secondary uppercase tracking-wider w-[18%]">
                   Status
                 </th>
-                <th className="h-11 px-5 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider w-[18%]">
+                <th className="h-11 px-5 text-left text-callout text-text-secondary uppercase tracking-wider w-[18%]">
                   Date
                 </th>
-                <th className="h-11 px-5 text-right text-xs font-semibold text-text-secondary uppercase tracking-wider w-[140px]">
+                <th className="h-11 px-5 text-right text-callout text-text-secondary uppercase tracking-wider w-[140px]">
                   Actions
                 </th>
               </tr>
@@ -991,7 +991,7 @@ function StatusTable({
                   <td colSpan={6} className="h-9 px-5 bg-gray-50 border-b border-border-light">
                     <div className="flex items-center gap-2">
                       <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />
-                      <span className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
+                      <span className="text-callout text-text-secondary uppercase tracking-wider">
                         Completed ({completedRecipients.length})
                       </span>
                     </div>
@@ -1026,14 +1026,14 @@ function VerificationPanel({
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-border-light">
           <div>
-            <h3 className="text-lg font-semibold text-text-primary">Review Submission</h3>
-            <p className="text-sm text-text-secondary">
+            <h3 className="text-title-4 text-text-primary">Review Submission</h3>
+            <p className="text-body text-text-secondary">
               {recipient.name} · {recipient.role} · {recipient.location}
             </p>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
+            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-50 transition-colors"
           >
             <X className="w-4 h-4 text-gray-500" />
           </button>
@@ -1043,7 +1043,7 @@ function VerificationPanel({
         <div className="p-6 space-y-6">
           {/* Uploaded document preview */}
           <div>
-            <label className="flex items-center gap-2 text-sm font-semibold text-text-primary mb-3">
+            <label className="flex items-center gap-2 text-headline text-text-primary mb-3">
               <ImageIcon className="w-4 h-4 text-gray-500" />
               Uploaded Document
             </label>
@@ -1051,11 +1051,11 @@ function VerificationPanel({
               <div className="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center mb-3">
                 <FileText className="w-8 h-8 text-gray-400" />
               </div>
-              <p className="text-sm font-medium text-text-primary mb-1">
+              <p className="text-headline text-text-primary mb-1">
                 {recipient.name.replace(/\s+/g, '_')}_certificate.jpg
               </p>
-              <p className="text-xs text-text-secondary mb-3">Uploaded by employee</p>
-              <Button variant="outline" size="sm" leftIcon={<Eye className="w-3.5 h-3.5" />}>
+              <p className="text-caption text-text-secondary mb-3">Uploaded by employee</p>
+              <Button variant="plain-gray" size="sm" leftIcon={<Eye className="w-3.5 h-3.5" />}>
                 View Full Image
               </Button>
             </div>
@@ -1063,27 +1063,27 @@ function VerificationPanel({
 
           {/* OCR-captured expiration date */}
           <div>
-            <label className="flex items-center gap-2 text-sm font-semibold text-text-primary mb-3">
+            <label className="flex items-center gap-2 text-headline text-text-primary mb-3">
               <Calendar className="w-4 h-4 text-gray-500" />
               Expiration Date
             </label>
             <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg border border-border-light">
               <div className="flex-1">
-                <p className="text-sm text-text-secondary mb-1">Detected via OCR</p>
+                <p className="text-body text-text-secondary mb-1">Detected via OCR</p>
                 <p className="text-lg font-semibold text-text-primary">
                   {recipient.uploadedExpiryDate || 'Not detected'}
                 </p>
               </div>
               <div className="w-px h-10 bg-border-light" />
               <div className="flex-1">
-                <p className="text-sm text-text-secondary mb-1">Status</p>
+                <p className="text-body text-text-secondary mb-1">Status</p>
                 {recipient.uploadedExpiryDate ? (
-                  <span className="inline-flex items-center gap-1.5 text-sm font-medium text-green-600">
+                  <span className="inline-flex items-center gap-1.5 text-headline text-green-600">
                     <Check className="w-4 h-4" />
                     Date captured successfully
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1.5 text-sm font-medium text-amber-600">
+                  <span className="inline-flex items-center gap-1.5 text-headline text-amber-600">
                     <AlertTriangle className="w-4 h-4" />
                     Employee entered manually
                   </span>
@@ -1095,7 +1095,7 @@ function VerificationPanel({
           {/* Verification note */}
           <div className="flex items-start gap-2.5 p-3 bg-blue-50 border border-blue-200 rounded-lg">
             <AlertTriangle className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
-            <p className="text-xs text-blue-800">
+            <p className="text-caption text-blue-800">
               Please verify that the uploaded document matches the employee's information and that the
               expiration date is correct. If it's wrong, the employee will be asked to re-upload.
             </p>
@@ -1104,12 +1104,12 @@ function VerificationPanel({
 
         {/* Footer */}
         <div className="flex items-center justify-between px-6 py-4 border-t border-border-light bg-gray-50">
-          <Button variant="ghost" onClick={onClose}>
+          <Button variant="clear" onClick={onClose}>
             Cancel
           </Button>
           <div className="flex items-center gap-3">
             <Button
-              variant="outline"
+              variant="plain-gray"
               leftIcon={<RotateCcw className="w-4 h-4" />}
               onClick={onReject}
               className="text-red-600 border-red-300 hover:bg-red-50"
@@ -1186,12 +1186,12 @@ function ShareDocumentLinkModal({
       <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-border-light">
-          <h3 className="text-lg font-semibold text-text-primary">
+          <h3 className="text-title-4 text-text-primary">
             {isBulk ? 'Send reminder' : 'Share document link'}
           </h3>
           <button
             onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
+            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-50 transition-colors"
           >
             <X className="w-4 h-4 text-gray-500" />
           </button>
@@ -1203,7 +1203,7 @@ function ShareDocumentLinkModal({
           {isBulk && (
             <div className="flex items-center gap-2.5 px-3 py-2 bg-blue-50 border border-blue-200 rounded-lg">
               <Bell className="w-4 h-4 text-blue-500 flex-shrink-0" />
-              <p className="text-xs text-blue-800">
+              <p className="text-caption text-blue-800">
                 This reminder will be sent to <span className="font-semibold">{bulkCount} recipient{bulkCount !== 1 ? 's' : ''}</span>. Use <code className="bg-blue-100 px-1 rounded text-[11px]">{'{{first_name}}'}</code> to personalise the message.
               </p>
             </div>
@@ -1214,7 +1214,7 @@ function ShareDocumentLinkModal({
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             rows={7}
-            className="w-full rounded-lg border border-border-light bg-gray-50 px-4 py-3 text-sm text-text-primary leading-relaxed resize-y focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            className="w-full rounded-element border border-border bg-white px-3 py-2 text-body text-text-primary leading-relaxed resize-y focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
           />
 
           {/* Delivery checkboxes */}
@@ -1227,7 +1227,7 @@ function ShareDocumentLinkModal({
                 className="w-5 h-5 rounded border-gray-300 text-primary-500 focus:ring-primary-500 cursor-pointer"
               />
               <Mail className="w-4 h-4 text-gray-400" />
-              <span className="text-sm text-text-primary">
+              <span className="text-body text-text-primary">
                 {isBulk ? (
                   <>Send via email to <span className="font-medium">all recipients</span></>
                 ) : (
@@ -1244,7 +1244,7 @@ function ShareDocumentLinkModal({
                 className="w-5 h-5 rounded border-gray-300 text-primary-500 focus:ring-primary-500 cursor-pointer"
               />
               <MessageSquare className="w-4 h-4 text-gray-400" />
-              <span className="text-sm text-text-primary">
+              <span className="text-body text-text-primary">
                 {isBulk ? (
                   <>Send via text to <span className="font-medium">all recipients</span></>
                 ) : (
@@ -1260,17 +1260,17 @@ function ShareDocumentLinkModal({
           <button
             onClick={handleCopyLink}
             disabled={isBulk}
-            className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg transition-colors ${
+            className={`flex items-center gap-2 px-4 py-2.5 text-body font-medium rounded-lg transition-colors ${
               isBulk
                 ? 'text-gray-300 cursor-not-allowed'
-                : 'text-text-secondary hover:text-text-primary hover:bg-gray-100'
+                : 'text-text-secondary hover:text-text-primary hover:bg-gray-50'
             }`}
           >
             <Copy className="w-4 h-4" />
             Copy link
           </button>
           <Button
-            variant="primary"
+            variant="accent-blue"
             leftIcon={<Send className="w-4 h-4" />}
             onClick={handleSendMessage}
           >
@@ -1305,10 +1305,10 @@ function CancelAssignmentModal({
       <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-md mx-4 overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-border-light">
-          <h3 className="text-lg font-semibold text-text-primary">Cancel assignment</h3>
+          <h3 className="text-title-4 text-text-primary">Cancel assignment</h3>
           <button
             onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
+            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-50 transition-colors"
           >
             <X className="w-4 h-4 text-gray-500" />
           </button>
@@ -1316,12 +1316,12 @@ function CancelAssignmentModal({
 
         {/* Content */}
         <div className="p-6 space-y-4">
-          <p className="text-sm text-text-primary">
+          <p className="text-body text-text-primary">
             Are you sure you want to cancel {label}?
           </p>
           <div className="flex items-start gap-2.5 p-3 bg-amber-50 border border-amber-200 rounded-lg">
             <AlertTriangle className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />
-            <p className="text-xs text-amber-800">
+            <p className="text-caption text-amber-800">
               {isBulk
                 ? 'All selected recipients\u2019 document links will expire and become inaccessible. This action cannot be undone.'
                 : 'This recipient\u2019s document link will expire and become inaccessible. This action cannot be undone.'}
@@ -1331,11 +1331,11 @@ function CancelAssignmentModal({
 
         {/* Footer */}
         <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-border-light bg-gray-50">
-          <Button variant="ghost" onClick={onClose}>
+          <Button variant="clear" onClick={onClose}>
             Go back
           </Button>
           <Button
-            variant="primary"
+            variant="accent-blue"
             leftIcon={<UserX className="w-4 h-4" />}
             onClick={onConfirm}
             className="!bg-red-600 hover:!bg-red-700"
@@ -1438,7 +1438,7 @@ function AssignmentCard({
       )}
 
       {/* Card Header */}
-      <div className="p-5 cursor-pointer hover:bg-gray-50/50 transition-colors" onClick={onToggle}>
+      <div className="p-5 cursor-pointer hover:bg-gray-50 transition-colors" onClick={onToggle}>
         <div className="flex items-start justify-between">
           <div className="flex items-start gap-2.5">
             <div className="mt-0.5 w-5 h-5 flex items-center justify-center flex-shrink-0">
@@ -1450,28 +1450,16 @@ function AssignmentCard({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-sm font-semibold text-text-primary">
+                <h3 className="text-callout text-text-primary">
                   Assigned to {assignment.recipientCount} recipient
                   {assignment.recipientCount !== 1 ? 's' : ''}
                 </h3>
               </div>
-              <p className="text-xs text-text-secondary mt-0.5">
+              <p className="text-caption text-text-secondary mt-0.5">
                 {assignment.assignedDate} by {assignment.assignedBy}
+                {' · '}{assignment.completedCount}/{assignment.recipientCount} completed
+                {assignment.cancelledCount > 0 ? ` · ${assignment.cancelledCount} cancelled` : ''}
               </p>
-
-              {/* Progress bar */}
-              <div className="flex items-center gap-3 mt-2.5">
-                <div className="w-36 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-green-500 rounded-full transition-all"
-                    style={{ width: `${assignment.recipientCount > 0 ? (assignment.completedCount / assignment.recipientCount) * 100 : 0}%` }}
-                  />
-                </div>
-                <span className="text-xs text-text-secondary">
-                  {assignment.completedCount}/{assignment.recipientCount} completed
-                  {assignment.cancelledCount > 0 ? ` · ${assignment.cancelledCount} cancelled` : ''}
-                </span>
-              </div>
             </div>
           </div>
 
@@ -1504,19 +1492,19 @@ function AssignmentCard({
             <table className="w-full">
               <thead>
                 <tr className="border-t border-b border-border-light">
-                  <th className="h-12 px-5 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider">
+                  <th className="h-12 px-5 text-left text-callout text-text-secondary uppercase tracking-wider">
                     Member
                   </th>
-                  <th className="h-12 px-5 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider">
+                  <th className="h-12 px-5 text-left text-callout text-text-secondary uppercase tracking-wider">
                     Location
                   </th>
-                  <th className="h-12 px-5 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider">
+                  <th className="h-12 px-5 text-left text-callout text-text-secondary uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="h-12 px-5 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider">
+                  <th className="h-12 px-5 text-left text-callout text-text-secondary uppercase tracking-wider">
                     Completed Date
                   </th>
-                  <th className="h-12 px-5 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider">
+                  <th className="h-12 px-5 text-left text-callout text-text-secondary uppercase tracking-wider">
                     Last Assigned
                   </th>
                   <th className="h-12 px-3 w-12"></th>
@@ -1530,16 +1518,16 @@ function AssignmentCard({
                   >
                     <td className="h-14 px-5">
                       <div>
-                        <p className="text-sm font-medium text-text-primary">{recipient.name}</p>
-                        <p className="text-xs text-text-secondary">{recipient.role}</p>
+                        <p className="text-headline text-text-primary">{recipient.name}</p>
+                        <p className="text-caption text-text-secondary">{recipient.role}</p>
                       </div>
                     </td>
                     <td className="h-14 px-5">
-                      <span className="text-sm text-text-primary">{recipient.location}</span>
+                      <span className="text-body text-text-primary">{recipient.location}</span>
                     </td>
                     <td className="h-14 px-5">
                       <span
-                        className={`text-sm ${
+                        className={`text-body ${
                           recipient.status === 'completed'
                             ? 'text-green-600'
                             : recipient.status === 'refused'
@@ -1559,12 +1547,12 @@ function AssignmentCard({
                       </span>
                     </td>
                     <td className="h-14 px-5">
-                      <span className="text-sm text-text-primary">
+                      <span className="text-body text-text-primary">
                         {recipient.completedDate || '-'}
                       </span>
                     </td>
                     <td className="h-14 px-5">
-                      <span className="text-sm text-text-primary">
+                      <span className="text-body text-text-primary">
                         {recipient.lastAssignedDate}
                       </span>
                     </td>
@@ -1578,7 +1566,7 @@ function AssignmentCard({
 
             {filteredRecipients.length === 0 && (
               <div className="py-8 text-center border-t border-border-light">
-                <p className="text-sm text-text-secondary">
+                <p className="text-body text-text-secondary">
                   No recipients match your search
                 </p>
               </div>
@@ -1588,12 +1576,12 @@ function AssignmentCard({
           {/* Footer with pagination */}
           <div className="flex items-center justify-end gap-2 px-5 py-3 border-t border-border-light">
             <button
-              className="w-8 h-8 flex items-center justify-center rounded-md border border-border-light hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-8 h-8 flex items-center justify-center rounded-element border border-border-light hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               disabled
             >
               <ChevronLeft className="w-4 h-4 text-gray-400" />
             </button>
-            <button className="w-8 h-8 flex items-center justify-center rounded-md border border-border-light hover:bg-gray-50 transition-colors">
+            <button className="w-8 h-8 flex items-center justify-center rounded-element border border-border-light hover:bg-gray-50 transition-colors">
               <ChevronRight className="w-4 h-4 text-gray-400" />
             </button>
           </div>

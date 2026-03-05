@@ -125,8 +125,8 @@ export default function CertificationUploadPage({
         <div className="flex items-start gap-3 p-4 bg-blue-50 border border-blue-200 rounded-element">
           <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
           <div>
-            <p className="text-sm font-medium text-blue-800">Instructions</p>
-            <p className="text-sm text-blue-700 mt-1">{request.instructions}</p>
+            <p className="text-body font-medium text-blue-800">Instructions</p>
+            <p className="text-body text-blue-700 mt-1">{request.instructions}</p>
           </div>
         </div>
       )}
@@ -166,23 +166,23 @@ export default function CertificationUploadPage({
             )}
             
             <div className="flex-1">
-              <p className="text-sm font-medium text-text-primary">
+              <p className="text-body font-medium text-text-primary">
                 {uploadedFile.name}
               </p>
-              <p className="text-xs text-text-secondary mt-1">
+              <p className="text-caption text-text-secondary mt-1">
                 {formatFileSize(uploadedFile.size)} · {uploadedFile.type || 'Unknown type'}
               </p>
               
               <div className="flex items-center gap-2 mt-3">
                 <Button
-                  variant="outline"
+                  variant="plain-gray"
                   size="sm"
                   onClick={clearFile}
                 >
                   Remove
                 </Button>
                 <label className="cursor-pointer">
-                  <Button variant="ghost" size="sm">
+                  <Button variant="clear" size="sm">
                     Replace
                   </Button>
                   <input
@@ -200,16 +200,16 @@ export default function CertificationUploadPage({
             <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
               <Upload className="w-8 h-8 text-gray-400" />
             </div>
-            <p className="text-sm font-medium text-text-primary mb-1">
+            <p className="text-body font-medium text-text-primary mb-1">
               Drag and drop your file here
             </p>
-            <p className="text-xs text-text-secondary mb-4">
+            <p className="text-caption text-text-secondary mb-4">
               or click to browse
             </p>
             
             <div className="flex items-center justify-center gap-3">
               <label className="cursor-pointer">
-                <Button variant="primary" leftIcon={<Upload className="w-4 h-4" />}>
+                <Button variant="accent-blue" leftIcon={<Upload className="w-4 h-4" />}>
                   Upload File
                 </Button>
                 <input
@@ -221,7 +221,7 @@ export default function CertificationUploadPage({
               </label>
               
               <label className="cursor-pointer">
-                <Button variant="outline" leftIcon={<Camera className="w-4 h-4" />}>
+                <Button variant="plain-gray" leftIcon={<Camera className="w-4 h-4" />}>
                   Take Photo
                 </Button>
                 <input
@@ -234,7 +234,7 @@ export default function CertificationUploadPage({
               </label>
             </div>
             
-            <p className="text-xs text-text-placeholder mt-4">
+            <p className="text-caption text-text-placeholder mt-4">
               Supports PDF, JPG, PNG (Max 10MB)
             </p>
           </div>
@@ -272,14 +272,14 @@ export default function CertificationUploadPage({
           </div>
         )}
         <div className="flex-1">
-          <p className="text-sm font-medium text-text-primary">
+          <p className="text-body font-medium text-text-primary">
             {uploadedFile?.name}
           </p>
-          <p className="text-xs text-text-secondary">
+          <p className="text-caption text-text-secondary">
             {uploadedFile && formatFileSize(uploadedFile.size)}
           </p>
         </div>
-        <Button variant="ghost" size="sm" onClick={() => setStep('upload')}>
+        <Button variant="clear" size="sm" onClick={() => setStep('upload')}>
           Change
         </Button>
       </div>
@@ -287,7 +287,7 @@ export default function CertificationUploadPage({
       {/* Expiration Date */}
       {request.expirationRequired && (
         <div>
-          <label className="block text-sm font-semibold text-text-primary mb-2">
+          <label className="block text-headline text-text-primary mb-2">
             Expiration Date <span className="text-red-500">*</span>
           </label>
           <div className="relative">
@@ -296,11 +296,11 @@ export default function CertificationUploadPage({
               value={expirationDate}
               onChange={(e) => setExpirationDate(e.target.value)}
               min={new Date().toISOString().split('T')[0]}
-              className="w-full h-10 px-3 pr-10 rounded-element border border-border bg-white text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="w-full h-10 px-3 pr-10 rounded-element border border-border bg-white text-body text-text-primary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             />
             <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
           </div>
-          <p className="text-xs text-text-secondary mt-1.5">
+          <p className="text-caption text-text-secondary mt-1.5">
             Enter the expiration date shown on your certificate
           </p>
         </div>
@@ -308,7 +308,7 @@ export default function CertificationUploadPage({
 
       {/* Certificate Number */}
       <div>
-        <label className="block text-sm font-semibold text-text-primary mb-2">
+        <label className="block text-headline text-text-primary mb-2">
           Certificate Number (optional)
         </label>
         <input
@@ -316,16 +316,16 @@ export default function CertificationUploadPage({
           value={certificateNumber}
           onChange={(e) => setCertificateNumber(e.target.value)}
           placeholder="e.g., FH-2024-12345"
-          className="w-full h-10 px-3 rounded-element border border-border bg-white text-sm text-text-primary placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          className="w-full h-10 px-3 rounded-element border border-border bg-white text-body text-text-primary placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
         />
-        <p className="text-xs text-text-secondary mt-1.5">
+        <p className="text-caption text-text-secondary mt-1.5">
           If your certificate has an ID number, enter it here
         </p>
       </div>
 
       {/* Navigation */}
       <div className="flex items-center gap-3 pt-4">
-        <Button variant="outline" onClick={() => setStep('upload')} className="flex-1">
+        <Button variant="plain-gray" onClick={() => setStep('upload')} className="flex-1">
           Back
         </Button>
         <Button 
@@ -344,7 +344,7 @@ export default function CertificationUploadPage({
       {/* Summary Card */}
       <div className="bg-gray-50 rounded-container border border-border-light overflow-hidden">
         <div className="p-4 border-b border-border-light">
-          <h3 className="text-sm font-semibold text-text-primary">Review Your Submission</h3>
+          <h3 className="text-headline text-text-primary">Review Your Submission</h3>
         </div>
         
         <div className="p-4 space-y-4">
@@ -364,11 +364,11 @@ export default function CertificationUploadPage({
               </div>
             )}
             <div>
-              <p className="text-xs text-text-secondary uppercase tracking-wider">Document</p>
-              <p className="text-sm font-medium text-text-primary mt-1">
+              <p className="text-caption text-text-secondary uppercase tracking-wider">Document</p>
+              <p className="text-body font-medium text-text-primary mt-1">
                 {uploadedFile?.name}
               </p>
-              <p className="text-xs text-text-secondary">
+              <p className="text-caption text-text-secondary">
                 {uploadedFile && formatFileSize(uploadedFile.size)}
               </p>
             </div>
@@ -378,16 +378,16 @@ export default function CertificationUploadPage({
           <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border-light">
             {request.expirationRequired && expirationDate && (
               <div>
-                <p className="text-xs text-text-secondary uppercase tracking-wider">Expiration Date</p>
-                <p className="text-sm font-medium text-text-primary mt-1">
+                <p className="text-caption text-text-secondary uppercase tracking-wider">Expiration Date</p>
+                <p className="text-body font-medium text-text-primary mt-1">
                   {formatDate(expirationDate)}
                 </p>
               </div>
             )}
             {certificateNumber && (
               <div>
-                <p className="text-xs text-text-secondary uppercase tracking-wider">Certificate Number</p>
-                <p className="text-sm font-medium text-text-primary mt-1">
+                <p className="text-caption text-text-secondary uppercase tracking-wider">Certificate Number</p>
+                <p className="text-body font-medium text-text-primary mt-1">
                   {certificateNumber}
                 </p>
               </div>
@@ -400,8 +400,8 @@ export default function CertificationUploadPage({
       <div className="flex items-start gap-3 p-4 bg-amber-50 border border-amber-200 rounded-element">
         <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
         <div>
-          <p className="text-sm font-medium text-amber-800">Before you submit</p>
-          <ul className="text-xs text-amber-700 mt-1 space-y-1">
+          <p className="text-body font-medium text-amber-800">Before you submit</p>
+          <ul className="text-caption text-amber-700 mt-1 space-y-1">
             <li>• Make sure the document is clearly readable</li>
             <li>• Check that the expiration date matches what's on your certificate</li>
             <li>• Your manager will review and verify this submission</li>
@@ -411,7 +411,7 @@ export default function CertificationUploadPage({
 
       {/* Navigation */}
       <div className="flex items-center gap-3 pt-4">
-        <Button variant="outline" onClick={() => setStep('details')} className="flex-1">
+        <Button variant="plain-gray" onClick={() => setStep('details')} className="flex-1">
           Back
         </Button>
         <Button 
@@ -434,15 +434,15 @@ export default function CertificationUploadPage({
             <FileText className="w-6 h-6 text-primary-600" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-text-primary">{request.templateName}</h1>
-            <p className="text-sm text-text-secondary">
+            <h1 className="text-title-4 text-text-primary">{request.templateName}</h1>
+            <p className="text-body text-text-secondary">
               Requested by {request.requestedBy} · {formatDate(request.requestedAt)}
             </p>
           </div>
         </div>
         
         {request.description && (
-          <p className="text-sm text-text-secondary">{request.description}</p>
+          <p className="text-body text-text-secondary">{request.description}</p>
         )}
       </div>
 
@@ -456,7 +456,7 @@ export default function CertificationUploadPage({
           return (
             <div key={s} className="flex items-center flex-1">
               <div className={`
-                w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium
+                w-8 h-8 rounded-full flex items-center justify-center text-body font-medium
                 ${isActive ? 'bg-primary-500 text-white' : isComplete ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-500'}
               `}>
                 {isComplete ? <CheckCircle2 className="w-4 h-4" /> : index + 1}
@@ -472,7 +472,7 @@ export default function CertificationUploadPage({
       </div>
 
       {/* Step Labels */}
-      <div className="flex items-center justify-between mb-8 text-xs text-text-secondary">
+      <div className="flex items-center justify-between mb-8 text-caption text-text-secondary">
         <span className={step === 'upload' ? 'text-primary-600 font-medium' : ''}>Upload</span>
         <span className={step === 'details' ? 'text-primary-600 font-medium' : ''}>Details</span>
         <span className={step === 'review' ? 'text-primary-600 font-medium' : ''}>Review</span>
@@ -488,7 +488,7 @@ export default function CertificationUploadPage({
         <div className="mt-8 text-center">
           <button
             onClick={onCancel}
-            className="text-sm text-text-secondary hover:text-text-primary"
+            className="text-body text-text-secondary hover:text-text-primary"
           >
             Cancel
           </button>

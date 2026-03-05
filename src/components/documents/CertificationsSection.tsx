@@ -140,10 +140,10 @@ export default function CertificationsSection({
     return (
       <div className="bg-white rounded-container border border-border-light p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-semibold text-text-primary">Certifications & Licenses</h3>
+          <h3 className="text-headline text-text-primary">Certifications & Licenses</h3>
           <Button
             size="sm"
-            variant="outline"
+            variant="plain-gray"
             leftIcon={<Plus className="w-3 h-3" />}
             onClick={() => onUploadCertification?.()}
           >
@@ -152,8 +152,8 @@ export default function CertificationsSection({
         </div>
         <div className="text-center py-8">
           <Shield className="w-10 h-10 text-gray-300 mx-auto mb-3" />
-          <p className="text-sm text-text-secondary">No certifications on file</p>
-          <p className="text-xs text-text-placeholder mt-1">
+          <p className="text-body text-text-secondary">No certifications on file</p>
+          <p className="text-caption text-text-placeholder mt-1">
             Request certifications from {employeeName.split(' ')[0]}
           </p>
         </div>
@@ -173,20 +173,20 @@ export default function CertificationsSection({
             <Shield className="w-5 h-5 text-blue-600" />
           </div>
           <div className="text-left">
-            <h3 className="text-sm font-semibold text-text-primary">Certifications & Licenses</h3>
-            <p className="text-xs text-text-secondary">
+            <h3 className="text-headline text-text-primary">Certifications & Licenses</h3>
+            <p className="text-caption text-text-secondary">
               {stats.valid} valid · {stats.pending} pending · {stats.expiring + stats.expired} needs attention
             </p>
           </div>
         </div>
         <div className="flex items-center gap-3">
           {stats.expired > 0 && (
-            <span className="px-2 py-1 bg-red-100 text-red-700 rounded text-xs font-medium">
+            <span className="px-2 py-1 bg-red-100 text-red-700 rounded text-caption font-medium">
               {stats.expired} expired
             </span>
           )}
           {stats.expiring > 0 && (
-            <span className="px-2 py-1 bg-orange-100 text-orange-700 rounded text-xs font-medium">
+            <span className="px-2 py-1 bg-orange-100 text-orange-700 rounded text-caption font-medium">
               {stats.expiring} expiring
             </span>
           )}
@@ -232,14 +232,14 @@ export default function CertificationsSection({
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2">
                         <div>
-                          <p className="text-sm font-medium text-text-primary">{cert.templateName}</p>
+                          <p className="text-body font-medium text-text-primary">{cert.templateName}</p>
                           <div className="flex items-center gap-2 mt-1">
-                            <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-xs font-medium ${status.bgColor} ${status.color}`}>
+                            <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-caption font-medium ${status.bgColor} ${status.color}`}>
                               {status.icon}
                               {status.label}
                             </span>
                             {cert.expirationDate && (
-                              <span className={`text-xs ${
+                              <span className={`text-caption ${
                                 daysUntilExpiry !== null && daysUntilExpiry < 0 ? 'text-red-600' :
                                 daysUntilExpiry !== null && daysUntilExpiry < 30 ? 'text-orange-600' :
                                 'text-text-secondary'
@@ -293,13 +293,13 @@ export default function CertificationsSection({
                       
                       {/* Additional Info */}
                       {cert.certificateNumber && (
-                        <p className="text-xs text-text-secondary mt-2">
+                        <p className="text-caption text-text-secondary mt-2">
                           Certificate #: <span className="font-mono">{cert.certificateNumber}</span>
                         </p>
                       )}
                       
                       {cert.verifiedBy && (
-                        <p className="text-xs text-text-secondary mt-1">
+                        <p className="text-caption text-text-secondary mt-1">
                           Verified by {cert.verifiedBy} on {formatDate(cert.verifiedAt)}
                         </p>
                       )}
@@ -308,7 +308,7 @@ export default function CertificationsSection({
                         <div className="mt-2">
                           <Button
                             size="sm"
-                            variant="outline"
+                            variant="plain-gray"
                             leftIcon={<Upload className="w-3 h-3" />}
                             onClick={() => onUploadCertification?.(cert.templateId)}
                           >
@@ -326,7 +326,7 @@ export default function CertificationsSection({
           {/* Request New */}
           <div className="p-4 bg-gray-50 border-t border-border-light">
             <Button
-              variant="ghost"
+              variant="clear"
               size="sm"
               leftIcon={<Plus className="w-4 h-4" />}
               onClick={() => onUploadCertification?.()}

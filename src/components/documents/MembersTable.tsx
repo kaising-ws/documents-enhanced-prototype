@@ -159,12 +159,12 @@ export default function MembersTable({ members }: MembersTableProps) {
       {/* Floating bulk action bar */}
       {selectedRows.length > 0 && (
         <div className="sticky top-0 z-10 bg-primary-500 text-white rounded-container px-4 py-3 mb-3 flex items-center justify-between shadow-lg">
-          <span className="text-sm font-medium">
+          <span className="text-body font-medium">
             {selectedRows.length} member{selectedRows.length !== 1 ? 's' : ''} selected
           </span>
           <div className="flex items-center gap-2">
             <Button
-              variant="ghost"
+              variant="clear"
               size="sm"
               className="text-white hover:bg-white/20"
               onClick={() => {
@@ -175,7 +175,7 @@ export default function MembersTable({ members }: MembersTableProps) {
               Remind All
             </Button>
             <Button
-              variant="ghost"
+              variant="clear"
               size="sm"
               className="text-white hover:bg-white/20"
               onClick={() => {
@@ -186,7 +186,7 @@ export default function MembersTable({ members }: MembersTableProps) {
               Download All
             </Button>
             <Button
-              variant="ghost"
+              variant="clear"
               size="sm"
               className="text-white hover:bg-white/20"
               onClick={() => setSelectedRows([])}
@@ -207,7 +207,7 @@ export default function MembersTable({ members }: MembersTableProps) {
                   onChange={handleSelectAll}
                 />
               </th>
-              <th className="h-12 px-4 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider w-[30%]">
+              <th className="h-12 px-4 text-left text-callout text-text-secondary uppercase tracking-wider w-[30%]">
                 <button
                   onClick={() => handleSort('name')}
                   className="flex items-center gap-1 hover:text-text-primary transition-colors"
@@ -215,7 +215,7 @@ export default function MembersTable({ members }: MembersTableProps) {
                   Member {getSortIcon('name')}
                 </button>
               </th>
-              <th className="h-12 px-4 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider">
+              <th className="h-12 px-4 text-left text-callout text-text-secondary uppercase tracking-wider">
                 <button
                   onClick={() => handleSort('location')}
                   className="flex items-center gap-1 hover:text-text-primary transition-colors"
@@ -223,7 +223,7 @@ export default function MembersTable({ members }: MembersTableProps) {
                   Location {getSortIcon('location')}
                 </button>
               </th>
-              <th className="h-12 px-4 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider">
+              <th className="h-12 px-4 text-left text-callout text-text-secondary uppercase tracking-wider">
                 <button
                   onClick={() => handleSort('progress')}
                   className="flex items-center gap-1 hover:text-text-primary transition-colors"
@@ -231,7 +231,7 @@ export default function MembersTable({ members }: MembersTableProps) {
                   Progress {getSortIcon('progress')}
                 </button>
               </th>
-              <th className="h-12 px-4 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider">
+              <th className="h-12 px-4 text-left text-callout text-text-secondary uppercase tracking-wider">
                 <button
                   onClick={() => handleSort('validity')}
                   className="flex items-center gap-1 hover:text-text-primary transition-colors"
@@ -239,7 +239,7 @@ export default function MembersTable({ members }: MembersTableProps) {
                   Validity {getSortIcon('validity')}
                 </button>
               </th>
-              <th className="h-12 px-4 text-right text-xs font-semibold text-text-secondary uppercase tracking-wider w-[140px]">
+              <th className="h-12 px-4 text-right text-callout text-text-secondary uppercase tracking-wider w-[140px]">
                 Actions
               </th>
             </tr>
@@ -267,20 +267,20 @@ export default function MembersTable({ members }: MembersTableProps) {
                   <td className="h-16 px-4">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 bg-primary-500 rounded-full flex items-center justify-center flex-shrink-0">
-                        <span className="text-sm font-semibold text-white">{member.initials}</span>
+                        <span className="text-headline text-white">{member.initials}</span>
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-text-primary">{member.name}</p>
-                        <p className="text-xs text-text-secondary">{member.role}</p>
+                        <p className="text-headline text-text-primary">{member.name}</p>
+                        <p className="text-caption text-text-secondary">{member.role}</p>
                       </div>
                     </div>
                   </td>
                   <td className="h-16 px-4">
-                    <span className="text-sm text-text-primary">{member.location}</span>
+                    <span className="text-body text-text-primary">{member.location}</span>
                   </td>
                   <td className="h-16 px-4">
                     <div className="flex flex-col gap-1">
-                      <span className="text-sm text-text-primary">
+                      <span className="text-body text-text-primary">
                         {stats.completed}/{stats.total}
                       </span>
                       <div className="w-20 h-1.5 bg-gray-200 rounded-full overflow-hidden">
@@ -296,12 +296,12 @@ export default function MembersTable({ members }: MembersTableProps) {
                   <td className="h-16 px-4">
                     <div className="flex items-center gap-2">
                       <span
-                        className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${validity.color}`}
+                        className={`inline-flex items-center px-2 py-1 rounded text-caption font-medium ${validity.color}`}
                       >
                         {validity.label}
                       </span>
                       {stats.expired > 0 && (
-                        <span className="text-xs text-red-600 font-medium">
+                        <span className="text-caption text-red-600 font-medium">
                           {stats.expired} expired
                         </span>
                       )}
@@ -311,7 +311,7 @@ export default function MembersTable({ members }: MembersTableProps) {
                     <div className="flex items-center justify-end gap-2">
                       {(stats.expired > 0 || stats.pending > 0) && (
                         <Button
-                          variant="ghost"
+                          variant="clear"
                           size="sm"
                           onClick={() => addToast(`Reminder sent to ${member.name}`, 'success')}
                         >
@@ -361,10 +361,10 @@ function MemberSlideOver({
       <div className="fixed right-0 top-0 bottom-0 z-50 w-[420px] bg-white shadow-2xl flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-border-light">
-          <h2 className="text-lg font-bold text-text-primary">Member Details</h2>
+          <h2 className="text-title-4 text-text-primary">Member Details</h2>
           <button
             onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
+            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-50 transition-colors"
           >
             <X className="w-5 h-5 text-gray-500" />
           </button>
@@ -376,14 +376,14 @@ function MemberSlideOver({
           <div className="px-6 py-5 border-b border-border-light">
             <div className="flex items-center gap-4">
               <div className="w-14 h-14 bg-primary-500 rounded-full flex items-center justify-center">
-                <span className="text-lg font-bold text-white">{member.initials}</span>
+                <span className="text-title-4 text-white">{member.initials}</span>
               </div>
               <div>
-                <h3 className="text-base font-bold text-text-primary">{member.name}</h3>
-                <p className="text-sm text-text-secondary">
+                <h3 className="text-headline text-text-primary">{member.name}</h3>
+                <p className="text-body text-text-secondary">
                   {member.role} · {member.location}
                 </p>
-                <p className="text-xs text-text-secondary mt-0.5">{member.email}</p>
+                <p className="text-caption text-text-secondary mt-0.5">{member.email}</p>
               </div>
             </div>
           </div>
@@ -393,10 +393,10 @@ function MemberSlideOver({
             {member.documents.map((category) => (
               <div key={category.category} className="mb-5 last:mb-0">
                 <div className="flex items-center justify-between mb-3">
-                  <h4 className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
+                  <h4 className="text-callout text-text-secondary uppercase tracking-wider">
                     {category.category}
                   </h4>
-                  <span className="text-xs text-text-secondary">{category.documents.length}</span>
+                  <span className="text-caption text-text-secondary">{category.documents.length}</span>
                 </div>
                 <div className="space-y-2">
                   {category.documents.map((doc) => (
@@ -407,17 +407,17 @@ function MemberSlideOver({
                       <div className="flex items-center gap-3">
                         {getStatusIcon(doc.status)}
                         <div>
-                          <p className="text-sm font-medium text-text-primary">{doc.name}</p>
+                          <p className="text-headline text-text-primary">{doc.name}</p>
                           {doc.completedDate && (
-                            <p className="text-xs text-text-secondary">Completed {doc.completedDate}</p>
+                            <p className="text-caption text-text-secondary">Completed {doc.completedDate}</p>
                           )}
                           {doc.dueDate && doc.status !== 'completed' && (
-                            <p className="text-xs text-text-secondary">Due {doc.dueDate}</p>
+                            <p className="text-caption text-text-secondary">Due {doc.dueDate}</p>
                           )}
                         </div>
                       </div>
                       <span
-                        className={`text-xs font-medium px-2 py-0.5 rounded ${
+                        className={`text-caption font-medium px-2 py-0.5 rounded ${
                           doc.status === 'expired'
                             ? 'text-red-600 bg-red-50'
                             : doc.status === 'expiring'
@@ -446,7 +446,7 @@ function MemberSlideOver({
         {/* Footer */}
         <div className="px-6 py-4 border-t border-border-light flex items-center gap-3">
           <Button
-            variant="primary"
+            variant="accent-blue"
             className="flex-1"
             leftIcon={<Bell className="w-4 h-4" />}
             onClick={() => addToast(`Reminder sent to ${member.name}`, 'success')}
@@ -454,7 +454,7 @@ function MemberSlideOver({
             Send Reminder
           </Button>
           <Button
-            variant="outline"
+            variant="plain-gray"
             leftIcon={<Download className="w-4 h-4" />}
             onClick={() => addToast(`Downloading documents for ${member.name}`, 'info')}
           >

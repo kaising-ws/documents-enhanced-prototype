@@ -154,10 +154,10 @@ export default function ExpiryCalendar({
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-border-light">
           <div className="flex items-center gap-4">
-            <h2 className="text-lg font-bold text-text-primary">
+            <h2 className="text-title-4 text-text-primary">
               {formatMonthYear(currentDate)}
             </h2>
-            <Button variant="ghost" size="sm" onClick={goToToday}>
+            <Button variant="clear" size="sm" onClick={goToToday}>
               Today
             </Button>
           </div>
@@ -165,13 +165,13 @@ export default function ExpiryCalendar({
           <div className="flex items-center gap-2">
             <button
               onClick={goToPreviousMonth}
-              className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+              className="p-2 rounded-lg hover:bg-gray-50 transition-colors"
             >
               <ChevronLeft className="w-5 h-5 text-gray-600" />
             </button>
             <button
               onClick={goToNextMonth}
-              className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+              className="p-2 rounded-lg hover:bg-gray-50 transition-colors"
             >
               <ChevronRight className="w-5 h-5 text-gray-600" />
             </button>
@@ -182,22 +182,22 @@ export default function ExpiryCalendar({
         <div className="grid grid-cols-3 gap-4 p-4 bg-gray-50 border-b border-border-light">
           <div className="text-center">
             <p className="text-2xl font-bold text-red-600">{monthlyStats.expiredCount}</p>
-            <p className="text-xs text-text-secondary">Expired</p>
+            <p className="text-caption text-text-secondary">Expired</p>
           </div>
           <div className="text-center">
             <p className="text-2xl font-bold text-orange-600">{monthlyStats.expiringThisMonth}</p>
-            <p className="text-xs text-text-secondary">Expiring This Month</p>
+            <p className="text-caption text-text-secondary">Expiring This Month</p>
           </div>
           <div className="text-center">
             <p className="text-2xl font-bold text-green-600">{monthlyStats.upcomingCount}</p>
-            <p className="text-xs text-text-secondary">Future</p>
+            <p className="text-caption text-text-secondary">Future</p>
           </div>
         </div>
 
         {/* Weekday Headers */}
         <div className="grid grid-cols-7 border-b border-border-light">
           {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
-            <div key={day} className="h-10 flex items-center justify-center text-xs font-semibold text-text-secondary uppercase">
+            <div key={day} className="h-10 flex items-center justify-center text-callout text-text-secondary uppercase">
               {day}
             </div>
           ))}
@@ -221,7 +221,7 @@ export default function ExpiryCalendar({
                 `}
               >
                 <span className={`
-                  text-sm font-medium
+                  text-body font-medium
                   ${!day.isCurrentMonth ? 'text-text-placeholder' : 'text-text-primary'}
                   ${day.isToday ? 'text-primary-600' : ''}
                 `}>
@@ -239,7 +239,7 @@ export default function ExpiryCalendar({
                       />
                     ))}
                     {day.expirations.length > 3 && (
-                      <span className="text-xs text-text-secondary">
+                      <span className="text-caption text-text-secondary">
                         +{day.expirations.length - 3} more
                       </span>
                     )}
@@ -254,19 +254,19 @@ export default function ExpiryCalendar({
         <div className="flex items-center justify-center gap-6 p-3 bg-gray-50 border-t border-border-light">
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full bg-red-500" />
-            <span className="text-xs text-text-secondary">Expired</span>
+            <span className="text-caption text-text-secondary">Expired</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full bg-orange-400" />
-            <span className="text-xs text-text-secondary">This Month</span>
+            <span className="text-caption text-text-secondary">This Month</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full bg-yellow-400" />
-            <span className="text-xs text-text-secondary">60 Days</span>
+            <span className="text-caption text-text-secondary">60 Days</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full bg-green-400" />
-            <span className="text-xs text-text-secondary">Valid</span>
+            <span className="text-caption text-text-secondary">Valid</span>
           </div>
         </div>
       </div>
@@ -279,13 +279,13 @@ export default function ExpiryCalendar({
               <CalendarIcon className="w-5 h-5 text-primary-600" />
             </div>
             <div>
-              <h3 className="text-sm font-semibold text-text-primary">
+              <h3 className="text-body font-semibold text-text-primary">
                 {selectedDate 
                   ? selectedDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
                   : 'Select a date'
                 }
               </h3>
-              <p className="text-xs text-text-secondary">
+              <p className="text-caption text-text-secondary">
                 {selectedExpirations.length} certification{selectedExpirations.length !== 1 ? 's' : ''} expiring
               </p>
             </div>
@@ -319,13 +319,13 @@ export default function ExpiryCalendar({
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-text-primary truncate">
+                          <p className="text-body font-medium text-text-primary truncate">
                             {cert.employeeName}
                           </p>
-                          <p className="text-xs text-text-secondary">
+                          <p className="text-caption text-text-secondary">
                             {cert.templateName}
                           </p>
-                          <p className="text-xs text-text-secondary">
+                          <p className="text-caption text-text-secondary">
                             {cert.employeeRole} · {cert.employeeLocation}
                           </p>
                         </div>
@@ -334,7 +334,7 @@ export default function ExpiryCalendar({
                       <div className="flex items-center gap-2 mt-3 pt-3 border-t border-current border-opacity-10">
                         <Button
                           size="sm"
-                          variant="outline"
+                          variant="plain-gray"
                           className="flex-1"
                           onClick={() => onViewCertification?.(cert)}
                         >
@@ -342,7 +342,7 @@ export default function ExpiryCalendar({
                         </Button>
                         <Button
                           size="sm"
-                          variant="ghost"
+                          variant="clear"
                           leftIcon={<Bell className="w-3 h-3" />}
                           onClick={() => onSendReminder?.(cert)}
                         >
@@ -356,7 +356,7 @@ export default function ExpiryCalendar({
             ) : (
               <div className="text-center py-8">
                 <CheckCircle2 className="w-10 h-10 text-green-400 mx-auto mb-3" />
-                <p className="text-sm text-text-secondary">
+                <p className="text-body text-text-secondary">
                   No certifications expiring on this date
                 </p>
               </div>
@@ -364,7 +364,7 @@ export default function ExpiryCalendar({
           ) : (
             <div className="text-center py-8">
               <CalendarIcon className="w-10 h-10 text-gray-300 mx-auto mb-3" />
-              <p className="text-sm text-text-secondary">
+              <p className="text-body text-text-secondary">
                 Click on a date to see expiring certifications
               </p>
             </div>

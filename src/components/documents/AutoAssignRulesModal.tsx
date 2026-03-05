@@ -134,12 +134,12 @@ export default function AutoAssignRulesModal({
       size="xl"
       footer={
         <div className="flex items-center justify-between w-full">
-          <Button variant="ghost" onClick={onClose}>
+          <Button variant="clear" onClick={onClose}>
             Cancel
           </Button>
           <div className="flex items-center gap-3">
             <Button 
-              variant="outline" 
+              variant="plain-gray" 
               leftIcon={<Play className="w-4 h-4" />}
               onClick={testRules}
             >
@@ -157,7 +157,7 @@ export default function AutoAssignRulesModal({
         <div className="flex items-start gap-3 p-4 bg-blue-50 border border-blue-200 rounded-element">
           <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
           <div>
-            <p className="text-sm text-blue-800">
+            <p className="text-body text-blue-800">
               Auto-assign rules automatically request this certification when a <strong>new employee is hired</strong> or
               an <strong>existing employee's job title changes</strong> to one matching the conditions below.
             </p>
@@ -179,16 +179,16 @@ export default function AutoAssignRulesModal({
                 onClick={() => setExpandedRule(expandedRule === rule.id ? null : rule.id)}
               >
                 <div className="flex items-center gap-3">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-headline ${
                     rule.enabled ? 'bg-primary-100 text-primary-600' : 'bg-gray-200 text-gray-500'
                   }`}>
                     {index + 1}
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-text-primary">
+                    <p className="text-body font-medium text-text-primary">
                       Rule {index + 1}
                     </p>
-                    <p className="text-xs text-text-secondary">
+                    <p className="text-caption text-text-secondary">
                       {rule.conditions.jobTitles.length > 0 
                         ? `${rule.conditions.jobTitles.length} job title(s)` 
                         : 'All job titles'}
@@ -223,7 +223,7 @@ export default function AutoAssignRulesModal({
                         e.stopPropagation()
                         removeRule(rule.id)
                       }}
-                      className="p-2 rounded hover:bg-gray-200 transition-colors"
+                      className="p-2 rounded hover:bg-gray-50 transition-colors"
                     >
                       <Trash2 className="w-4 h-4 text-gray-400 hover:text-red-500" />
                     </button>
@@ -242,7 +242,7 @@ export default function AutoAssignRulesModal({
                 <div className="p-4 space-y-4 border-t border-border-light">
                   {/* Job Titles */}
                   <div>
-                    <label className="flex items-center gap-2 text-sm font-medium text-text-primary mb-2">
+                    <label className="flex items-center gap-2 text-body font-medium text-text-primary mb-2">
                       <Briefcase className="w-4 h-4 text-gray-500" />
                       For employees with job title
                     </label>
@@ -258,7 +258,7 @@ export default function AutoAssignRulesModal({
                       allLabel="All"
                     />
                     {rule.conditions.jobTitles.length === 0 && (
-                      <p className="text-xs text-text-secondary mt-2">
+                      <p className="text-caption text-text-secondary mt-2">
                         No job titles selected = applies to all job titles
                       </p>
                     )}
@@ -266,7 +266,7 @@ export default function AutoAssignRulesModal({
 
                   {/* Locations */}
                   <div>
-                    <label className="flex items-center gap-2 text-sm font-medium text-text-primary mb-2">
+                    <label className="flex items-center gap-2 text-body font-medium text-text-primary mb-2">
                       <MapPin className="w-4 h-4 text-gray-500" />
                       At location
                     </label>
@@ -282,7 +282,7 @@ export default function AutoAssignRulesModal({
                       allLabel="All"
                     />
                     {rule.conditions.locations.length === 0 && (
-                      <p className="text-xs text-text-secondary mt-2">
+                      <p className="text-caption text-text-secondary mt-2">
                         No locations selected = applies to all locations
                       </p>
                     )}
@@ -290,10 +290,10 @@ export default function AutoAssignRulesModal({
 
                   {/* Timing */}
                   <div className="p-4 bg-gray-50 border border-border-light rounded-element space-y-4">
-                    <p className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Timing</p>
+                    <p className="text-callout text-text-secondary uppercase tracking-wider">Timing</p>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-text-primary mb-1.5">
+                        <label className="block text-body font-medium text-text-primary mb-1.5">
                           Assign date
                         </label>
                         <div className="flex items-center gap-2">
@@ -302,15 +302,15 @@ export default function AutoAssignRulesModal({
                             min={0}
                             value={rule.delayDays}
                             onChange={(e) => updateRule(rule.id, { delayDays: Math.max(0, parseInt(e.target.value) || 0) })}
-                            className="w-20 h-9 px-3 rounded-element border border-border bg-white text-sm text-text-primary text-center focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                            className="w-20 h-9 px-3 rounded-element border border-border bg-white text-body text-text-primary text-center focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                           />
-                          <span className="text-sm text-text-secondary">
+                          <span className="text-body text-text-secondary">
                             day{rule.delayDays !== 1 ? 's' : ''} after trigger
                           </span>
                         </div>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-text-primary mb-1.5">
+                        <label className="block text-body font-medium text-text-primary mb-1.5">
                           Due date
                         </label>
                         <div className="flex items-center gap-2">
@@ -319,16 +319,16 @@ export default function AutoAssignRulesModal({
                             min={1}
                             value={rule.dueDays}
                             onChange={(e) => updateRule(rule.id, { dueDays: Math.max(1, parseInt(e.target.value) || 1) })}
-                            className="w-20 h-9 px-3 rounded-element border border-border bg-white text-sm text-text-primary text-center focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                            className="w-20 h-9 px-3 rounded-element border border-border bg-white text-body text-text-primary text-center focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                           />
-                          <span className="text-sm text-text-secondary">
+                          <span className="text-body text-text-secondary">
                             day{rule.dueDays !== 1 ? 's' : ''} after trigger
                           </span>
                         </div>
                       </div>
                     </div>
                     {rule.delayDays >= rule.dueDays && (
-                      <div className="flex items-center gap-2 text-xs text-amber-600">
+                      <div className="flex items-center gap-2 text-caption text-amber-600">
                         <Info className="w-3 h-3 flex-shrink-0" />
                         The due date should be after the assign date.
                       </div>
@@ -343,7 +343,7 @@ export default function AutoAssignRulesModal({
         {/* Add Rule Button */}
         <button
           onClick={addRule}
-          className="w-full flex items-center justify-center gap-2 p-3 border-2 border-dashed border-gray-300 rounded-element text-sm font-medium text-gray-500 hover:border-gray-400 hover:text-gray-600 transition-colors"
+          className="w-full flex items-center justify-center gap-2 p-3 border-2 border-dashed border-gray-300 rounded-element text-body font-medium text-gray-500 hover:border-gray-400 hover:text-gray-600 transition-colors"
         >
           <Plus className="w-4 h-4" />
           Add Another Rule
@@ -363,17 +363,17 @@ export default function AutoAssignRulesModal({
                     }`} />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-text-primary">
+                    <p className="text-headline text-text-primary">
                       Test Results
                     </p>
-                    <p className="text-xs text-text-secondary">
+                    <p className="text-caption text-text-secondary">
                       {getMatchingCount()} of {testResults.length} employees would receive this certification
                     </p>
                   </div>
                 </div>
                 <button
                   onClick={() => setTestResults(null)}
-                  className="text-xs text-text-secondary hover:text-text-primary"
+                  className="text-caption text-text-secondary hover:text-text-primary"
                 >
                   Clear
                 </button>
@@ -388,14 +388,14 @@ export default function AutoAssignRulesModal({
                     result.matches ? 'bg-green-50' : ''
                   }`}
                 >
-                  <span className="text-sm text-text-primary">{result.name}</span>
+                  <span className="text-body text-text-primary">{result.name}</span>
                   {result.matches ? (
-                    <span className="flex items-center gap-1 text-xs font-medium text-green-600">
+                    <span className="flex items-center gap-1 text-caption font-medium text-green-600">
                       <CheckCircle2 className="w-3 h-3" />
                       Would be assigned
                     </span>
                   ) : (
-                    <span className="text-xs text-text-secondary">
+                    <span className="text-caption text-text-secondary">
                       No match
                     </span>
                   )}

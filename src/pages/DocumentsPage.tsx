@@ -168,7 +168,7 @@ export default function DocumentsPage({ templates: documentTemplates, onOpenDocu
           </div>
           <div>
             <p className="text-2xl font-bold text-text-primary">{analytics.totalAttention}</p>
-            <p className="text-xs text-text-secondary">
+            <p className="text-caption text-text-secondary">
               assignees need attention across {analytics.templatesWithIssues} template{analytics.templatesWithIssues !== 1 ? 's' : ''}
             </p>
           </div>
@@ -179,7 +179,7 @@ export default function DocumentsPage({ templates: documentTemplates, onOpenDocu
           </div>
           <div>
             <p className="text-2xl font-bold text-text-primary">{analytics.pendingYourReview}</p>
-            <p className="text-xs text-text-secondary">
+            <p className="text-caption text-text-secondary">
               submissions pending your review
             </p>
           </div>
@@ -190,7 +190,7 @@ export default function DocumentsPage({ templates: documentTemplates, onOpenDocu
           </div>
           <div>
             <p className="text-2xl font-bold text-text-primary">{analytics.totalAssigned}</p>
-            <p className="text-xs text-text-secondary">
+            <p className="text-caption text-text-secondary">
               total assigned across {analytics.templateCount} template{analytics.templateCount !== 1 ? 's' : ''}
             </p>
           </div>
@@ -209,7 +209,7 @@ export default function DocumentsPage({ templates: documentTemplates, onOpenDocu
           {archivedCount > 0 && (
             <button
               onClick={() => setShowArchived(!showArchived)}
-              className={`flex items-center gap-1.5 h-9 px-3 rounded-full border text-xs font-medium transition-colors ${
+              className={`flex items-center gap-1.5 h-9 px-3 rounded-full border text-caption font-medium transition-colors ${
                 showArchived
                   ? 'bg-primary-50 border-primary-300 text-primary-700'
                   : 'bg-white border-border text-text-secondary hover:border-gray-400'
@@ -224,7 +224,7 @@ export default function DocumentsPage({ templates: documentTemplates, onOpenDocu
 
         {!showArchived && (
           <Button
-            variant="primary"
+            variant="accent-blue"
             leftIcon={<Plus className="w-4 h-4" />}
             onClick={handleAddClick}
           >
@@ -243,14 +243,14 @@ export default function DocumentsPage({ templates: documentTemplates, onOpenDocu
               <button
                 key={tab.id}
                 onClick={() => setActiveCategory(tab.id)}
-                className={`relative px-4 py-2.5 text-sm font-medium transition-colors whitespace-nowrap ${
+                className={`relative px-4 py-2.5 text-body font-medium transition-colors whitespace-nowrap ${
                   isActive
                     ? 'text-text-primary'
                     : 'text-text-secondary hover:text-text-primary'
                 }`}
               >
                 {tab.label}
-                <span className={`ml-1.5 text-xs tabular-nums ${isActive ? 'text-text-secondary' : 'text-text-secondary/60'}`}>
+                <span className={`ml-1.5 text-caption tabular-nums ${isActive ? 'text-text-secondary' : 'text-text-secondary/60'}`}>
                   {count}
                 </span>
                 {/* Active indicator bar */}
@@ -277,14 +277,14 @@ export default function DocumentsPage({ templates: documentTemplates, onOpenDocu
 
       {/* Pagination */}
       <div className="flex items-center justify-between mt-4 px-4">
-        <span className="text-sm text-text-secondary">
+        <span className="text-body text-text-secondary">
           Showing {filteredDocuments.length} of {baseTemplates.length} template{baseTemplates.length !== 1 ? 's' : ''}
         </span>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" disabled>
+          <Button variant="plain-gray" size="sm" disabled>
             Previous
           </Button>
-          <Button variant="outline" size="sm">
+          <Button variant="plain-gray" size="sm">
             Next
           </Button>
         </div>

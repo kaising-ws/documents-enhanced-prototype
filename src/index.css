@@ -17,28 +17,38 @@ body {
   font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-size: 14px;
+  line-height: 20px;
+  color: #161a24;
 }
 
-/* Custom scrollbar styles */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 4px;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
+  background: rgba(4,26,77,0.15);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #a1a1a1;
+  background: rgba(6,26,74,0.3);
 }
 
-
-
-
+@layer components {
+  .menu-item-hover {
+    @apply relative;
+  }
+  .menu-item-hover::before {
+    content: '';
+    @apply absolute inset-x-1 inset-y-0.5 rounded-element transition-colors;
+  }
+  .menu-item-hover:hover::before {
+    @apply bg-gray-50;
+  }
+}

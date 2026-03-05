@@ -106,31 +106,31 @@ function ArchiveConfirmModal({
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
       <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-md mx-4 overflow-hidden">
         <div className="flex items-center justify-between px-6 py-4 border-b border-border-light">
-          <h3 className="text-lg font-semibold text-text-primary">Archive template{isBulk ? 's' : ''}</h3>
+          <h3 className="text-title-4 text-text-primary">Archive template{isBulk ? 's' : ''}</h3>
           <button
             onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
+            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-50 transition-colors"
           >
             <X className="w-4 h-4 text-gray-500" />
           </button>
         </div>
         <div className="p-6 space-y-4">
-          <p className="text-sm text-text-primary">
+          <p className="text-body text-text-primary">
             Are you sure you want to archive {label}?
           </p>
           <div className="flex items-start gap-2.5 p-3 bg-blue-50 border border-blue-200 rounded-lg">
             <AlertTriangle className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
-            <p className="text-xs text-blue-800">
+            <p className="text-caption text-blue-800">
               Anyone who still has this document in progress will still be able to complete it. No new assignments can be made from archived templates.
             </p>
           </div>
         </div>
         <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-border-light bg-gray-50">
-          <Button variant="ghost" onClick={onClose}>
+          <Button variant="clear" onClick={onClose}>
             Cancel
           </Button>
           <Button
-            variant="primary"
+            variant="accent-blue"
             leftIcon={<Archive className="w-4 h-4" />}
             onClick={onConfirm}
           >
@@ -165,31 +165,31 @@ function DeleteConfirmModal({
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
       <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-md mx-4 overflow-hidden">
         <div className="flex items-center justify-between px-6 py-4 border-b border-border-light">
-          <h3 className="text-lg font-semibold text-text-primary">Delete template{isBulk ? 's' : ''}</h3>
+          <h3 className="text-title-4 text-text-primary">Delete template{isBulk ? 's' : ''}</h3>
           <button
             onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
+            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-50 transition-colors"
           >
             <X className="w-4 h-4 text-gray-500" />
           </button>
         </div>
         <div className="p-6 space-y-4">
-          <p className="text-sm text-text-primary">
+          <p className="text-body text-text-primary">
             Are you sure you want to permanently delete {label}?
           </p>
           <div className="flex items-start gap-2.5 p-3 bg-red-50 border border-red-200 rounded-lg">
             <AlertTriangle className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" />
-            <p className="text-xs text-red-800">
+            <p className="text-caption text-red-800">
               This action cannot be undone. All template data will be permanently removed and cannot be recovered.
             </p>
           </div>
         </div>
         <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-border-light bg-gray-50">
-          <Button variant="ghost" onClick={onClose}>
+          <Button variant="clear" onClick={onClose}>
             Cancel
           </Button>
           <Button
-            variant="primary"
+            variant="accent-blue"
             leftIcon={<Trash2 className="w-4 h-4" />}
             onClick={onConfirm}
             className="!bg-red-600 hover:!bg-red-700"
@@ -401,14 +401,14 @@ export default function DocumentsTable({
       {/* Floating bulk action bar */}
       {selectedRows.length > 0 && (
         <div className="sticky top-0 z-10 bg-primary-500 text-white rounded-container px-4 py-3 mb-3 flex items-center justify-between shadow-lg">
-          <span className="text-sm font-medium">
+          <span className="text-body font-medium">
             {selectedRows.length} selected
           </span>
           <div className="flex items-center gap-2">
             {isArchivedView ? (
               <>
                 <Button
-                  variant="ghost"
+                  variant="clear"
                   size="sm"
                   className="text-white hover:bg-white/20"
                   onClick={handleBulkUnarchive}
@@ -416,7 +416,7 @@ export default function DocumentsTable({
                   Unarchive
                 </Button>
                 <Button
-                  variant="ghost"
+                  variant="clear"
                   size="sm"
                   className="text-white hover:bg-white/20"
                   onClick={handleBulkDelete}
@@ -427,7 +427,7 @@ export default function DocumentsTable({
             ) : (
               <>
                 <Button
-                  variant="ghost"
+                  variant="clear"
                   size="sm"
                   className="text-white hover:bg-white/20"
                   onClick={() => {
@@ -438,7 +438,7 @@ export default function DocumentsTable({
                   Send Reminders
                 </Button>
                 <Button
-                  variant="ghost"
+                  variant="clear"
                   size="sm"
                   className="text-white hover:bg-white/20"
                   onClick={handleBulkArchive}
@@ -448,7 +448,7 @@ export default function DocumentsTable({
               </>
             )}
             <Button
-              variant="ghost"
+              variant="clear"
               size="sm"
               className="text-white hover:bg-white/20"
               onClick={() => setSelectedRows([])}
@@ -469,7 +469,7 @@ export default function DocumentsTable({
                   onChange={handleSelectAll}
                 />
               </th>
-              <th className="h-10 px-4 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider">
+              <th className="h-10 px-4 text-left text-callout text-text-secondary uppercase tracking-wider">
                 <button
                   onClick={() => handleSort('name')}
                   className="flex items-center gap-1 hover:text-text-primary transition-colors"
@@ -477,7 +477,7 @@ export default function DocumentsTable({
                   Template {getSortIcon('name')}
                 </button>
               </th>
-              <th className="h-10 px-4 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider w-[140px]">
+              <th className="h-10 px-4 text-left text-callout text-text-secondary uppercase tracking-wider w-[140px]">
                 <button
                   onClick={() => handleSort('type')}
                   className="flex items-center gap-1 hover:text-text-primary transition-colors"
@@ -485,7 +485,7 @@ export default function DocumentsTable({
                   Type {getSortIcon('type')}
                 </button>
               </th>
-              <th className="h-10 px-4 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider w-[110px]">
+              <th className="h-10 px-4 text-left text-callout text-text-secondary uppercase tracking-wider w-[110px]">
                 <button
                   onClick={() => handleSort('status')}
                   className="flex items-center gap-1 hover:text-text-primary transition-colors"
@@ -493,7 +493,7 @@ export default function DocumentsTable({
                   Status {getSortIcon('status')}
                 </button>
               </th>
-              <th className="h-10 px-4 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider w-[120px]">
+              <th className="h-10 px-4 text-left text-callout text-text-secondary uppercase tracking-wider w-[120px]">
                 <button
                   onClick={() => handleSort('createdAt')}
                   className="flex items-center gap-1 hover:text-text-primary transition-colors"
@@ -514,7 +514,7 @@ export default function DocumentsTable({
                   className={`border-b border-border-light last:border-b-0 cursor-pointer transition-colors ${
                     selectedRows.includes(doc.id)
                       ? 'bg-primary-50 hover:bg-primary-50'
-                      : 'hover:bg-gray-50/60'
+                      : 'hover:bg-gray-50'
                   }`}
                 >
                   <td className="py-3.5 px-4" onClick={(e) => e.stopPropagation()}>
@@ -529,37 +529,37 @@ export default function DocumentsTable({
                         {getCategoryIcon(doc.category)}
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className={`text-sm font-medium truncate leading-5 ${isArchivedView ? 'text-text-secondary' : 'text-text-primary'}`}>
+                        <p className={`text-headline truncate leading-5 ${isArchivedView ? 'text-text-secondary' : 'text-text-primary'}`}>
                           {doc.name}
                         </p>
-                        <p className="text-xs text-text-secondary/70 leading-4">
+                        <p className="text-caption text-text-secondary/70 leading-4">
                           {categoryLabel[doc.category]}
                         </p>
                       </div>
                     </div>
                   </td>
                   <td className="py-3.5 px-4">
-                    <span className="text-sm text-text-secondary">
+                    <span className="text-body text-text-secondary">
                       {doc.type}
                     </span>
                   </td>
                   <td className="py-3.5 px-4">
                     {isArchivedView ? (
-                      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-medium text-gray-500 bg-gray-100">
+                      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-caption font-medium text-gray-500 bg-gray-100">
                         <Archive className="w-3 h-3" />
                         Archived
                       </span>
                     ) : (
                       <div className="flex items-center gap-2">
                         <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${dotColors[health]}`} />
-                        <span className="text-sm text-text-primary tabular-nums">
+                        <span className="text-body text-text-primary tabular-nums">
                           {getStatusText(doc)}
                         </span>
                       </div>
                     )}
                   </td>
                   <td className="py-3.5 px-4">
-                    <span className="text-sm text-text-secondary">{doc.createdAtFormatted}</span>
+                    <span className="text-body text-text-secondary">{doc.createdAtFormatted}</span>
                   </td>
                   <td className="py-3.5 px-4" onClick={(e) => e.stopPropagation()}>
                     <ContextMenu items={isArchivedView ? getArchivedMenuItems(doc) : getActiveMenuItems(doc)} />

@@ -22,6 +22,7 @@ import {
 import Button from '../ui/Button'
 import SearchBox from '../ui/SearchBox'
 import Checkbox from '../ui/Checkbox'
+import FilterChip from '../ui/FilterChip'
 import ContextMenu, { ContextMenuItem } from '../ui/ContextMenu'
 import { useToast } from '../ui/Toast'
 
@@ -396,31 +397,20 @@ export default function CertificationsDashboard({
     <div className="space-y-4">
       {/* ─── Status Filter Chips + Search ─── */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           {statusChips.map((chip) => {
             const count = chipCounts[chip.id]
             if (chip.id !== 'all' && count === 0) return null
-            const isActive = activeChip === chip.id
             return (
-              <button
+              <FilterChip
                 key={chip.id}
+                label={chip.label}
+                count={count}
+                isActive={activeChip === chip.id}
                 onClick={() => setActiveChip(chip.id)}
-                className={`
-                  inline-flex items-center gap-1.5 h-8 px-3 rounded-full text-xs font-medium transition-all
-                  ${isActive
-                    ? 'bg-text-primary text-white shadow-sm'
-                    : 'bg-white text-text-secondary border border-border-light hover:border-gray-300 hover:text-text-primary'
-                  }
-                `}
-              >
-                {chip.id !== 'all' && (
-                  <span className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-white/70' : chip.dotColor}`} />
-                )}
-                {chip.label}
-                <span className={`${isActive ? 'text-white/70' : 'text-text-secondary'}`}>
-                  {count}
-                </span>
-              </button>
+                dotColor={chip.dotColor}
+                showDot={chip.id !== 'all'}
+              />
             )
           })}
         </div>
@@ -433,7 +423,7 @@ export default function CertificationsDashboard({
             className="w-64"
           />
           <Button
-            variant="outline"
+            variant="plain-gray"
             size="sm"
             leftIcon={<CalendarDays className="w-3.5 h-3.5" />}
             onClick={onViewCalendar}
@@ -446,12 +436,12 @@ export default function CertificationsDashboard({
       {/* Floating bulk action bar */}
       {selectedRows.length > 0 && (
         <div className="sticky top-0 z-10 bg-gray-900 text-white rounded-container px-4 py-3 flex items-center justify-between shadow-lg">
-          <span className="text-sm font-medium">
+          <span className="text-body font-medium">
             {selectedRows.length} certification{selectedRows.length !== 1 ? 's' : ''} selected
           </span>
           <div className="flex items-center gap-2">
             <Button
-              variant="ghost"
+              variant="clear"
               size="sm"
               className="text-white hover:bg-white/20"
               onClick={() => {
@@ -462,7 +452,7 @@ export default function CertificationsDashboard({
               Send Reminders
             </Button>
             <Button
-              variant="ghost"
+              variant="clear"
               size="sm"
               className="text-white hover:bg-white/20"
               onClick={() => {
@@ -473,7 +463,7 @@ export default function CertificationsDashboard({
               Download
             </Button>
             <Button
-              variant="ghost"
+              variant="clear"
               size="sm"
               className="text-white hover:bg-white/20"
               onClick={() => setSelectedRows([])}
@@ -495,7 +485,7 @@ export default function CertificationsDashboard({
                   onChange={handleSelectAll}
                 />
               </th>
-              <th className="h-11 px-4 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider">
+              <th className="h-11 px-4 text-left text-callout text-text-secondary uppercase tracking-wider">
                 <button
                   onClick={() => handleSort('employee')}
                   className="flex items-center gap-1 hover:text-text-primary transition-colors"
@@ -503,7 +493,7 @@ export default function CertificationsDashboard({
                   Employee {getSortIcon('employee')}
                 </button>
               </th>
-              <th className="h-11 px-4 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider">
+              <th className="h-11 px-4 text-left text-callout text-text-secondary uppercase tracking-wider">
                 <button
                   onClick={() => handleSort('certification')}
                   className="flex items-center gap-1 hover:text-text-primary transition-colors"
@@ -511,10 +501,10 @@ export default function CertificationsDashboard({
                   Certification {getSortIcon('certification')}
                 </button>
               </th>
-              <th className="h-11 px-4 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider">
+              <th className="h-11 px-4 text-left text-callout text-text-secondary uppercase tracking-wider">
                 Category
               </th>
-              <th className="h-11 px-4 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider">
+              <th className="h-11 px-4 text-left text-callout text-text-secondary uppercase tracking-wider">
                 <button
                   onClick={() => handleSort('status')}
                   className="flex items-center gap-1 hover:text-text-primary transition-colors"
@@ -522,7 +512,7 @@ export default function CertificationsDashboard({
                   Status {getSortIcon('status')}
                 </button>
               </th>
-              <th className="h-11 px-4 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider">
+              <th className="h-11 px-4 text-left text-callout text-text-secondary uppercase tracking-wider">
                 <button
                   onClick={() => handleSort('expiration')}
                   className="flex items-center gap-1 hover:text-text-primary transition-colors"
@@ -530,7 +520,7 @@ export default function CertificationsDashboard({
                   Expiration {getSortIcon('expiration')}
                 </button>
               </th>
-              <th className="h-11 px-4 text-right text-xs font-semibold text-text-secondary uppercase tracking-wider w-[120px]">
+              <th className="h-11 px-4 text-right text-callout text-text-secondary uppercase tracking-wider w-[120px]">
                 Actions
               </th>
             </tr>
@@ -558,27 +548,27 @@ export default function CertificationsDashboard({
                   <td className="h-14 px-4">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center flex-shrink-0">
-                        <span className="text-xs font-semibold text-gray-600">
+                        <span className="text-callout text-gray-600">
                           {cert.employeeName.split(' ').map(n => n[0]).join('')}
                         </span>
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-text-primary">{cert.employeeName}</p>
-                        <p className="text-xs text-text-secondary">{cert.employeeRole}</p>
+                        <p className="text-body font-medium text-text-primary">{cert.employeeName}</p>
+                        <p className="text-caption text-text-secondary">{cert.employeeRole}</p>
                       </div>
                     </div>
                   </td>
                   <td className="h-14 px-4">
-                    <p className="text-sm text-text-primary">{cert.templateName}</p>
+                    <p className="text-body text-text-primary">{cert.templateName}</p>
                   </td>
                   <td className="h-14 px-4">
-                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-medium bg-gray-100 text-gray-600">
+                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded text-caption font-medium bg-gray-100 text-gray-600">
                       {category.icon}
                       {category.label}
                     </span>
                   </td>
                   <td className="h-14 px-4">
-                    <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded text-xs font-medium ${status.bgColor} ${status.color}`}>
+                    <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded text-caption font-medium ${status.bgColor} ${status.color}`}>
                       {status.icon}
                       {status.label}
                     </span>
@@ -586,9 +576,9 @@ export default function CertificationsDashboard({
                   <td className="h-14 px-4">
                     {cert.expirationDate ? (
                       <div>
-                        <p className="text-sm text-text-primary">{formatDate(cert.expirationDate)}</p>
+                        <p className="text-body text-text-primary">{formatDate(cert.expirationDate)}</p>
                         {daysUntilExpiry !== null && (
-                          <p className={`text-xs ${
+                          <p className={`text-caption ${
                             daysUntilExpiry < 0 ? 'text-red-600' :
                             daysUntilExpiry < 30 ? 'text-amber-600' :
                             'text-text-secondary'
@@ -603,7 +593,7 @@ export default function CertificationsDashboard({
                         )}
                       </div>
                     ) : (
-                      <span className="text-sm text-text-placeholder">—</span>
+                      <span className="text-body text-text-placeholder">—</span>
                     )}
                   </td>
                   <td className="h-14 px-4" onClick={(e) => e.stopPropagation()}>
@@ -611,7 +601,7 @@ export default function CertificationsDashboard({
                       {cert.status === 'pending-verification' && (
                         <Button
                           size="sm"
-                          variant="outline"
+                          variant="plain-gray"
                           onClick={() => onVerifyCertification?.(cert)}
                         >
                           Review
@@ -619,7 +609,7 @@ export default function CertificationsDashboard({
                       )}
                       {(cert.status === 'expired' || cert.status === 'expiring-soon' || cert.status === 'pending-upload') && (
                         <Button
-                          variant="ghost"
+                          variant="clear"
                           size="sm"
                           onClick={() => addToast(`Reminder sent to ${cert.employeeName}`, 'success')}
                           className="text-gray-500 hover:bg-gray-100"
@@ -639,15 +629,15 @@ export default function CertificationsDashboard({
         {sortedCertifications.length === 0 && (
           <div className="p-12 text-center">
             <FileCheck className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-sm font-medium text-text-primary mb-1">No certifications found</h3>
-            <p className="text-sm text-text-secondary">
+            <h3 className="text-body font-medium text-text-primary mb-1">No certifications found</h3>
+            <p className="text-body text-text-secondary">
               {searchQuery || activeChip !== 'all'
                 ? 'Try adjusting your filters'
                 : 'Request certifications from your team to get started'}
             </p>
             {!searchQuery && activeChip === 'all' && (
               <Button
-                variant="primary"
+                variant="accent-blue"
                 leftIcon={<Plus className="w-4 h-4" />}
                 className="mt-4"
                 onClick={onRequestCertification}
@@ -662,14 +652,14 @@ export default function CertificationsDashboard({
       {/* Pagination */}
       {sortedCertifications.length > 0 && (
         <div className="flex items-center justify-between">
-          <span className="text-sm text-text-secondary">
+          <span className="text-body text-text-secondary">
             Showing {sortedCertifications.length} of {mockCertifications.length} certifications
           </span>
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" disabled>
+            <Button variant="plain-gray" size="sm" disabled>
               Previous
             </Button>
-            <Button variant="outline" size="sm">
+            <Button variant="plain-gray" size="sm">
               Next
             </Button>
           </div>

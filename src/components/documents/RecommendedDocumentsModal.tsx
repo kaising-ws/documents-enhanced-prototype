@@ -477,10 +477,10 @@ export default function RecommendedDocumentsModal({
               <Sparkles className="w-5 h-5 text-orange-500" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-text-primary">
+              <h2 className="text-title-4 text-text-primary">
                 Recommended Documents
               </h2>
-              <p className="text-sm text-text-secondary">
+              <p className="text-body text-text-secondary">
                 Based on your locations, roles, industry, and current templates
               </p>
             </div>
@@ -494,7 +494,7 @@ export default function RecommendedDocumentsModal({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search recommended documents..."
-              className="w-full h-10 pl-10 pr-4 rounded-element border border-border bg-white text-sm text-text-primary placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="w-full h-10 pl-10 pr-4 rounded-element border border-border bg-white text-body text-text-primary placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             />
           </div>
         </div>
@@ -522,8 +522,8 @@ export default function RecommendedDocumentsModal({
                       {config.icon}
                     </div>
                     <div className="text-left">
-                      <span className="text-sm font-semibold text-text-primary">{config.label}</span>
-                      <span className="text-xs text-text-secondary ml-2">
+                      <span className="text-headline text-text-primary">{config.label}</span>
+                      <span className="text-caption text-text-secondary ml-2">
                         {docs.length} document{docs.length !== 1 ? 's' : ''}
                       </span>
                     </div>
@@ -535,10 +535,10 @@ export default function RecommendedDocumentsModal({
                           e.stopPropagation()
                           toggleSelectAll(reason)
                         }}
-                        className={`text-xs font-medium px-2 py-1 rounded transition-colors ${
+                        className={`text-caption font-medium px-2 py-1 rounded transition-colors ${
                           allSelected
                             ? 'text-primary-600 bg-primary-50 hover:bg-primary-100'
-                            : 'text-text-secondary hover:text-text-primary hover:bg-gray-100'
+                            : 'text-text-secondary hover:text-text-primary hover:bg-gray-50'
                         }`}
                       >
                         {allSelected ? 'Deselect all' : 'Select all'}
@@ -556,7 +556,7 @@ export default function RecommendedDocumentsModal({
                 {isExpanded && (
                   <div className="flex items-start gap-2 px-3 py-1.5 mb-2">
                     <Info className="w-3.5 h-3.5 text-text-placeholder mt-0.5 flex-shrink-0" />
-                    <p className="text-xs text-text-secondary">{config.description}</p>
+                    <p className="text-caption text-text-secondary">{config.description}</p>
                   </div>
                 )}
 
@@ -599,7 +599,7 @@ export default function RecommendedDocumentsModal({
                             {/* Content */}
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2 mb-1">
-                                <span className="text-sm font-semibold text-text-primary">
+                                <span className="text-headline text-text-primary">
                                   {doc.name}
                                 </span>
                                 {isAdded && (
@@ -608,7 +608,7 @@ export default function RecommendedDocumentsModal({
                                   </span>
                                 )}
                               </div>
-                              <p className="text-xs text-text-secondary leading-relaxed mb-2">
+                              <p className="text-caption text-text-secondary leading-relaxed mb-2">
                                 {doc.description}
                               </p>
                               <div className="flex items-center gap-3 flex-wrap">
@@ -643,14 +643,14 @@ export default function RecommendedDocumentsModal({
           {filteredDocs.length === 0 && (
             <div className="text-center py-12">
               <Search className="w-8 h-8 text-text-placeholder mx-auto mb-3" />
-              <p className="text-sm text-text-secondary">No recommendations match your search</p>
+              <p className="text-body text-text-secondary">No recommendations match your search</p>
             </div>
           )}
         </div>
 
         {/* Footer */}
         <div className="pt-4 border-t border-border-light flex items-center justify-between flex-shrink-0">
-          <div className="text-sm text-text-secondary">
+          <div className="text-body text-text-secondary">
             {selectedCount > 0 ? (
               <span>
                 <strong className="text-text-primary">{selectedCount}</strong> document{selectedCount !== 1 ? 's' : ''} selected
@@ -660,11 +660,11 @@ export default function RecommendedDocumentsModal({
             )}
           </div>
           <div className="flex items-center gap-3">
-            <Button variant="outline" onClick={handleClose}>
+            <Button variant="plain-gray" onClick={handleClose}>
               {addedIds.size > 0 ? 'Done' : 'Cancel'}
             </Button>
             <Button
-              variant="primary"
+              variant="accent-blue"
               onClick={handleAdd}
               disabled={selectedCount === 0}
             >

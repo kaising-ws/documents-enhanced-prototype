@@ -652,7 +652,7 @@ export default function AddDocumentModal({
         {/* PDF upload area — only for pdf-signing */}
         {documentType === 'pdf-signing' && (
           <div>
-            <label className="block text-sm font-semibold text-text-primary mb-2">
+            <label className="block text-headline text-text-primary mb-2">
               Upload PDF
             </label>
             <div
@@ -678,8 +678,8 @@ export default function AddDocumentModal({
                     <FileText className="w-6 h-6 text-gray-500" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-text-primary">{uploadedFile.name}</p>
-                    <p className="text-xs text-text-secondary">
+                    <p className="text-body font-medium text-text-primary">{uploadedFile.name}</p>
+                    <p className="text-caption text-text-secondary">
                       {(uploadedFile.size / 1024).toFixed(1)} KB
                     </p>
                   </div>
@@ -696,10 +696,10 @@ export default function AddDocumentModal({
                     <FileText className="w-6 h-6 text-blue-500" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-text-primary">{editingTemplate.name}</p>
-                    <p className="text-xs text-text-secondary">Previously uploaded PDF</p>
+                    <p className="text-body font-medium text-text-primary">{editingTemplate.name}</p>
+                    <p className="text-caption text-text-secondary">Previously uploaded PDF</p>
                   </div>
-                  <label className="text-xs text-primary-500 hover:underline cursor-pointer font-medium">
+                  <label className="text-caption text-primary-500 hover:underline cursor-pointer font-medium">
                     Replace file
                     <input
                       type="file"
@@ -712,7 +712,7 @@ export default function AddDocumentModal({
               ) : (
                 <div className="text-center">
                   <Upload className="w-10 h-10 text-gray-400 mx-auto mb-3" />
-                  <p className="text-sm text-text-primary mb-1">
+                  <p className="text-body text-text-primary mb-1">
                     Drag and drop your PDF here, or{' '}
                     <label className="text-primary-500 hover:underline cursor-pointer">
                       browse
@@ -724,7 +724,7 @@ export default function AddDocumentModal({
                       />
                     </label>
                   </p>
-                  <p className="text-xs text-text-secondary">Supports PDF files (Max 10MB)</p>
+                  <p className="text-caption text-text-secondary">Supports PDF files (Max 10MB)</p>
                 </div>
               )}
             </div>
@@ -733,7 +733,7 @@ export default function AddDocumentModal({
 
         {/* Template name — shared */}
         <div>
-          <label className="block text-sm font-semibold text-text-primary mb-2">
+          <label className="block text-headline text-text-primary mb-2">
             Template name
           </label>
           <input
@@ -741,13 +741,13 @@ export default function AddDocumentModal({
             value={documentName}
             onChange={(e) => setDocumentName(e.target.value)}
             placeholder={placeholders.name}
-            className="w-full h-10 px-3 rounded-element border border-border bg-white text-sm text-text-primary placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            className="w-full h-10 px-3 rounded-element border border-border bg-white text-body text-text-primary placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
           />
         </div>
 
         {/* Category — shared */}
         <div>
-          <label className="block text-sm font-semibold text-text-primary mb-2">Category</label>
+          <label className="block text-headline text-text-primary mb-2">Category</label>
           <Dropdown
             options={categoryOptions}
             value={docType}
@@ -758,22 +758,22 @@ export default function AddDocumentModal({
 
         {/* Description — shared */}
         <div>
-          <label className="block text-sm font-semibold text-text-primary mb-2">Description</label>
+          <label className="block text-headline text-text-primary mb-2">Description</label>
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder={placeholders.description}
-            className="w-full h-16 px-3 py-2 rounded-element border border-border bg-white text-sm text-text-primary placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
+            className="w-full h-16 px-3 py-2 rounded-element border border-border bg-white text-body text-text-primary placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 resize-none"
           />
         </div>
 
         {/* Signers & signing order — PDF only */}
         {documentType === 'pdf-signing' && (
           <div className="border-t border-border-light pt-6">
-            <label className="block text-sm font-semibold text-text-primary mb-1">
+            <label className="block text-headline text-text-primary mb-1">
               Who should sign or complete this document?
             </label>
-            <p className="text-xs text-text-secondary mb-4">
+            <p className="text-caption text-text-secondary mb-4">
               Select signer types and set the signing order. Signers will complete the document in the order shown.
             </p>
 
@@ -805,7 +805,7 @@ export default function AddDocumentModal({
                   <User className="w-3.5 h-3.5" />
                 </div>
                 <div className="text-left">
-                  <p className={`text-sm font-medium ${teamMemberSigns ? 'text-blue-700' : 'text-text-primary'}`}>
+                  <p className={`text-body font-medium ${teamMemberSigns ? 'text-blue-700' : 'text-text-primary'}`}>
                     Team member
                   </p>
                 </div>
@@ -837,7 +837,7 @@ export default function AddDocumentModal({
                   <Building2 className="w-3.5 h-3.5" />
                 </div>
                 <div className="text-left">
-                  <p className={`text-sm font-medium ${companySigns ? 'text-purple-700' : 'text-text-primary'}`}>
+                  <p className={`text-body font-medium ${companySigns ? 'text-purple-700' : 'text-text-primary'}`}>
                     Company
                   </p>
                 </div>
@@ -846,7 +846,7 @@ export default function AddDocumentModal({
             </div>
 
             {signerEntries.length === 0 && (
-              <p className="text-xs text-red-500 flex items-center gap-1 mb-4">
+              <p className="text-caption text-red-500 flex items-center gap-1 mb-4">
                 <Info className="w-3 h-3" />
                 Select at least one signer type
               </p>
@@ -856,7 +856,7 @@ export default function AddDocumentModal({
             {signerEntries.length > 0 && (
               <div className="border border-border-light rounded-container overflow-hidden">
                 <div className="px-4 py-2.5 bg-gray-50 border-b border-border-light">
-                  <p className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
+                  <p className="text-callout text-text-secondary uppercase tracking-wider">
                     Signing order
                   </p>
                 </div>
@@ -872,7 +872,7 @@ export default function AddDocumentModal({
                       <div key={entry.id} className="px-4 py-3">
                         <div className="flex items-center gap-3">
                           {/* Order badge */}
-                          <span className="w-6 h-6 rounded-full bg-gray-100 text-gray-600 text-xs font-semibold flex items-center justify-center flex-shrink-0">
+                          <span className="w-6 h-6 rounded-full bg-gray-100 text-gray-600 text-callout flex items-center justify-center flex-shrink-0">
                             {idx + 1}
                           </span>
 
@@ -891,12 +891,12 @@ export default function AddDocumentModal({
                           <div className="flex-1 min-w-0">
                             {isTeamMember ? (
                               <div>
-                                <p className="text-sm font-medium text-text-primary">Team member signer</p>
-                                <p className="text-xs text-text-secondary">Employee receives and signs</p>
+                                <p className="text-body font-medium text-text-primary">Team member signer</p>
+                                <p className="text-caption text-text-secondary">Employee receives and signs</p>
                               </div>
                             ) : (
                               <div>
-                                <p className="text-sm font-medium text-text-primary mb-1.5">
+                                <p className="text-body font-medium text-text-primary mb-1.5">
                                   Company signer #{companySignerIndex}
                                 </p>
                                 <select
@@ -908,7 +908,7 @@ export default function AddDocumentModal({
                                       )
                                     )
                                   }}
-                                  className="w-full h-9 px-3 rounded-element border border-border bg-white text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                                  className="w-full h-10 px-3 rounded-element border border-border bg-white text-body text-text-primary placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
                                 >
                                   <option value="">Select a person…</option>
                                   {COMPANY_SIGNER_OPTIONS.map((opt) => (
@@ -935,7 +935,7 @@ export default function AddDocumentModal({
                                       return arr
                                     })
                                   }}
-                                  className="w-7 h-7 flex items-center justify-center rounded hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                                  className="w-7 h-7 flex items-center justify-center rounded hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                                   title="Move up"
                                 >
                                   <ArrowUp className="w-3.5 h-3.5 text-gray-500" />
@@ -950,7 +950,7 @@ export default function AddDocumentModal({
                                       return arr
                                     })
                                   }}
-                                  className="w-7 h-7 flex items-center justify-center rounded hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                                  className="w-7 h-7 flex items-center justify-center rounded hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                                   title="Move down"
                                 >
                                   <ArrowDown className="w-3.5 h-3.5 text-gray-500" />
@@ -988,7 +988,7 @@ export default function AddDocumentModal({
                           { id: `se-co-${Date.now()}`, type: 'company', personId: '' },
                         ])
                       }
-                      className="flex items-center gap-2 text-sm font-medium text-primary-500 hover:text-primary-700 transition-colors"
+                      className="flex items-center gap-2 text-body font-medium text-primary-500 hover:text-primary-700 transition-colors"
                     >
                       <Plus className="w-4 h-4" />
                       Add another company signer
@@ -1002,7 +1002,7 @@ export default function AddDocumentModal({
             {companySigns && (
               <div className="flex items-start gap-2.5 p-3 bg-blue-50 border border-blue-200 rounded-element mt-4">
                 <Info className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
-                <p className="text-xs text-blue-800">
+                <p className="text-caption text-blue-800">
                   If this document is assigned and there are no eligible company signers within the
                   selected roles, super admins will be notified by default to complete or sign.
                 </p>
@@ -1026,17 +1026,17 @@ export default function AddDocumentModal({
         {/* Basics section */}
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-semibold text-text-primary mb-2">Template name</label>
+            <label className="block text-headline text-text-primary mb-2">Template name</label>
             <input
               type="text"
               value={documentName}
               onChange={(e) => setDocumentName(e.target.value)}
               placeholder={placeholders.name}
-              className="w-full h-10 px-3 rounded-element border border-border bg-white text-sm text-text-primary placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="w-full h-10 px-3 rounded-element border border-border bg-white text-body text-text-primary placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-text-primary mb-2">Category</label>
+            <label className="block text-headline text-text-primary mb-2">Category</label>
             <Dropdown
               options={categoryOptions}
               value={docType}
@@ -1046,22 +1046,22 @@ export default function AddDocumentModal({
           </div>
         </div>
         <div>
-          <label className="block text-sm font-semibold text-text-primary mb-2">Description</label>
+          <label className="block text-headline text-text-primary mb-2">Description</label>
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder={placeholders.description}
-            className="w-full h-16 px-3 py-2 rounded-element border border-border bg-white text-sm text-text-primary placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
+            className="w-full h-16 px-3 py-2 rounded-element border border-border bg-white text-body text-text-primary placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 resize-none"
           />
         </div>
 
         {/* Form Fields */}
         <div className="border-t border-border-light pt-6">
           <div>
-            <label className="block text-sm font-semibold text-text-primary mb-2">
+            <label className="block text-headline text-text-primary mb-2">
               Manager section
             </label>
-            <p className="text-xs text-text-secondary mb-3">
+            <p className="text-caption text-text-secondary mb-3">
               Questions for the manager to complete before sending to the worker.
             </p>
             <FormFieldBuilder
@@ -1071,10 +1071,10 @@ export default function AddDocumentModal({
             />
           </div>
           <div className="mt-6">
-            <label className="block text-sm font-semibold text-text-primary mb-2">
+            <label className="block text-headline text-text-primary mb-2">
               Worker section
             </label>
-            <p className="text-xs text-text-secondary mb-3">
+            <p className="text-caption text-text-secondary mb-3">
               Questions for the worker to respond to after receiving the write-up.
             </p>
             <FormFieldBuilder
@@ -1087,7 +1087,7 @@ export default function AddDocumentModal({
 
         {/* Non-acknowledgement Handling */}
         <div className="border-t border-border-light pt-6">
-          <label className="block text-sm font-semibold text-text-primary mb-3">
+          <label className="block text-headline text-text-primary mb-3">
             Non-acknowledgement handling
           </label>
           <div className="space-y-4">
@@ -1096,10 +1096,10 @@ export default function AddDocumentModal({
               <div className="flex items-center gap-3">
                 <Checkbox checked={allowManagerRefuse} onChange={setAllowManagerRefuse} />
                 <div>
-                  <p className="text-sm font-medium text-text-primary">
+                  <p className="text-body font-medium text-text-primary">
                     Allow manager to mark as "Refused to sign"
                   </p>
-                  <p className="text-xs text-text-secondary">
+                  <p className="text-caption text-text-secondary">
                     Manager can mark the write-up as refused after the employee hasn't responded
                   </p>
                 </div>
@@ -1110,7 +1110,7 @@ export default function AddDocumentModal({
               <div className="ml-4 pl-4 border-l-2 border-border-light space-y-4">
                 {/* Days threshold */}
                 <div>
-                  <label className="block text-sm font-medium text-text-primary mb-1.5">
+                  <label className="block text-body font-medium text-text-primary mb-1.5">
                     Enable "Refused to sign" after
                   </label>
                   <div className="flex items-center gap-2">
@@ -1120,19 +1120,19 @@ export default function AddDocumentModal({
                       max="90"
                       value={refuseAfterDays}
                       onChange={(e) => setRefuseAfterDays(parseInt(e.target.value) || 7)}
-                      className="w-20 h-10 px-3 rounded-element border border-border bg-white text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      className="w-20 h-10 px-3 rounded-element border border-border bg-white text-body text-text-primary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                     />
-                    <span className="text-sm text-text-secondary">days without acknowledgement</span>
+                    <span className="text-body text-text-secondary">days without acknowledgement</span>
                   </div>
                 </div>
 
                 {/* Auto-refuse toggle */}
                 <div className="flex items-center justify-between p-3 bg-gray-50 rounded-element">
                   <div className="flex-1 mr-3">
-                    <p className="text-sm font-medium text-text-primary">
+                    <p className="text-body font-medium text-text-primary">
                       Automatically mark as "Refused to sign"
                     </p>
-                    <p className="text-xs text-text-secondary">
+                    <p className="text-caption text-text-secondary">
                       After {refuseAfterDays} days, automatically mark as refused without manual action
                     </p>
                   </div>
@@ -1154,7 +1154,7 @@ export default function AddDocumentModal({
                 {/* Info callout */}
                 <div className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-200 rounded-element">
                   <Info className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
-                  <p className="text-xs text-amber-800">
+                  <p className="text-caption text-amber-800">
                     {autoRefuse
                       ? `After ${refuseAfterDays} days without acknowledgement, the write-up will be automatically marked as "Refused to Sign" and HR will be notified.`
                       : `After ${refuseAfterDays} days without acknowledgement, the manager will be able to manually mark the write-up as "Refused to Sign".`}
@@ -1167,10 +1167,10 @@ export default function AddDocumentModal({
 
         {/* Notifications */}
         <div className="border-t border-border-light pt-6">
-          <label className="block text-sm font-semibold text-text-primary mb-1">
+          <label className="block text-headline text-text-primary mb-1">
             Notifications
           </label>
-          <p className="text-xs text-text-secondary mb-4">
+          <p className="text-caption text-text-secondary mb-4">
             Choose who else should be notified when a write-up is assigned to an employee.
           </p>
           <div className="space-y-2">
@@ -1185,7 +1185,7 @@ export default function AddDocumentModal({
                 <div
                   key={recipient.id}
                   className={`flex items-center gap-3 p-3 rounded-element cursor-pointer transition-colors ${
-                    isChecked ? 'bg-primary-50 border border-primary-200' : 'bg-gray-50 border border-transparent hover:bg-gray-100'
+                    isChecked ? 'bg-primary-50 border border-primary-200' : 'bg-gray-50 border border-transparent hover:bg-gray-50'
                   }`}
                   onClick={() => {
                     setNotifyOnAssignment((prev) =>
@@ -1202,8 +1202,8 @@ export default function AddDocumentModal({
                     }}
                   />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-text-primary">{recipient.label}</p>
-                    <p className="text-xs text-text-secondary">{recipient.desc}</p>
+                    <p className="text-body font-medium text-text-primary">{recipient.label}</p>
+                    <p className="text-caption text-text-secondary">{recipient.desc}</p>
                   </div>
                 </div>
               )
@@ -1212,7 +1212,7 @@ export default function AddDocumentModal({
           {notifyOnAssignment.length === 0 && (
             <div className="flex items-start gap-2 p-3 mt-3 bg-amber-50 border border-amber-200 rounded-element">
               <Info className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
-              <p className="text-xs text-amber-800">
+              <p className="text-caption text-amber-800">
                 No one will be notified when a write-up is assigned. Only the assignee will receive the task.
               </p>
             </div>
@@ -1234,17 +1234,17 @@ export default function AddDocumentModal({
         {/* Basics section */}
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-semibold text-text-primary mb-2">Template name</label>
+            <label className="block text-headline text-text-primary mb-2">Template name</label>
             <input
               type="text"
               value={documentName}
               onChange={(e) => setDocumentName(e.target.value)}
               placeholder={placeholders.name}
-              className="w-full h-10 px-3 rounded-element border border-border bg-white text-sm text-text-primary placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="w-full h-10 px-3 rounded-element border border-border bg-white text-body text-text-primary placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-text-primary mb-2">Category</label>
+            <label className="block text-headline text-text-primary mb-2">Category</label>
             <Dropdown
               options={categoryOptions}
               value={docType}
@@ -1254,12 +1254,12 @@ export default function AddDocumentModal({
           </div>
         </div>
         <div>
-          <label className="block text-sm font-semibold text-text-primary mb-2">Description</label>
+          <label className="block text-headline text-text-primary mb-2">Description</label>
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder={placeholders.description}
-            className="w-full h-16 px-3 py-2 rounded-element border border-border bg-white text-sm text-text-primary placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
+            className="w-full h-16 px-3 py-2 rounded-element border border-border bg-white text-body text-text-primary placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 resize-none"
           />
         </div>
 
@@ -1267,8 +1267,8 @@ export default function AddDocumentModal({
         <div className="border-t border-border-light pt-6">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <label className="text-sm font-semibold text-text-primary">Expiration tracking</label>
-              <p className="text-xs text-text-secondary mt-0.5">
+              <label className="text-headline text-text-primary">Expiration tracking</label>
+              <p className="text-caption text-text-secondary mt-0.5">
                 Require employees to enter an expiration date when uploading
               </p>
             </div>
@@ -1290,7 +1290,7 @@ export default function AddDocumentModal({
           {expirationRequired && (
             <div className="flex items-start gap-2.5 p-3 bg-blue-50 border border-blue-200 rounded-element">
               <Info className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
-              <div className="text-xs text-blue-800 space-y-1">
+              <div className="text-caption text-blue-800 space-y-1">
                 <p>
                   When assignees upload their document, the <strong>expiration date will be captured
                   automatically via OCR</strong>. If OCR cannot detect the date, the assignee will be
@@ -1309,8 +1309,8 @@ export default function AddDocumentModal({
           <div className="flex items-center gap-3">
             <Checkbox checked={requireVerification} onChange={setRequireVerification} />
             <div>
-              <p className="text-sm font-medium text-text-primary">Require manager verification</p>
-              <p className="text-xs text-text-secondary">Manager must approve uploaded documents</p>
+              <p className="text-body font-medium text-text-primary">Require manager verification</p>
+              <p className="text-caption text-text-secondary">Manager must approve uploaded documents</p>
             </div>
           </div>
         </div>
@@ -1335,7 +1335,7 @@ export default function AddDocumentModal({
         {/* Mode selector */}
         {!customFormMode && (
           <>
-            <p className="text-sm text-text-secondary">
+            <p className="text-body text-text-secondary">
               How would you like to build this form?
             </p>
             <div className="grid grid-cols-2 gap-4">
@@ -1347,8 +1347,8 @@ export default function AddDocumentModal({
                 <div className="w-14 h-14 rounded-xl bg-blue-50 flex items-center justify-center mb-3">
                   <Upload className="w-7 h-7 text-blue-600" />
                 </div>
-                <h4 className="text-sm font-semibold text-text-primary mb-1">Upload PDF for signing</h4>
-                <p className="text-xs text-text-secondary leading-relaxed">
+                <h4 className="text-headline text-text-primary mb-1">Upload PDF for signing</h4>
+                <p className="text-caption text-text-secondary leading-relaxed">
                   Upload an existing PDF and map signature fields for signers to complete.
                 </p>
               </button>
@@ -1360,8 +1360,8 @@ export default function AddDocumentModal({
                 <div className="w-14 h-14 rounded-xl bg-indigo-50 flex items-center justify-center mb-3">
                   <FileText className="w-7 h-7 text-indigo-600" />
                 </div>
-                <h4 className="text-sm font-semibold text-text-primary mb-1">Create digital form</h4>
-                <p className="text-xs text-text-secondary leading-relaxed">
+                <h4 className="text-headline text-text-primary mb-1">Create digital form</h4>
+                <p className="text-caption text-text-secondary leading-relaxed">
                   Build a form with custom questions for assignees to fill out online.
                 </p>
               </button>
@@ -1376,7 +1376,7 @@ export default function AddDocumentModal({
             <div className="flex items-center justify-between p-3 bg-blue-50 border border-blue-200 rounded-element">
               <div className="flex items-center gap-2">
                 <Upload className="w-4 h-4 text-blue-600" />
-                <span className="text-sm font-medium text-blue-800">Upload PDF for signing</span>
+                <span className="text-body font-medium text-blue-800">Upload PDF for signing</span>
               </div>
               <button
                 type="button"
@@ -1386,7 +1386,7 @@ export default function AddDocumentModal({
                   setSignerEntries([{ id: 'se-default', type: 'team-member', personId: 'employee' }])
                   setMappedFields([])
                 }}
-                className="text-xs font-medium text-blue-600 hover:text-blue-800 underline"
+                className="text-caption font-medium text-blue-600 hover:text-blue-800 underline"
               >
                 Change
               </button>
@@ -1394,7 +1394,7 @@ export default function AddDocumentModal({
 
             {/* PDF uploader */}
             <div>
-              <label className="block text-sm font-semibold text-text-primary mb-2">Upload PDF</label>
+              <label className="block text-headline text-text-primary mb-2">Upload PDF</label>
               <div
                 onDragOver={(e) => { e.preventDefault(); setIsDragging(true) }}
                 onDragLeave={() => setIsDragging(false)}
@@ -1409,8 +1409,8 @@ export default function AddDocumentModal({
                       <FileText className="w-5 h-5 text-gray-500" />
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-medium text-text-primary">{uploadedFile.name}</p>
-                      <p className="text-xs text-text-secondary">{(uploadedFile.size / 1024).toFixed(1)} KB</p>
+                      <p className="text-body font-medium text-text-primary">{uploadedFile.name}</p>
+                      <p className="text-caption text-text-secondary">{(uploadedFile.size / 1024).toFixed(1)} KB</p>
                     </div>
                     <button onClick={() => setUploadedFile(null)} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-200 transition-colors">
                       <X className="w-4 h-4 text-gray-500" />
@@ -1419,14 +1419,14 @@ export default function AddDocumentModal({
                 ) : (
                   <div className="text-center">
                     <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                    <p className="text-sm text-text-primary mb-1">
+                    <p className="text-body text-text-primary mb-1">
                       Drag and drop your PDF here, or{' '}
                       <label className="text-primary-500 hover:underline cursor-pointer">
                         browse
                         <input type="file" className="hidden" accept=".pdf" onChange={handleFileSelect} />
                       </label>
                     </p>
-                    <p className="text-xs text-text-secondary">Supports PDF files (Max 10MB)</p>
+                    <p className="text-caption text-text-secondary">Supports PDF files (Max 10MB)</p>
                   </div>
                 )}
               </div>
@@ -1434,10 +1434,10 @@ export default function AddDocumentModal({
 
             {/* Signers */}
             <div>
-              <label className="block text-sm font-semibold text-text-primary mb-1">
+              <label className="block text-headline text-text-primary mb-1">
                 Who should sign this document?
               </label>
-              <p className="text-xs text-text-secondary mb-4">
+              <p className="text-caption text-text-secondary mb-4">
                 Select signer types and set the signing order.
               </p>
 
@@ -1463,7 +1463,7 @@ export default function AddDocumentModal({
                   }`}>
                     <User className="w-3.5 h-3.5" />
                   </div>
-                  <span className={`text-sm font-medium ${teamMemberSigns ? 'text-blue-700' : 'text-text-primary'}`}>
+                  <span className={`text-body font-medium ${teamMemberSigns ? 'text-blue-700' : 'text-text-primary'}`}>
                     Team member
                   </span>
                   {teamMemberSigns && <Check className="w-4 h-4 text-blue-500 ml-1" />}
@@ -1489,7 +1489,7 @@ export default function AddDocumentModal({
                   }`}>
                     <Building2 className="w-3.5 h-3.5" />
                   </div>
-                  <span className={`text-sm font-medium ${companySigns ? 'text-purple-700' : 'text-text-primary'}`}>
+                  <span className={`text-body font-medium ${companySigns ? 'text-purple-700' : 'text-text-primary'}`}>
                     Company
                   </span>
                   {companySigns && <Check className="w-4 h-4 text-purple-500 ml-1" />}
@@ -1497,7 +1497,7 @@ export default function AddDocumentModal({
               </div>
 
               {signerEntries.length === 0 && (
-                <p className="text-xs text-red-500 flex items-center gap-1 mb-4">
+                <p className="text-caption text-red-500 flex items-center gap-1 mb-4">
                   <Info className="w-3 h-3" /> Select at least one signer type
                 </p>
               )}
@@ -1505,7 +1505,7 @@ export default function AddDocumentModal({
               {signerEntries.length > 0 && (
                 <div className="border border-border-light rounded-container overflow-hidden">
                   <div className="px-4 py-2.5 bg-gray-50 border-b border-border-light">
-                    <p className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Signing order</p>
+                    <p className="text-callout text-text-secondary uppercase tracking-wider">Signing order</p>
                   </div>
                   <div className="divide-y divide-border-light">
                     {signerEntries.map((entry, idx) => {
@@ -1515,23 +1515,23 @@ export default function AddDocumentModal({
                       return (
                         <div key={entry.id} className="px-4 py-3">
                           <div className="flex items-center gap-3">
-                            <span className="w-6 h-6 rounded-full bg-gray-100 text-gray-600 text-xs font-semibold flex items-center justify-center flex-shrink-0">{idx + 1}</span>
+                            <span className="w-6 h-6 rounded-full bg-gray-100 text-gray-600 text-callout flex items-center justify-center flex-shrink-0">{idx + 1}</span>
                             <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${isTeamMember ? 'bg-blue-100' : 'bg-purple-100'}`}>
                               {isTeamMember ? <User className="w-4 h-4 text-blue-600" /> : <Building2 className="w-4 h-4 text-purple-600" />}
                             </div>
                             <div className="flex-1 min-w-0">
                               {isTeamMember ? (
                                 <div>
-                                  <p className="text-sm font-medium text-text-primary">Team member signer</p>
-                                  <p className="text-xs text-text-secondary">Employee receives and signs</p>
+                                  <p className="text-body font-medium text-text-primary">Team member signer</p>
+                                  <p className="text-caption text-text-secondary">Employee receives and signs</p>
                                 </div>
                               ) : (
                                 <div>
-                                  <p className="text-sm font-medium text-text-primary mb-1.5">Company signer #{companySignerIndex}</p>
+                                  <p className="text-body font-medium text-text-primary mb-1.5">Company signer #{companySignerIndex}</p>
                                   <select
                                     value={entry.personId}
                                     onChange={(e) => setSignerEntries((prev) => prev.map((se) => se.id === entry.id ? { ...se, personId: e.target.value } : se))}
-                                    className="w-full h-9 px-3 rounded-element border border-border bg-white text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                                    className="w-full h-10 px-3 rounded-element border border-border bg-white text-body text-text-primary placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
                                   >
                                     <option value="">Select a person…</option>
                                     {COMPANY_SIGNER_OPTIONS.map((opt) => (
@@ -1544,10 +1544,10 @@ export default function AddDocumentModal({
                             <div className="flex items-center gap-1 flex-shrink-0">
                               {signerEntries.length > 1 && (
                                 <>
-                                  <button type="button" disabled={idx === 0} onClick={() => setSignerEntries((prev) => { const arr = [...prev]; [arr[idx - 1], arr[idx]] = [arr[idx], arr[idx - 1]]; return arr })} className="w-7 h-7 flex items-center justify-center rounded hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors" title="Move up">
+                                  <button type="button" disabled={idx === 0} onClick={() => setSignerEntries((prev) => { const arr = [...prev]; [arr[idx - 1], arr[idx]] = [arr[idx], arr[idx - 1]]; return arr })} className="w-7 h-7 flex items-center justify-center rounded hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors" title="Move up">
                                     <ArrowUp className="w-3.5 h-3.5 text-gray-500" />
                                   </button>
-                                  <button type="button" disabled={idx === signerEntries.length - 1} onClick={() => setSignerEntries((prev) => { const arr = [...prev]; [arr[idx], arr[idx + 1]] = [arr[idx + 1], arr[idx]]; return arr })} className="w-7 h-7 flex items-center justify-center rounded hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors" title="Move down">
+                                  <button type="button" disabled={idx === signerEntries.length - 1} onClick={() => setSignerEntries((prev) => { const arr = [...prev]; [arr[idx], arr[idx + 1]] = [arr[idx + 1], arr[idx]]; return arr })} className="w-7 h-7 flex items-center justify-center rounded hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors" title="Move down">
                                     <ArrowDown className="w-3.5 h-3.5 text-gray-500" />
                                   </button>
                                 </>
@@ -1565,7 +1565,7 @@ export default function AddDocumentModal({
                   </div>
                   {companySigns && (
                     <div className="px-4 py-3 border-t border-border-light">
-                      <button type="button" onClick={() => setSignerEntries((prev) => [...prev, { id: `se-co-${Date.now()}`, type: 'company', personId: '' }])} className="flex items-center gap-2 text-sm font-medium text-primary-500 hover:text-primary-700 transition-colors">
+                      <button type="button" onClick={() => setSignerEntries((prev) => [...prev, { id: `se-co-${Date.now()}`, type: 'company', personId: '' }])} className="flex items-center gap-2 text-body font-medium text-primary-500 hover:text-primary-700 transition-colors">
                         <Plus className="w-4 h-4" /> Add another company signer
                       </button>
                     </div>
@@ -1578,7 +1578,7 @@ export default function AddDocumentModal({
             {uploadedFile && signerEntries.length > 0 && (
               <div className="flex items-start gap-2.5 p-3 bg-blue-50 border border-blue-200 rounded-element">
                 <Info className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
-                <p className="text-xs text-blue-800">
+                <p className="text-caption text-blue-800">
                   After creating the template, you can map signature fields onto the PDF from the template detail page.
                 </p>
               </div>
@@ -1593,7 +1593,7 @@ export default function AddDocumentModal({
             <div className="flex items-center justify-between p-3 bg-indigo-50 border border-indigo-200 rounded-element">
               <div className="flex items-center gap-2">
                 <FileText className="w-4 h-4 text-indigo-600" />
-                <span className="text-sm font-medium text-indigo-800">Digital form — Multi-step workflow</span>
+                <span className="text-body font-medium text-indigo-800">Digital form — Multi-step workflow</span>
               </div>
               <button
                 type="button"
@@ -1603,7 +1603,7 @@ export default function AddDocumentModal({
                   setFormWorkflowSteps([{ id: 'step-1', label: 'Step 1', fields: [], managerOnly: false, saveToProfile: false }])
                   setActiveWorkflowStep('step-1')
                 }}
-                className="text-xs font-medium text-indigo-600 hover:text-indigo-800 underline"
+                className="text-caption font-medium text-indigo-600 hover:text-indigo-800 underline"
               >
                 Change
               </button>
@@ -1612,7 +1612,7 @@ export default function AddDocumentModal({
             {/* Info */}
             <div className="flex items-start gap-2.5 p-3 bg-blue-50 border border-blue-200 rounded-element">
               <Info className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
-              <p className="text-xs text-blue-800">
+              <p className="text-caption text-blue-800">
                 Build a multi-step form workflow. Each step can be filled by a different person — for example, the employee fills Step 1, then a manager fills Step 2. Assignees for each step are configured when you assign the form.
               </p>
             </div>
@@ -1626,13 +1626,13 @@ export default function AddDocumentModal({
                       key={step.id}
                       type="button"
                       onClick={() => setActiveWorkflowStep(step.id)}
-                      className={`relative flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
+                      className={`relative flex items-center gap-2 px-4 py-2 rounded-lg text-body font-medium whitespace-nowrap transition-all ${
                         activeWorkflowStep === step.id
                           ? 'bg-primary-500 text-white shadow-sm'
                           : 'bg-gray-100 text-text-primary hover:bg-gray-200'
                       }`}
                     >
-                      <span className={`w-5 h-5 rounded-full text-xs font-bold flex items-center justify-center ${
+                      <span className={`w-5 h-5 rounded-full text-caption font-bold flex items-center justify-center ${
                         activeWorkflowStep === step.id
                           ? 'bg-white/25 text-white'
                           : 'bg-gray-300 text-gray-600'
@@ -1680,7 +1680,7 @@ export default function AddDocumentModal({
                     }])
                     setActiveWorkflowStep(newId)
                   }}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-lg border-2 border-dashed border-gray-300 text-sm font-medium text-gray-500 hover:border-gray-400 hover:text-gray-600 transition-colors whitespace-nowrap"
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-lg border-2 border-dashed border-gray-300 text-body font-medium text-gray-500 hover:border-gray-400 hover:text-gray-600 transition-colors whitespace-nowrap"
                 >
                   <Plus className="w-4 h-4" />
                   Add step
@@ -1696,7 +1696,7 @@ export default function AddDocumentModal({
                   <div key={step.id} className="space-y-4">
                     {/* Step name */}
                     <div>
-                      <label className="block text-xs font-semibold text-text-secondary mb-1.5">
+                      <label className="block text-callout text-text-secondary mb-1.5">
                         Step name
                       </label>
                       <input
@@ -1708,7 +1708,7 @@ export default function AddDocumentModal({
                           ))
                         }}
                         placeholder={`e.g., Self-Assessment, Manager Review`}
-                        className="w-full h-9 px-3 rounded-element border border-border bg-white text-sm text-text-primary placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                        className="w-full h-9 px-3 rounded-element border border-border bg-white text-body text-text-primary placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                       />
                     </div>
 
@@ -1731,7 +1731,7 @@ export default function AddDocumentModal({
                             step.managerOnly ? 'right-0.5' : 'left-0.5'
                           }`} />
                         </button>
-                        <span className="text-xs font-medium text-text-primary">Managers only</span>
+                        <span className="text-caption font-medium text-text-primary">Managers only</span>
                       </div>
 
                       <div className="w-px h-5 bg-border-light" />
@@ -1753,16 +1753,16 @@ export default function AddDocumentModal({
                             step.saveToProfile ? 'right-0.5' : 'left-0.5'
                           }`} />
                         </button>
-                        <span className="text-xs font-medium text-text-primary">Save to assignee's profile</span>
+                        <span className="text-caption font-medium text-text-primary">Save to assignee's profile</span>
                       </div>
                     </div>
 
                     {/* Questions for this step */}
                     <div>
-                      <label className="block text-sm font-semibold text-text-primary mb-2">
+                      <label className="block text-headline text-text-primary mb-2">
                         Questions for {step.label || `Step ${stepIdx + 1}`}
                       </label>
-                      <p className="text-xs text-text-secondary mb-3">
+                      <p className="text-caption text-text-secondary mb-3">
                         {step.managerOnly
                           ? 'Only managers can fill out these questions.'
                           : 'The assignee for this step will fill out these questions.'}
@@ -1781,7 +1781,7 @@ export default function AddDocumentModal({
                     {step.fields.length === 0 && (
                       <div className="flex items-start gap-2.5 p-3 bg-amber-50 border border-amber-200 rounded-element">
                         <Info className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />
-                        <p className="text-xs text-amber-800">
+                        <p className="text-caption text-amber-800">
                           Add at least one question for this step.
                         </p>
                       </div>
@@ -1794,15 +1794,15 @@ export default function AddDocumentModal({
             {/* Workflow summary */}
             {formWorkflowSteps.length > 1 && (
               <div className="p-4 bg-gray-50 border border-border-light rounded-element">
-                <p className="text-xs font-semibold text-text-secondary uppercase tracking-wider mb-3">Workflow Summary</p>
+                <p className="text-callout text-text-secondary uppercase tracking-wider mb-3">Workflow Summary</p>
                 <div className="space-y-2">
                   {formWorkflowSteps.map((step, idx) => (
                     <div key={step.id} className="flex items-center gap-3">
                       <div className="flex items-center gap-2 flex-1">
-                        <span className="w-6 h-6 rounded-full bg-primary-100 text-primary-700 text-xs font-bold flex items-center justify-center flex-shrink-0">
+                        <span className="w-6 h-6 rounded-full bg-primary-100 text-primary-700 text-caption font-bold flex items-center justify-center flex-shrink-0">
                           {idx + 1}
                         </span>
-                        <span className="text-sm font-medium text-text-primary">{step.label || `Step ${idx + 1}`}</span>
+                        <span className="text-body font-medium text-text-primary">{step.label || `Step ${idx + 1}`}</span>
                         {step.managerOnly && (
                           <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-purple-100 text-purple-700 font-semibold">
                             Managers only
@@ -1814,7 +1814,7 @@ export default function AddDocumentModal({
                           </span>
                         )}
                       </div>
-                      <span className="text-xs text-text-secondary">{step.fields.length} question{step.fields.length !== 1 ? 's' : ''}</span>
+                      <span className="text-caption text-text-secondary">{step.fields.length} question{step.fields.length !== 1 ? 's' : ''}</span>
                       {idx < formWorkflowSteps.length - 1 && (
                         <ArrowRight className="w-3 h-3 text-gray-400 flex-shrink-0" />
                       )}
@@ -1852,7 +1852,7 @@ export default function AddDocumentModal({
         <div className="w-64 flex-shrink-0 border-r border-border-light flex flex-col bg-gray-50 overflow-y-auto ml-6 rounded-l-lg">
           {/* Signer selector */}
           <div className="p-4 border-b border-border-light">
-            <label className="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2">
+            <label className="block text-callout text-text-secondary uppercase tracking-wider mb-2">
               Adding fields for
             </label>
             <div className="space-y-1.5">
@@ -1881,10 +1881,10 @@ export default function AddDocumentModal({
                       <Icon className="w-3.5 h-3.5" />
                     </div>
                     <div className="text-left flex-1 min-w-0">
-                      <p className="text-sm font-medium text-text-primary">{signer.label}</p>
+                      <p className="text-body font-medium text-text-primary">{signer.label}</p>
                     </div>
                     {count > 0 && (
-                      <span className="text-xs text-text-secondary bg-gray-200 px-1.5 py-0.5 rounded">
+                      <span className="text-caption text-text-secondary bg-gray-200 px-1.5 py-0.5 rounded">
                         {count}
                       </span>
                     )}
@@ -1896,7 +1896,7 @@ export default function AddDocumentModal({
 
           {/* Signature fields */}
           <div className="p-4 border-b border-border-light">
-            <label className="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2">
+            <label className="block text-callout text-text-secondary uppercase tracking-wider mb-2">
               Signature fields
             </label>
             <div className="space-y-1.5">
@@ -1918,7 +1918,7 @@ export default function AddDocumentModal({
                       >
                         <Icon className="w-3.5 h-3.5" />
                       </div>
-                      <span className="text-sm font-medium text-text-primary">{option.label}</span>
+                      <span className="text-body font-medium text-text-primary">{option.label}</span>
                     </button>
                   )
                 }
@@ -1928,7 +1928,7 @@ export default function AddDocumentModal({
 
           {/* Auto-fill fields */}
           <div className="p-4 border-b border-border-light">
-            <label className="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2">
+            <label className="block text-callout text-text-secondary uppercase tracking-wider mb-2">
               Auto-fill fields
             </label>
             <div className="space-y-1.5">
@@ -1951,7 +1951,7 @@ export default function AddDocumentModal({
                     >
                       <Icon className="w-3.5 h-3.5" />
                     </div>
-                    <span className="text-sm font-medium text-text-primary">{option.label}</span>
+                    <span className="text-body font-medium text-text-primary">{option.label}</span>
                   </button>
                 )
               })}
@@ -1961,7 +1961,7 @@ export default function AddDocumentModal({
           {/* Added fields list */}
           {mappedFields.length > 0 && (
             <div className="p-4 flex-1 overflow-auto">
-              <label className="block text-xs font-semibold text-text-secondary uppercase tracking-wider mb-2">
+              <label className="block text-callout text-text-secondary uppercase tracking-wider mb-2">
                 Placed fields ({mappedFields.length})
               </label>
               <div className="space-y-1.5">
@@ -1983,11 +1983,11 @@ export default function AddDocumentModal({
                         >
                           <FieldIcon className="w-3 h-3" />
                         </div>
-                        <span className="text-xs font-medium text-text-primary">{field.label}</span>
+                        <span className="text-caption font-medium text-text-primary">{field.label}</span>
                       </div>
                       <button
                         onClick={() => handleRemoveMappedField(field.id)}
-                        className="w-5 h-5 flex items-center justify-center rounded hover:bg-gray-100 transition-colors"
+                        className="w-5 h-5 flex items-center justify-center rounded hover:bg-gray-50 transition-colors"
                       >
                         <Trash2 className="w-3 h-3 text-gray-400" />
                       </button>
@@ -2012,7 +2012,7 @@ export default function AddDocumentModal({
                 <div className="space-y-5">
                   <div className="text-center border-b border-gray-200 pb-5">
                     <h1 className="text-xl font-bold text-gray-800">{documentName}</h1>
-                    <p className="text-xs text-gray-400 mt-1">{uploadedFile?.name}</p>
+                    <p className="text-caption text-gray-400 mt-1">{uploadedFile?.name}</p>
                   </div>
                   <div className="space-y-2.5">
                     <div className="h-3.5 bg-gray-100 rounded w-full" />
@@ -2033,7 +2033,7 @@ export default function AddDocumentModal({
                   </div>
                   {/* Signature area hint */}
                   <div className="pt-10 mt-10 border-t border-dashed border-gray-300">
-                    <p className="text-xs text-gray-400 text-center mb-6">
+                    <p className="text-caption text-gray-400 text-center mb-6">
                       Click on the document to place fields, or add them from the sidebar
                     </p>
                     <div className="flex justify-between">
@@ -2066,7 +2066,7 @@ export default function AddDocumentModal({
                     style={{ left: field.x, top: field.y }}
                   >
                     <div
-                      className={`flex items-center gap-1 px-2 py-1 rounded border-2 shadow-sm text-xs font-medium ${
+                      className={`flex items-center gap-1 px-2 py-1 rounded border-2 shadow-sm text-caption font-medium ${
                         field.signer === 'team-member'
                           ? 'bg-blue-50 border-blue-400 text-blue-700'
                           : 'bg-purple-50 border-purple-400 text-purple-700'
@@ -2105,20 +2105,20 @@ export default function AddDocumentModal({
       <div className="space-y-6">
         {/* Summary Card */}
         <div className="bg-gray-50 rounded-container border border-border-light p-5">
-          <h3 className="text-sm font-semibold text-text-primary mb-3">Summary</h3>
+          <h3 className="text-headline text-text-primary mb-3">Summary</h3>
           <div className="space-y-2">
             {documentType === 'pdf-signing' && uploadedFile && (
-              <div className="flex justify-between text-sm">
+              <div className="flex justify-between text-body">
                 <span className="text-text-secondary">File</span>
                 <span className="text-text-primary font-medium">{uploadedFile.name}</span>
               </div>
             )}
-            <div className="flex justify-between text-sm">
+            <div className="flex justify-between text-body">
               <span className="text-text-secondary">Template name</span>
               <span className="text-text-primary font-medium">{documentName}</span>
             </div>
             {docType && (
-              <div className="flex justify-between text-sm">
+              <div className="flex justify-between text-body">
                 <span className="text-text-secondary">Category</span>
                 <span className="text-text-primary font-medium">
                   {CATEGORY_OPTIONS[documentType]?.find((o) => o.id === docType)?.label || docType}
@@ -2126,7 +2126,7 @@ export default function AddDocumentModal({
               </div>
             )}
             {description && (
-              <div className="flex justify-between text-sm">
+              <div className="flex justify-between text-body">
                 <span className="text-text-secondary">Description</span>
                 <span className="text-text-primary font-medium truncate max-w-[60%] text-right">
                   {description}
@@ -2137,7 +2137,7 @@ export default function AddDocumentModal({
             {/* PDF-specific summary */}
             {documentType === 'pdf-signing' && (
               <>
-                <div className="flex justify-between text-sm">
+                <div className="flex justify-between text-body">
                   <span className="text-text-secondary">Signing order</span>
                   <span className="text-text-primary font-medium">
                     {signerEntries
@@ -2149,11 +2149,11 @@ export default function AddDocumentModal({
                       .join(' → ')}
                   </span>
                 </div>
-                <div className="flex justify-between text-sm">
+                <div className="flex justify-between text-body">
                   <span className="text-text-secondary">Total signers</span>
                   <span className="text-text-primary font-medium">{signerEntries.length}</span>
                 </div>
-                <div className="flex justify-between text-sm">
+                <div className="flex justify-between text-body">
                   <span className="text-text-secondary">Mapped fields</span>
                   <span className="text-text-primary font-medium">{mappedFields.length}</span>
                 </div>
@@ -2163,27 +2163,27 @@ export default function AddDocumentModal({
             {/* Write-up-specific summary */}
             {documentType === 'write-up' && (
               <>
-                <div className="flex justify-between text-sm">
+                <div className="flex justify-between text-body">
                   <span className="text-text-secondary">Manager questions</span>
                   <span className="text-text-primary font-medium">{managerFields.length}</span>
                 </div>
-                <div className="flex justify-between text-sm">
+                <div className="flex justify-between text-body">
                   <span className="text-text-secondary">Worker questions</span>
                   <span className="text-text-primary font-medium">{workerFields.length}</span>
                 </div>
                 {allowManagerRefuse && (
                   <>
-                    <div className="flex justify-between text-sm">
+                    <div className="flex justify-between text-body">
                       <span className="text-text-secondary">Refuse to sign after</span>
                       <span className="text-text-primary font-medium">{refuseAfterDays} days</span>
                     </div>
-                    <div className="flex justify-between text-sm">
+                    <div className="flex justify-between text-body">
                       <span className="text-text-secondary">Auto-refuse</span>
                       <span className="text-text-primary font-medium">{autoRefuse ? 'Enabled' : 'Manual'}</span>
                     </div>
                   </>
                 )}
-                <div className="flex justify-between text-sm">
+                <div className="flex justify-between text-body">
                   <span className="text-text-secondary">Notify on assignment</span>
                   <span className="text-text-primary font-medium">
                     {notifyOnAssignment.length === 0
@@ -2204,19 +2204,19 @@ export default function AddDocumentModal({
             {/* Certification-specific summary */}
             {documentType === 'collect-uploads' && (
               <>
-                <div className="flex justify-between text-sm">
+                <div className="flex justify-between text-body">
                   <span className="text-text-secondary">Expiration tracking</span>
                   <span className="text-text-primary font-medium">
                     {expirationRequired ? 'Enabled' : 'Disabled'}
                   </span>
                 </div>
                 {expirationRequired && (
-                  <div className="flex justify-between text-sm">
+                  <div className="flex justify-between text-body">
                     <span className="text-text-secondary">Expiration capture</span>
                     <span className="text-text-primary font-medium">Via OCR + manual fallback</span>
                   </div>
                 )}
-                <div className="flex justify-between text-sm">
+                <div className="flex justify-between text-body">
                   <span className="text-text-secondary">Manager verification</span>
                   <span className="text-text-primary font-medium">
                     {requireVerification ? 'Required' : 'Not required'}
@@ -2228,21 +2228,21 @@ export default function AddDocumentModal({
             {/* Custom form summary */}
             {documentType === 'custom-form' && (
               <>
-                <div className="flex justify-between text-sm">
+                <div className="flex justify-between text-body">
                   <span className="text-text-secondary">Form type</span>
                   <span className="text-text-primary font-medium">
                     {customFormMode === 'pdf-upload' ? 'PDF for signing' : 'Digital form'}
                   </span>
                 </div>
                 {customFormMode === 'pdf-upload' && uploadedFile && (
-                  <div className="flex justify-between text-sm">
+                  <div className="flex justify-between text-body">
                     <span className="text-text-secondary">File</span>
                     <span className="text-text-primary font-medium">{uploadedFile.name}</span>
                   </div>
                 )}
                 {customFormMode === 'pdf-upload' && (
                   <>
-                    <div className="flex justify-between text-sm">
+                    <div className="flex justify-between text-body">
                       <span className="text-text-secondary">Signing order</span>
                       <span className="text-text-primary font-medium">
                         {signerEntries
@@ -2254,7 +2254,7 @@ export default function AddDocumentModal({
                           .join(' → ')}
                       </span>
                     </div>
-                    <div className="flex justify-between text-sm">
+                    <div className="flex justify-between text-body">
                       <span className="text-text-secondary">Total signers</span>
                       <span className="text-text-primary font-medium">{signerEntries.length}</span>
                     </div>
@@ -2262,20 +2262,20 @@ export default function AddDocumentModal({
                 )}
                 {customFormMode === 'digital-form' && (
                   <>
-                    <div className="flex justify-between text-sm">
+                    <div className="flex justify-between text-body">
                       <span className="text-text-secondary">Workflow steps</span>
                       <span className="text-text-primary font-medium">{formWorkflowSteps.length}</span>
                     </div>
-                    <div className="flex justify-between text-sm">
+                    <div className="flex justify-between text-body">
                       <span className="text-text-secondary">Total questions</span>
                       <span className="text-text-primary font-medium">{formWorkflowSteps.reduce((sum, s) => sum + s.fields.length, 0)}</span>
                     </div>
                     {formWorkflowSteps.length > 0 && (
                       <div className="pt-2 mt-2 border-t border-border-light">
-                        <p className="text-xs font-semibold text-text-secondary mb-2">Workflow</p>
+                        <p className="text-callout text-text-secondary mb-2">Workflow</p>
                         <div className="space-y-1.5">
                           {formWorkflowSteps.map((step, idx) => (
-                            <div key={step.id} className="flex items-center gap-2 text-xs">
+                            <div key={step.id} className="flex items-center gap-2 text-caption">
                               <span className="w-5 h-5 rounded-full bg-primary-100 text-primary-700 font-bold flex items-center justify-center flex-shrink-0">{idx + 1}</span>
                               <span className="text-text-primary font-medium">{step.label}</span>
                               <span className="text-text-secondary">({step.fields.length} Q)</span>
@@ -2305,8 +2305,8 @@ export default function AddDocumentModal({
                 <Users className="w-4 h-4 text-purple-600" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-text-primary">Permissions</p>
-                <p className="text-xs text-text-secondary">
+                <p className="text-headline text-text-primary">Permissions</p>
+                <p className="text-caption text-text-secondary">
                   {selectedLocations.length === 0 && selectedRoles.length === 0
                     ? 'All locations and roles can use this template'
                     : `${selectedLocations.length} location(s), ${selectedRoles.length} role(s) selected`}
@@ -2323,7 +2323,7 @@ export default function AddDocumentModal({
           {permissionsExpanded && (
             <div className="border-t border-border-light p-4 space-y-4">
               <div>
-                <label className="flex items-center gap-2 text-sm font-medium text-text-primary mb-2">
+                <label className="flex items-center gap-2 text-body font-medium text-text-primary mb-2">
                   <MapPin className="w-4 h-4 text-gray-500" />
                   Locations
                 </label>
@@ -2335,13 +2335,13 @@ export default function AddDocumentModal({
                   allLabel="All"
                 />
                 {selectedLocations.length === 0 && (
-                  <p className="text-xs text-text-secondary mt-1.5">
+                  <p className="text-caption text-text-secondary mt-1.5">
                     No locations selected = available at all locations
                   </p>
                 )}
               </div>
               <div>
-                <label className="flex items-center gap-2 text-sm font-medium text-text-primary mb-2">
+                <label className="flex items-center gap-2 text-body font-medium text-text-primary mb-2">
                   <Users className="w-4 h-4 text-gray-500" />
                   Roles that can use this template
                 </label>
@@ -2353,7 +2353,7 @@ export default function AddDocumentModal({
                   allLabel="All"
                 />
                 {selectedRoles.length === 0 && (
-                  <p className="text-xs text-text-secondary mt-1.5">
+                  <p className="text-caption text-text-secondary mt-1.5">
                     No roles selected = available to all managers
                   </p>
                 )}
@@ -2370,8 +2370,8 @@ export default function AddDocumentModal({
                 <Users className="w-4 h-4 text-blue-600" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-text-primary">Auto-assign rules</p>
-                <p className="text-xs text-text-secondary">
+                <p className="text-headline text-text-primary">Auto-assign rules</p>
+                <p className="text-caption text-text-secondary">
                   {autoAssignEnabled
                     ? `Enabled${autoAssignJobTitles.length > 0 ? ` · ${autoAssignJobTitles.length} job title(s)` : ' · all job titles'}`
                     : 'Manually assign when needed'}
@@ -2380,7 +2380,7 @@ export default function AddDocumentModal({
             </div>
             <div className="space-y-4 pl-11">
               <div className="flex items-center justify-between">
-                <label className="text-sm font-medium text-text-primary">
+                <label className="text-body font-medium text-text-primary">
                   Enable auto-assign
                 </label>
                 <button
@@ -2402,13 +2402,13 @@ export default function AddDocumentModal({
                   {/* How it works */}
                   <div className="flex items-start gap-3 p-3 bg-blue-50 border border-blue-200 rounded-element">
                     <Info className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
-                    <p className="text-xs text-blue-800">
+                    <p className="text-caption text-blue-800">
                       This document will be automatically assigned when a <strong>new employee is hired</strong> or an <strong>existing employee's job title changes</strong> to one of the selected job titles below.
                     </p>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-text-primary mb-2">
+                    <label className="block text-body font-medium text-text-primary mb-2">
                       For employees with job title
                     </label>
                     <MultiSelectDropdown
@@ -2419,7 +2419,7 @@ export default function AddDocumentModal({
                       allLabel="All"
                     />
                     {autoAssignJobTitles.length === 0 && (
-                      <p className="text-xs text-amber-600 mt-2 flex items-center gap-1">
+                      <p className="text-caption text-amber-600 mt-2 flex items-center gap-1">
                         <Info className="w-3 h-3" />
                         Select at least one job title, or leave empty to apply to all
                       </p>
@@ -2428,13 +2428,13 @@ export default function AddDocumentModal({
 
                   {/* Timing */}
                   <div className="p-4 bg-gray-50 border border-border-light rounded-element space-y-4">
-                    <p className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Timing</p>
+                    <p className="text-callout text-text-secondary uppercase tracking-wider">Timing</p>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-text-primary mb-1.5">
+                        <label className="block text-body font-medium text-text-primary mb-1.5">
                           Assign date
                         </label>
-                        <p className="text-xs text-text-secondary mb-2">
+                        <p className="text-caption text-text-secondary mb-2">
                           Delay before the document is sent to the employee
                         </p>
                         <div className="flex items-center gap-2">
@@ -2443,18 +2443,18 @@ export default function AddDocumentModal({
                             min={0}
                             value={autoAssignDelayDays}
                             onChange={(e) => setAutoAssignDelayDays(Math.max(0, parseInt(e.target.value) || 0))}
-                            className="w-20 h-9 px-3 rounded-element border border-border bg-white text-sm text-text-primary text-center focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                            className="w-20 h-9 px-3 rounded-element border border-border bg-white text-body text-text-primary text-center focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                           />
-                          <span className="text-sm text-text-secondary">
+                          <span className="text-body text-text-secondary">
                             day{autoAssignDelayDays !== 1 ? 's' : ''} after trigger
                           </span>
                         </div>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-text-primary mb-1.5">
+                        <label className="block text-body font-medium text-text-primary mb-1.5">
                           Due date
                         </label>
-                        <p className="text-xs text-text-secondary mb-2">
+                        <p className="text-caption text-text-secondary mb-2">
                           Deadline for the employee to complete the document
                         </p>
                         <div className="flex items-center gap-2">
@@ -2463,16 +2463,16 @@ export default function AddDocumentModal({
                             min={1}
                             value={autoAssignDueDays}
                             onChange={(e) => setAutoAssignDueDays(Math.max(1, parseInt(e.target.value) || 1))}
-                            className="w-20 h-9 px-3 rounded-element border border-border bg-white text-sm text-text-primary text-center focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                            className="w-20 h-9 px-3 rounded-element border border-border bg-white text-body text-text-primary text-center focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                           />
-                          <span className="text-sm text-text-secondary">
+                          <span className="text-body text-text-secondary">
                             day{autoAssignDueDays !== 1 ? 's' : ''} after trigger
                           </span>
                         </div>
                       </div>
                     </div>
                     {autoAssignDelayDays >= autoAssignDueDays && (
-                      <div className="flex items-center gap-2 text-xs text-amber-600">
+                      <div className="flex items-center gap-2 text-caption text-amber-600">
                         <Info className="w-3 h-3 flex-shrink-0" />
                         The due date should be after the assign date. The document would be sent on day {autoAssignDelayDays} but due on day {autoAssignDueDays}.
                       </div>
@@ -2481,7 +2481,7 @@ export default function AddDocumentModal({
 
                   {/* Rule preview */}
                   <div className="p-3 bg-blue-50 border border-blue-200 rounded-element">
-                    <p className="text-xs text-blue-800">
+                    <p className="text-caption text-blue-800">
                       <strong>Rule preview:</strong> When a new employee is hired or an existing employee acquires a job title
                       {autoAssignJobTitles.length > 0
                         ? ` matching ${autoAssignJobTitles.join(', ')}`
@@ -2506,7 +2506,7 @@ export default function AddDocumentModal({
   const renderDuplicateStep = () => (
     <div className="space-y-6">
       <div>
-        <label className="block text-sm font-semibold text-text-primary mb-2">
+        <label className="block text-headline text-text-primary mb-2">
           Select document to duplicate
         </label>
         <Dropdown
@@ -2523,7 +2523,7 @@ export default function AddDocumentModal({
         />
       </div>
       <div>
-        <label className="block text-sm font-semibold text-text-primary mb-2">
+        <label className="block text-headline text-text-primary mb-2">
           New document name
         </label>
         <input
@@ -2531,11 +2531,11 @@ export default function AddDocumentModal({
           value={documentName}
           onChange={(e) => setDocumentName(e.target.value)}
           placeholder="Enter new document name"
-          className="w-full h-10 px-3 rounded-element border border-border bg-white text-sm text-text-primary placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          className="w-full h-10 px-3 rounded-element border border-border bg-white text-body text-text-primary placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
         />
       </div>
       <div className="bg-blue-50 border border-blue-200 rounded-element p-4">
-        <p className="text-sm text-blue-800">
+        <p className="text-body text-blue-800">
           This will create a copy of the selected document with all its settings. You can modify it
           after creation.
         </p>
@@ -2555,12 +2555,12 @@ export default function AddDocumentModal({
       <div className="flex items-center justify-between w-full">
         <div>
           {isFirstStep ? (
-            <Button variant="ghost" onClick={handleClose}>
+            <Button variant="clear" onClick={handleClose}>
               Cancel
             </Button>
           ) : (
             <Button
-              variant="ghost"
+              variant="clear"
               leftIcon={<ArrowLeft className="w-4 h-4" />}
               onClick={handleBack}
             >
@@ -2571,7 +2571,7 @@ export default function AddDocumentModal({
         <div className="flex items-center gap-3">
           {documentType === 'write-up' && isLastStep && (
             <Button
-              variant="outline"
+              variant="plain-gray"
               onClick={handleSaveAsDraft}
               disabled={!documentName || !docType}
             >
@@ -2635,7 +2635,7 @@ export default function AddDocumentModal({
                     <div className="flex items-center gap-2 flex-1 min-w-0">
                       <div
                         className={`
-                          w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-semibold transition-all
+                          w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 text-callout transition-all
                           ${
                             isCompleted
                               ? 'bg-green-500 text-white'
@@ -2648,7 +2648,7 @@ export default function AddDocumentModal({
                         {isCompleted ? <Check className="w-3.5 h-3.5" /> : index + 1}
                       </div>
                       <span
-                        className={`text-xs font-medium truncate ${
+                        className={`text-caption font-medium truncate ${
                           isActive
                             ? 'text-text-primary'
                             : isCompleted

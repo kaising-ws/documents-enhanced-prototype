@@ -103,7 +103,7 @@ export default function CertificationVerifyModal({
             >
               <ZoomOut className="w-4 h-4 text-white" />
             </button>
-            <span className="text-xs text-white font-medium px-2">{zoom}%</span>
+            <span className="text-caption text-white font-medium px-2">{zoom}%</span>
             <button
               onClick={() => setZoom(Math.min(200, zoom + 25))}
               className="p-2 rounded bg-white/10 hover:bg-white/20 transition-colors"
@@ -144,17 +144,17 @@ export default function CertificationVerifyModal({
           ) : (
             <div className="text-center text-gray-400">
               <FileText className="w-16 h-16 mx-auto mb-2" />
-              <p className="text-sm">No document preview available</p>
+              <p className="text-body">No document preview available</p>
             </div>
           )}
         </div>
 
         {/* Document Name */}
         <div className="p-3 bg-gray-800 border-t border-gray-700">
-          <p className="text-sm text-white font-medium">
+          <p className="text-body text-white font-medium">
             {certification.documentName || 'Uploaded document'}
           </p>
-          <p className="text-xs text-gray-400">
+          <p className="text-caption text-gray-400">
             Uploaded {certification.uploadedAt ? formatDate(certification.uploadedAt) : 'Unknown'}
           </p>
         </div>
@@ -168,16 +168,16 @@ export default function CertificationVerifyModal({
           </span>
         </div>
         <div className="flex-1">
-          <p className="text-sm font-medium text-text-primary">{certification.employeeName}</p>
-          <p className="text-xs text-text-secondary">{certification.employeeRole} · {certification.employeeLocation}</p>
+          <p className="text-body font-medium text-text-primary">{certification.employeeName}</p>
+          <p className="text-caption text-text-secondary">{certification.employeeRole} · {certification.employeeLocation}</p>
         </div>
       </div>
 
       {/* Certification Details */}
       <div className="grid grid-cols-2 gap-4">
         <div className="p-4 bg-white border border-border-light rounded-element">
-          <p className="text-xs text-text-secondary uppercase tracking-wider">Certification</p>
-          <p className="text-sm font-medium text-text-primary mt-1">{certification.templateName}</p>
+          <p className="text-caption text-text-secondary uppercase tracking-wider">Certification</p>
+          <p className="text-body font-medium text-text-primary mt-1">{certification.templateName}</p>
         </div>
         
         <div className={`p-4 rounded-element ${
@@ -185,12 +185,12 @@ export default function CertificationVerifyModal({
             ? 'bg-orange-50 border border-orange-200' 
             : 'bg-white border border-border-light'
         }`}>
-          <p className="text-xs text-text-secondary uppercase tracking-wider">Expiration Date</p>
-          <p className="text-sm font-medium text-text-primary mt-1">
+          <p className="text-caption text-text-secondary uppercase tracking-wider">Expiration Date</p>
+          <p className="text-body font-medium text-text-primary mt-1">
             {formatDate(certification.expirationDate)}
           </p>
           {daysUntilExpiry !== null && (
-            <p className={`text-xs mt-0.5 ${
+            <p className={`text-caption mt-0.5 ${
               daysUntilExpiry < 30 ? 'text-orange-600' : 'text-green-600'
             }`}>
               {daysUntilExpiry > 0 ? `${daysUntilExpiry} days remaining` : 'Expired'}
@@ -201,8 +201,8 @@ export default function CertificationVerifyModal({
 
       {certification.certificateNumber && (
         <div className="p-4 bg-white border border-border-light rounded-element">
-          <p className="text-xs text-text-secondary uppercase tracking-wider">Certificate Number</p>
-          <p className="text-sm font-mono font-medium text-text-primary mt-1">
+          <p className="text-caption text-text-secondary uppercase tracking-wider">Certificate Number</p>
+          <p className="text-body font-mono font-medium text-text-primary mt-1">
             {certification.certificateNumber}
           </p>
         </div>
@@ -210,7 +210,7 @@ export default function CertificationVerifyModal({
 
       {/* Verification Checklist */}
       <div className="border-t border-border-light pt-6">
-        <h4 className="text-sm font-semibold text-text-primary mb-4">Verification Checklist</h4>
+        <h4 className="text-body font-semibold text-text-primary mb-4">Verification Checklist</h4>
         
         <div className="space-y-3">
           <div 
@@ -227,8 +227,8 @@ export default function CertificationVerifyModal({
               {documentVerified && <CheckCircle2 className="w-3 h-3 text-white" />}
             </div>
             <div>
-              <p className="text-sm font-medium text-text-primary">Document is authentic and readable</p>
-              <p className="text-xs text-text-secondary">Certificate appears valid and all text is legible</p>
+              <p className="text-body font-medium text-text-primary">Document is authentic and readable</p>
+              <p className="text-caption text-text-secondary">Certificate appears valid and all text is legible</p>
             </div>
           </div>
 
@@ -246,8 +246,8 @@ export default function CertificationVerifyModal({
               {expirationVerified && <CheckCircle2 className="w-3 h-3 text-white" />}
             </div>
             <div>
-              <p className="text-sm font-medium text-text-primary">Expiration date is correct</p>
-              <p className="text-xs text-text-secondary">
+              <p className="text-body font-medium text-text-primary">Expiration date is correct</p>
+              <p className="text-caption text-text-secondary">
                 Date on document matches entered date: {formatDate(certification.expirationDate)}
               </p>
             </div>
@@ -263,26 +263,26 @@ export default function CertificationVerifyModal({
         <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
           <CheckCircle2 className="w-8 h-8 text-green-600" />
         </div>
-        <h3 className="text-lg font-bold text-text-primary">Approve Certification</h3>
-        <p className="text-sm text-text-secondary mt-1">
+        <h3 className="text-title-4 text-text-primary">Approve Certification</h3>
+        <p className="text-body text-text-secondary mt-1">
           You are about to approve {certification.employeeName}'s {certification.templateName}.
         </p>
       </div>
 
       <div>
-        <label className="block text-sm font-semibold text-text-primary mb-2">
+        <label className="block text-body font-semibold text-text-primary mb-2">
           Notes (optional)
         </label>
         <textarea
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
           placeholder="Add any notes about this verification..."
-          className="w-full h-24 px-3 py-2 rounded-element border border-border bg-white text-sm text-text-primary placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
+          className="w-full h-24 px-3 py-2 rounded-element border border-border bg-white text-body text-text-primary placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 resize-none"
         />
       </div>
 
       <div className="flex items-center gap-3">
-        <Button variant="outline" onClick={() => setAction(null)} className="flex-1">
+        <Button variant="plain-gray" onClick={() => setAction(null)} className="flex-1">
           Back
         </Button>
         <Button 
@@ -302,27 +302,27 @@ export default function CertificationVerifyModal({
         <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
           <XCircle className="w-8 h-8 text-red-600" />
         </div>
-        <h3 className="text-lg font-bold text-text-primary">Reject Certification</h3>
-        <p className="text-sm text-text-secondary mt-1">
+        <h3 className="text-title-4 text-text-primary">Reject Certification</h3>
+        <p className="text-body text-text-secondary mt-1">
           {certification.employeeName} will be notified and asked to re-upload.
         </p>
       </div>
 
       <div>
-        <label className="block text-sm font-semibold text-text-primary mb-2">
+        <label className="block text-body font-semibold text-text-primary mb-2">
           Reason for rejection <span className="text-red-500">*</span>
         </label>
         <textarea
           value={rejectReason}
           onChange={(e) => setRejectReason(e.target.value)}
           placeholder="Explain why this certification was rejected..."
-          className="w-full h-24 px-3 py-2 rounded-element border border-border bg-white text-sm text-text-primary placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
+          className="w-full h-24 px-3 py-2 rounded-element border border-border bg-white text-body text-text-primary placeholder:text-text-placeholder focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 resize-none"
         />
       </div>
 
       {/* Quick rejection reasons */}
       <div>
-        <p className="text-xs text-text-secondary mb-2">Quick reasons:</p>
+        <p className="text-caption text-text-secondary mb-2">Quick reasons:</p>
         <div className="flex flex-wrap gap-2">
           {[
             'Document not readable',
@@ -334,10 +334,10 @@ export default function CertificationVerifyModal({
             <button
               key={reason}
               onClick={() => setRejectReason(reason)}
-              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+              className={`px-3 py-1.5 rounded-full text-caption font-medium transition-colors ${
                 rejectReason === reason
                   ? 'bg-red-500 text-white'
-                  : 'bg-gray-100 text-text-primary hover:bg-gray-200'
+                  : 'bg-gray-100 text-text-primary hover:bg-gray-50'
               }`}
             >
               {reason}
@@ -347,13 +347,13 @@ export default function CertificationVerifyModal({
       </div>
 
       <div className="flex items-center gap-3">
-        <Button variant="outline" onClick={() => setAction(null)} className="flex-1">
+        <Button variant="plain-gray" onClick={() => setAction(null)} className="flex-1">
           Back
         </Button>
         <Button 
           onClick={handleReject}
           disabled={!rejectReason}
-          variant="outline"
+          variant="plain-gray"
           className="flex-1 border-red-500 text-red-600 hover:bg-red-50"
         >
           Reject
@@ -371,12 +371,12 @@ export default function CertificationVerifyModal({
       footer={
         !action ? (
           <div className="flex items-center justify-between w-full">
-            <Button variant="ghost" onClick={handleClose}>
+            <Button variant="clear" onClick={handleClose}>
               Cancel
             </Button>
             <div className="flex items-center gap-3">
               <Button 
-                variant="outline"
+                variant="plain-gray"
                 onClick={() => setAction('reject')}
                 className="border-red-300 text-red-600 hover:bg-red-50"
               >
