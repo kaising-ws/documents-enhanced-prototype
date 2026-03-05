@@ -348,49 +348,16 @@ export default function DocumentDetailPage({ document, documentCategory, onBack,
 
       {/* Status Tab */}
       {activeTab === 'status' && (
-        <div className="space-y-8">
-          {/* Needs Attention Table */}
-          {attention.length > 0 && (
-            <div>
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center">
-                  <AlertTriangle className="w-4 h-4 text-amber-600" />
-                </div>
-                <div>
-                  <h2 className="text-base font-semibold text-text-primary">
-                    Needs Attention
-                  </h2>
-                  <p className="text-sm text-text-secondary">
-                    {attention.length} team member{attention.length !== 1 ? 's' : ''} require action
-                  </p>
-                </div>
-              </div>
-              <NeedsAttentionTable recipients={attention} documentCategory={documentCategory} onViewAssigneeTask={onViewAssigneeTask} documentName={document.name} />
-            </div>
-          )}
-
-          {/* Completed Table */}
-          {trueCompleted.length > 0 && (
-            <div>
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
-                  <CheckCircle2 className="w-4 h-4 text-green-600" />
-                </div>
-                <div>
-                  <h2 className="text-base font-semibold text-text-primary">
-                    Completed
-                  </h2>
-                  <p className="text-sm text-text-secondary">
-                    {trueCompleted.length} team member{trueCompleted.length !== 1 ? 's' : ''}
-                  </p>
-                </div>
-              </div>
-              <CompletedTable recipients={trueCompleted} documentCategory={documentCategory} onViewAssigneeTask={onViewAssigneeTask} documentName={document.name} />
-            </div>
-          )}
-
-          {/* Empty state */}
-          {filteredRecipients.length === 0 && (
+        <div>
+          {filteredRecipients.length > 0 ? (
+            <StatusTable
+              attentionRecipients={attention}
+              completedRecipients={trueCompleted}
+              documentCategory={documentCategory}
+              onViewAssigneeTask={onViewAssigneeTask}
+              documentName={document.name}
+            />
+          ) : (
             <div className="bg-white rounded-container border border-border-light p-12 text-center">
               <p className="text-sm text-text-secondary">No team members found</p>
             </div>
@@ -676,157 +643,20 @@ export default function DocumentDetailPage({ document, documentCategory, onBack,
 }
 
 // Completed Table Component
-function CompletedTable({ recipients, documentCategory, onViewAssigneeTask, documentName }: { recipients: DocumentRecipient[]; documentCategory?: TemplateCategory; onViewAssigneeTask?: (recipient: DocumentRecipient) => void; documentName: string }) {
-  const [selected, setSelected] = useState<string[]>([])
-  const [sharingRecipient, setSharingRecipient] = useState<DocumentRecipient | null>(null)
-  const { addToast } = useToast()
-  const hasRefused = recipients.some((r) => r.status === 'refused')
-
-  const toggleRow = (id: string) =>
-    setSelected((prev) => (prev.includes(id) ? prev.filter((r) => r !== id) : [...prev, id]))
-  const toggleAll = () =>
-    setSelected((prev) => (prev.length === recipients.length ? [] : recipients.map((r) => r.id)))
-
-  const getMenuItems = (recipient: DocumentRecipient): ContextMenuItem[] => [
-    {
-      id: 'view-assignee-task',
-      label: 'View assignee task',
-      icon: <ClipboardList className="w-4 h-4" />,
-      onClick: () => onViewAssigneeTask?.(recipient),
-    },
-    {
-      id: 'share-link',
-      label: 'Share document link',
-      icon: <Link2 className="w-4 h-4" />,
-      onClick: () => setSharingRecipient(recipient),
-    },
-    {
-      id: 'view',
-      label: 'View Document',
-      icon: <Eye className="w-4 h-4" />,
-      onClick: () => addToast(`Viewing document for ${recipient.name}`, 'info'),
-    },
-    {
-      id: 'download',
-      label: 'Export PDF',
-      icon: <Download className="w-4 h-4" />,
-      onClick: () => addToast(`Exporting PDF for ${recipient.name}`, 'info'),
-    },
-  ]
-
-  return (
-    <div className="relative">
-      {/* Share document link modal */}
-      {sharingRecipient && (
-        <ShareDocumentLinkModal
-          recipient={sharingRecipient}
-          documentName={documentName}
-          onClose={() => setSharingRecipient(null)}
-        />
-      )}
-      {selected.length > 0 && (
-        <div className="sticky top-0 z-10 bg-primary-500 text-white rounded-container px-4 py-3 mb-3 flex items-center justify-between shadow-lg">
-          <span className="text-sm font-medium">{selected.length} selected</span>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-white hover:bg-white/20"
-              onClick={() => {
-                addToast(`Exporting ${selected.length} PDF(s)`, 'info')
-                setSelected([])
-              }}
-            >
-              Export PDF
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-white hover:bg-white/20"
-              onClick={() => setSelected([])}
-            >
-              Deselect
-            </Button>
-          </div>
-        </div>
-      )}
-      <div className="bg-white rounded-container border border-border-light overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="bg-gray-50 border-b border-border-light">
-                <th className="h-11 px-4 w-12">
-                  <Checkbox checked={selected.length === recipients.length && recipients.length > 0} onChange={toggleAll} />
-                </th>
-                <th className="h-11 px-5 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider">
-                  Name
-                </th>
-                <th className="h-11 px-5 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider w-[20%]">
-                  Location
-                </th>
-                {hasRefused && (
-                  <th className="h-11 px-5 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider w-[15%]">
-                    Status
-                  </th>
-                )}
-                <th className="h-11 px-5 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider w-[20%]">
-                  Date
-                </th>
-                <th className="h-11 px-3 w-12"></th>
-              </tr>
-            </thead>
-            <tbody>
-              {recipients.map((recipient) => {
-                const isRefused = recipient.status === 'refused'
-                return (
-                  <tr
-                    key={recipient.id}
-                    className={`border-b border-border-light last:border-b-0 ${
-                      selected.includes(recipient.id) ? 'bg-primary-50' : 'hover:bg-gray-50'
-                    }`}
-                  >
-                    <td className="h-12 px-4">
-                      <Checkbox checked={selected.includes(recipient.id)} onChange={() => toggleRow(recipient.id)} />
-                    </td>
-                    <td className="h-12 px-5">
-                      <div>
-                        <p className="text-sm text-text-primary">{recipient.name}</p>
-                        <p className="text-xs text-text-secondary">{recipient.role}</p>
-                      </div>
-                    </td>
-                    <td className="h-12 px-5">
-                      <span className="text-sm text-text-secondary">{recipient.location}</span>
-                    </td>
-                    {hasRefused && (
-                      <td className="h-12 px-5">
-                        {isRefused ? (
-                          <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium text-red-700 bg-red-50">
-                            Refused
-                          </span>
-                        ) : (
-                          <span className="text-xs text-text-secondary">Completed</span>
-                        )}
-                      </td>
-                    )}
-                    <td className="h-12 px-5">
-                      <span className="text-sm text-text-secondary">{recipient.completedDate}</span>
-                    </td>
-                    <td className="h-12 px-3">
-                      <ContextMenu items={getMenuItems(recipient)} />
-                    </td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-// Needs Attention Table Component
-function NeedsAttentionTable({ recipients, documentCategory, onViewAssigneeTask, documentName }: { recipients: DocumentRecipient[]; documentCategory?: TemplateCategory; onViewAssigneeTask?: (recipient: DocumentRecipient) => void; documentName: string }) {
+function StatusTable({
+  attentionRecipients,
+  completedRecipients,
+  documentCategory,
+  onViewAssigneeTask,
+  documentName,
+}: {
+  attentionRecipients: DocumentRecipient[]
+  completedRecipients: DocumentRecipient[]
+  documentCategory?: TemplateCategory
+  onViewAssigneeTask?: (recipient: DocumentRecipient) => void
+  documentName: string
+}) {
+  const allRecipients = [...attentionRecipients, ...completedRecipients]
   const [selected, setSelected] = useState<string[]>([])
   const [reviewingRecipient, setReviewingRecipient] = useState<DocumentRecipient | null>(null)
   const [sharingRecipient, setSharingRecipient] = useState<DocumentRecipient | null>(null)
@@ -838,9 +668,18 @@ function NeedsAttentionTable({ recipients, documentCategory, onViewAssigneeTask,
   const toggleRow = (id: string) =>
     setSelected((prev) => (prev.includes(id) ? prev.filter((r) => r !== id) : [...prev, id]))
   const toggleAll = () =>
-    setSelected((prev) => (prev.length === recipients.length ? [] : recipients.map((r) => r.id)))
+    setSelected((prev) => (prev.length === allRecipients.length ? [] : allRecipients.map((r) => r.id)))
+
+  const isTerminal = (r: DocumentRecipient) =>
+    (r.status === 'completed' || r.status === 'refused') && !r.expiryDate
 
   const getStatusDisplay = (recipient: DocumentRecipient) => {
+    if (recipient.status === 'completed') {
+      return { text: 'Completed', className: 'text-green-600 bg-green-50' }
+    }
+    if (recipient.status === 'refused') {
+      return { text: 'Refused', className: 'text-red-600 bg-red-50' }
+    }
     if (recipient.status === 'pending_verification') {
       return { text: 'Pending verification', className: 'text-purple-600 bg-purple-50' }
     }
@@ -863,6 +702,9 @@ function NeedsAttentionTable({ recipients, documentCategory, onViewAssigneeTask,
   }
 
   const getDateDisplay = (recipient: DocumentRecipient) => {
+    if (isTerminal(recipient)) {
+      return { label: recipient.status === 'refused' ? 'Refused' : 'Completed', value: recipient.completedDate || '-' }
+    }
     if (recipient.status === 'pending_verification') {
       return { label: 'Uploaded expiry', value: recipient.uploadedExpiryDate || '-' }
     }
@@ -882,7 +724,6 @@ function NeedsAttentionTable({ recipients, documentCategory, onViewAssigneeTask,
         onClick: () => setReviewingRecipient(recipient),
       })
     }
-    // "Mark as refused to sign" for write-ups with pending statuses
     if (documentCategory === 'write-up' && (recipient.status === 'pending' || recipient.status === 'assigned')) {
       items.push({
         id: 'mark-refused',
@@ -892,45 +733,121 @@ function NeedsAttentionTable({ recipients, documentCategory, onViewAssigneeTask,
         onClick: () => addToast(`${recipient.name} marked as "Refused to sign"`, 'warning'),
       })
     }
-    items.push(
-      {
-        id: 'view-assignee-task',
-        label: 'View assignee task',
-        icon: <ClipboardList className="w-4 h-4" />,
-        onClick: () => onViewAssigneeTask?.(recipient),
-      },
-      {
-        id: 'share-link',
-        label: 'Share document link',
-        icon: <Link2 className="w-4 h-4" />,
-        onClick: () => setSharingRecipient(recipient),
-      },
-      {
+    items.push({
+      id: 'view-assignee-task',
+      label: 'View assignee task',
+      icon: <ClipboardList className="w-4 h-4" />,
+      onClick: () => onViewAssigneeTask?.(recipient),
+    })
+    items.push({
+      id: 'share-link',
+      label: 'Share document link',
+      icon: <Link2 className="w-4 h-4" />,
+      onClick: () => setSharingRecipient(recipient),
+    })
+    if (!isTerminal(recipient)) {
+      items.push({
         id: 'resend',
         label: 'Resend',
         icon: <Send className="w-4 h-4" />,
         onClick: () => addToast(`Document resent to ${recipient.name}`, 'success'),
-      },
-      {
-        id: 'view',
-        label: 'View Document',
-        icon: <Eye className="w-4 h-4" />,
-        onClick: () => addToast(`Viewing document for ${recipient.name}`, 'info'),
-      },
-      {
+      })
+    }
+    items.push({
+      id: 'view',
+      label: 'View Document',
+      icon: <Eye className="w-4 h-4" />,
+      onClick: () => addToast(`Viewing document for ${recipient.name}`, 'info'),
+    })
+    if (isTerminal(recipient)) {
+      items.push({
+        id: 'download',
+        label: 'Export PDF',
+        icon: <Download className="w-4 h-4" />,
+        onClick: () => addToast(`Exporting PDF for ${recipient.name}`, 'info'),
+      })
+    } else {
+      items.push({
         id: 'cancel',
         label: 'Cancel Assignment',
         icon: <UserX className="w-4 h-4" />,
         variant: 'danger',
         onClick: () => setCancellingRecipient(recipient),
-      },
-    )
+      })
+    }
     return items
+  }
+
+  const renderRow = (recipient: DocumentRecipient) => {
+    const status = getStatusDisplay(recipient)
+    const date = getDateDisplay(recipient)
+    const isPendingVerification = recipient.status === 'pending_verification'
+    const terminal = isTerminal(recipient)
+
+    return (
+      <tr
+        key={recipient.id}
+        className={`border-b border-border-light last:border-b-0 ${
+          selected.includes(recipient.id) ? 'bg-primary-50' : isPendingVerification ? 'bg-purple-50/30' : 'hover:bg-gray-50'
+        }`}
+      >
+        <td className="h-14 px-4">
+          <Checkbox checked={selected.includes(recipient.id)} onChange={() => toggleRow(recipient.id)} />
+        </td>
+        <td className="h-14 px-5">
+          <div>
+            <p className="text-sm font-medium text-text-primary">{recipient.name}</p>
+            <p className="text-xs text-text-secondary">{recipient.role}</p>
+          </div>
+        </td>
+        <td className="h-14 px-5">
+          <span className="text-sm text-text-primary">{recipient.location}</span>
+        </td>
+        <td className="h-14 px-5">
+          <span
+            className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${status.className}`}
+          >
+            {status.text}
+          </span>
+        </td>
+        <td className="h-14 px-5">
+          <div>
+            <p className="text-sm text-text-primary">{date.value}</p>
+            <p className="text-xs text-text-secondary">{date.label}</p>
+          </div>
+        </td>
+        <td className="h-14 px-5">
+          <div className="flex items-center justify-end gap-2">
+            {isPendingVerification ? (
+              <Button
+                variant="outline"
+                size="sm"
+                leftIcon={<Eye className="w-3.5 h-3.5" />}
+                onClick={() => setReviewingRecipient(recipient)}
+                className="text-purple-600 border-purple-300 hover:bg-purple-50"
+              >
+                Review
+              </Button>
+            ) : !terminal ? (
+              <Button
+                variant="ghost"
+                size="sm"
+                leftIcon={<Bell className="w-3.5 h-3.5" />}
+                onClick={() => setSharingRecipient(recipient)}
+                className="text-amber-600 hover:bg-amber-50"
+              >
+                Remind
+              </Button>
+            ) : null}
+            <ContextMenu items={getMenuItems(recipient)} />
+          </div>
+        </td>
+      </tr>
+    )
   }
 
   return (
     <div className="relative">
-      {/* Verification review panel */}
       {reviewingRecipient && (
         <VerificationPanel
           recipient={reviewingRecipient}
@@ -946,7 +863,6 @@ function NeedsAttentionTable({ recipients, documentCategory, onViewAssigneeTask,
         />
       )}
 
-      {/* Share document link modal */}
       {sharingRecipient && (
         <ShareDocumentLinkModal
           recipient={sharingRecipient}
@@ -955,7 +871,6 @@ function NeedsAttentionTable({ recipients, documentCategory, onViewAssigneeTask,
         />
       )}
 
-      {/* Bulk send reminder modal */}
       {showBulkReminder && (
         <ShareDocumentLinkModal
           bulkCount={selected.length}
@@ -967,7 +882,6 @@ function NeedsAttentionTable({ recipients, documentCategory, onViewAssigneeTask,
         />
       )}
 
-      {/* Individual cancel confirmation */}
       {cancellingRecipient && (
         <CancelAssignmentModal
           recipientName={cancellingRecipient.name}
@@ -979,7 +893,6 @@ function NeedsAttentionTable({ recipients, documentCategory, onViewAssigneeTask,
         />
       )}
 
-      {/* Bulk cancel confirmation */}
       {showBulkCancel && (
         <CancelAssignmentModal
           bulkCount={selected.length}
@@ -1016,6 +929,17 @@ function NeedsAttentionTable({ recipients, documentCategory, onViewAssigneeTask,
               variant="ghost"
               size="sm"
               className="text-white hover:bg-white/20"
+              onClick={() => {
+                addToast(`Exporting ${selected.length} PDF(s)`, 'info')
+                setSelected([])
+              }}
+            >
+              Export PDF
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-white hover:bg-white/20"
               onClick={() => setSelected([])}
             >
               Deselect
@@ -1029,7 +953,7 @@ function NeedsAttentionTable({ recipients, documentCategory, onViewAssigneeTask,
             <thead>
               <tr className="bg-gray-50 border-b border-border-light">
                 <th className="h-11 px-4 w-12">
-                  <Checkbox checked={selected.length === recipients.length && recipients.length > 0} onChange={toggleAll} />
+                  <Checkbox checked={selected.length === allRecipients.length && allRecipients.length > 0} onChange={toggleAll} />
                 </th>
                 <th className="h-11 px-5 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider w-[25%]">
                   Name
@@ -1049,72 +973,20 @@ function NeedsAttentionTable({ recipients, documentCategory, onViewAssigneeTask,
               </tr>
             </thead>
             <tbody>
-              {recipients.map((recipient) => {
-                const status = getStatusDisplay(recipient)
-                const date = getDateDisplay(recipient)
-                const isPendingVerification = recipient.status === 'pending_verification'
-
-                return (
-                  <tr
-                    key={recipient.id}
-                    className={`border-b border-border-light last:border-b-0 ${
-                      selected.includes(recipient.id) ? 'bg-primary-50' : isPendingVerification ? 'bg-purple-50/30' : 'hover:bg-gray-50'
-                    }`}
-                  >
-                    <td className="h-14 px-4">
-                      <Checkbox checked={selected.includes(recipient.id)} onChange={() => toggleRow(recipient.id)} />
-                    </td>
-                    <td className="h-14 px-5">
-                      <div>
-                        <p className="text-sm font-medium text-text-primary">{recipient.name}</p>
-                        <p className="text-xs text-text-secondary">{recipient.role}</p>
-                      </div>
-                    </td>
-                    <td className="h-14 px-5">
-                      <span className="text-sm text-text-primary">{recipient.location}</span>
-                    </td>
-                    <td className="h-14 px-5">
-                      <span
-                        className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${status.className}`}
-                      >
-                        {status.text}
+              {attentionRecipients.map(renderRow)}
+              {attentionRecipients.length > 0 && completedRecipients.length > 0 && (
+                <tr>
+                  <td colSpan={6} className="h-9 px-5 bg-gray-50 border-b border-border-light">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />
+                      <span className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
+                        Completed ({completedRecipients.length})
                       </span>
-                    </td>
-                    <td className="h-14 px-5">
-                      <div>
-                        <p className="text-sm text-text-primary">{date.value}</p>
-                        <p className="text-xs text-text-secondary">{date.label}</p>
-                      </div>
-                    </td>
-                    <td className="h-14 px-5">
-                      <div className="flex items-center justify-end gap-2">
-                        {isPendingVerification ? (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            leftIcon={<Eye className="w-3.5 h-3.5" />}
-                            onClick={() => setReviewingRecipient(recipient)}
-                            className="text-purple-600 border-purple-300 hover:bg-purple-50"
-                          >
-                            Review
-                          </Button>
-                        ) : (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            leftIcon={<Bell className="w-3.5 h-3.5" />}
-                            onClick={() => setSharingRecipient(recipient)}
-                            className="text-amber-600 hover:bg-amber-50"
-                          >
-                            Remind
-                          </Button>
-                        )}
-                        <ContextMenu items={getMenuItems(recipient)} />
-                      </div>
-                    </td>
-                  </tr>
-                )
-              })}
+                    </div>
+                  </td>
+                </tr>
+              )}
+              {completedRecipients.map(renderRow)}
             </tbody>
           </table>
         </div>
