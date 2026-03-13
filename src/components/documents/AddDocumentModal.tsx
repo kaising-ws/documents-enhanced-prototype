@@ -2511,11 +2511,11 @@ export default function AddDocumentModal({
         </label>
         <Dropdown
           options={[
-            { id: '1', label: 'PIPL_consent_form.pdf' },
-            { id: '2', label: 'Contract.pdf' },
-            { id: '3', label: 'VFS_consent_form.pdf' },
-            { id: '4', label: 'Food_Safety_Certificate.pdf' },
-            { id: '5', label: 'Employee_Handbook_2024.pdf' },
+            { id: '1', label: 'PIPL Consent Form' },
+            { id: '2', label: 'Employment Contract' },
+            { id: '3', label: 'VFS Consent Form' },
+            { id: '4', label: 'Food Safety Certificate' },
+            { id: '5', label: 'Employee Handbook 2024' },
           ]}
           value={docType}
           onChange={setDocType}

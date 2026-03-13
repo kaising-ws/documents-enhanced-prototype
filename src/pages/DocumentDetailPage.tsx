@@ -174,16 +174,9 @@ export default function DocumentDetailPage({ document, documentCategory, onBack,
 
   const filteredRecipients = filterRecipients(document.recipients)
 
-  // Summary stats
-  const totalAssigned = document.recipients.length
-  const isTerminal = (r: DocumentRecipient) =>
-    (r.status === 'completed' || r.status === 'refused') && !r.expiryDate
-  const totalCompleted = document.recipients.filter(isTerminal).length
-  const totalNeedsAttention = document.recipients.filter((r) => !isTerminal(r)).length
-
   // Split for status tab
-  const trueCompleted = filteredRecipients.filter(isTerminal)
-  const attention = filteredRecipients.filter((r) => !isTerminal(r))
+  const trueCompleted = filteredRecipients.filter(isTerminalTop)
+  const attention = filteredRecipients.filter((r) => !isTerminalTop(r))
 
   return (
     <div className="p-10 max-w-[1200px] mx-auto">
