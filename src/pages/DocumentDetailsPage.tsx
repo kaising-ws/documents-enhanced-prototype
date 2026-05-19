@@ -945,17 +945,6 @@ function pickRowMenuItems(
   return items;
 }
 
-function DocPill({ status }: { status: 'active' | 'expiring' | 'expired' | null }) {
-  if (status === null) return <span className="text-ink-500">—</span>;
-  return (
-    <span
-      className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold ring-1 ring-inset ${DOC_STATUS_PILL_CLASSES[status]}`}
-    >
-      {DOC_STATUS_LABELS[status]}
-    </span>
-  );
-}
-
 function AssignmentPill({ row }: { row: RecipientRow }) {
   if (row.pending) {
     return (
