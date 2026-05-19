@@ -7,7 +7,7 @@ import { DocumentEditPage } from './pages/DocumentEditPage';
 
 function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
       <ToastProvider>
         <Routes>
           <Route element={<Layout />}>
