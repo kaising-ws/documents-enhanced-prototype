@@ -1,0 +1,62 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Plus Jakarta Sans", Helvetica, Arial, sans-serif;
+
+  /* ws-theme palette */
+  --color-brand-100: #ecf2ff;
+  --color-brand-200: #cddcff;
+  --color-brand-300: #9ab5ff;
+  --color-brand-400: #6a8eef;
+  --color-brand-500: #3c6cde;
+  --color-brand-600: #2c54b8;
+  --color-brand-700: #1f3e8c;
+  --color-brand-800: #14285a;
+
+  --color-ink-100: #f9fafb;
+  --color-ink-200: #f3f5f9;
+  --color-ink-300: #e4e4e7;
+  --color-ink-400: #c7cad1;
+  --color-ink-500: #9aa0ad;
+  --color-ink-600: #68728a;
+  --color-ink-700: #525a6e;
+  --color-ink-800: #464d5d;
+  --color-ink-900: #2f343f;
+  --color-ink-1000: #23272f;
+
+  --color-success-100: #eaf9f1;
+  --color-success-300: #b8e8cc;
+  --color-success-500: #2aad68;
+  --color-success-700: #176d3e;
+
+  --color-warning-100: #fef8ed;
+  --color-warning-300: #f6d9a3;
+  --color-warning-500: #d7a146;
+  --color-warning-700: #7b5c28;
+
+  --color-danger-100: #fdeced;
+  --color-danger-300: #f3b4b9;
+  --color-danger-500: #cf3847;
+  --color-danger-700: #7c1d26;
+
+  --radius-element: 8px;
+  --radius-container: 12px;
+
+  --shadow-e1: 0 1px 2px rgba(35, 39, 47, 0.06), 0 1px 3px rgba(35, 39, 47, 0.1);
+  --shadow-e2: 0 2px 2px rgba(35, 39, 47, 0.08), 0 4px 8px rgba(35, 39, 47, 0.12);
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--color-ink-1000);
+  background: var(--color-ink-100);
+  -webkit-font-smoothing: antialiased;
+}
